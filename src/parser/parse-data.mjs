@@ -21,7 +21,7 @@ export function parseData() {
             skipToken() // Skip i32.const
 
             if (!atEnd() && /^-?\d+$/.test(peekToken())) {
-                offset = parseInt(getToken(), 10);
+                offset = Number.parseInt(getToken(), 10);
             }
 
             // Skip closing paren of the offset expression
@@ -38,17 +38,17 @@ export function parseData() {
     }
 
     // Parse bytes strings (can be multiple string literals in one data segment)
-    let rawStrings = [];
+    const rawStrings = [];
     const processedBytes = [];
-    
+
     while (!atEnd() && peekToken().startsWith('"') && peekToken().endsWith('"')) {
         // Extract string content between quotes
         let rawString = peekToken();
         // Remove surrounding quotes
         rawString = rawString.substring(1, rawString.length - 1);
-        
+
         rawStrings.push(rawString);
-        
+
         // Process raw string to get the actual byte values
         for (let i = 0; i < rawString.length; i++) {
             if (rawString[i] === '\\') {
@@ -64,14 +64,14 @@ export function parseData() {
                             if ((c2 >= '0' && c2 <= '9') || (c2 >= 'a' && c2 <= 'f') || (c2 >= 'A' && c2 <= 'F')) {
                                 // Two-digit hex escape
                                 const hexEscape = c + c2;
-                                processedBytes.push(parseInt(hexEscape, 16));
+                                processedBytes.push(Number.parseInt(hexEscape, 16));
                                 i++; // Skip the second hex digit
                                 continue;
                             }
                         }
 
                         // Single digit hex
-                        processedBytes.push(parseInt(c, 16));
+                        processedBytes.push(Number.parseInt(c, 16));
                     }
                     // Common escape sequences
                     else if (c === 't') processedBytes.push(9);   // Tab
@@ -91,7 +91,7 @@ export function parseData() {
                 processedBytes.push(rawString.charCodeAt(i));
             }
         }
-        
+
         skipToken();
     }
 

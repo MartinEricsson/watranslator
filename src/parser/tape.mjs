@@ -32,7 +32,7 @@ export function skipToken() {
     if (position < tokens.length) {
         position++;
     } else {
-        let err = new Error("No more tokens to skip");
+        const err = new Error("No more tokens to skip");
         err.context = {
             position: sourceMap.get(tokens.length - 1),
             token: tokens[tokens.length - 1],

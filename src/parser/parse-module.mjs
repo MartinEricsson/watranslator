@@ -65,7 +65,7 @@ export function parseModule() {
                 } else if (sectionType === 'export') {
                     // Parse export section
                     const exportItem = parseExport();
-                    if (exportItem && exportItem.name) {
+                    if (exportItem?.name) {
                         if (exportItem.kind === 'func') {
                             // Find function index by name
                             let funcIndex = -1;
@@ -75,7 +75,7 @@ export function parseModule() {
                                     throw createError(`Unknown exported function: ${exportItem.index}`);
                                 }
                             } else {
-                                funcIndex = parseInt(exportItem.index, 10) || 0;
+                                funcIndex = Number.parseInt(exportItem.index, 10) || 0;
                             }
                             module.exports[exportItem.name] = {
                                 kind: 'func',
@@ -84,7 +84,7 @@ export function parseModule() {
                         } else if (exportItem.kind === 'memory') {
                             module.exports[exportItem.name] = {
                                 kind: 'memory',
-                                index: parseInt(exportItem.index, 10) || 0
+                                index: Number.parseInt(exportItem.index, 10) || 0
                             };
                         } else if (exportItem.kind === 'global') {
                             // Find global index by name
@@ -95,7 +95,7 @@ export function parseModule() {
                                     throw createError(`Unknown exported global variable: ${exportItem.index}`);
                                 }
                             } else {
-                                globalIndex = parseInt(exportItem.index, 10) || 0;
+                                globalIndex = Number.parseInt(exportItem.index, 10) || 0;
                             }
                             module.exports[exportItem.name] = {
                                 kind: 'global',
@@ -104,7 +104,7 @@ export function parseModule() {
                         } else if (exportItem.kind === 'table') {
                             module.exports[exportItem.name] = {
                                 kind: 'table',
-                                index: parseInt(exportItem.index, 10) || 0
+                                index: Number.parseInt(exportItem.index, 10) || 0
                             };
                         }
                     }

@@ -15,11 +15,11 @@ export function parseTable() {
 
     // Parse minimum size (required)
     if (!atEnd() && /^\d+$/.test(peekToken())) {
-        min = parseInt(getToken(), 10);
+        min = Number.parseInt(getToken(), 10);
 
         // Parse maximum size (optional)
         if (!atEnd() && /^\d+$/.test(peekToken())) {
-            max = parseInt(getToken(), 10);
+            max = Number.parseInt(getToken(), 10);
         }
     }
 

@@ -2,7 +2,7 @@
 const writeWASMFileNode = async (filePath, wasmBinary) => {
     try {
         // Use dynamic import for fs in ES module environment
-        const { writeFile } = await import('fs/promises');
+        const { writeFile } = await import('node:fs/promises');
         await writeFile(filePath, Buffer.from(wasmBinary));
         return true;
     } catch (error) {
@@ -15,20 +15,20 @@ const writeWASMFileNode = async (filePath, wasmBinary) => {
 const writeWASMFileBrowser = (filename, wasmBinary) => {
     const blob = new Blob([wasmBinary], { type: 'application/wasm' });
     const url = URL.createObjectURL(blob);
-    
+
     const a = document.createElement('a');
     a.href = url;
     a.download = filename || 'compiled.wasm';
     a.style.display = 'none';
-    
+
     document.body.appendChild(a);
     a.click();
-    
+
     setTimeout(() => {
         URL.revokeObjectURL(url);
         document.body.removeChild(a);
     }, 100);
-    
+
     return true;
 }
 
@@ -38,8 +38,8 @@ const getWASMBinary = (wasmBinary) => {
 }
 
 // Detect environment and export appropriate function
-const isNode = typeof process !== 'undefined' && 
-    process.versions != null && 
+const isNode = typeof process !== 'undefined' &&
+    process.versions != null &&
     process.versions.node != null;
 
 const writeWASMFile = isNode ? writeWASMFileNode : writeWASMFileBrowser;

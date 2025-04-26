@@ -117,10 +117,10 @@ export function tokenize(fullInput) {
                 if (currentToken) {
                     // Push any accumulated token
                     const splitTokens = currentToken.trim().split(/\s+/).filter(t => t);
-                    splitTokens.forEach(t => {
+                    for (const t of splitTokens) {
                         tokens.push(t);
                         sourceMap.set(tokens.length - 1, { line: tokenStartLine + 1, column: tokenStartCol + 1 });
-                    });
+                    }
                     currentToken = "";
                 }
                 currentToken = char;
@@ -131,10 +131,10 @@ export function tokenize(fullInput) {
                 // Handle parentheses as separate tokens
                 if (currentToken) {
                     const splitTokens = currentToken.trim().split(/\s+/).filter(t => t);
-                    splitTokens.forEach(t => {
+                    for (const t of splitTokens) {
                         tokens.push(t);
                         sourceMap.set(tokens.length - 1, { line: tokenStartLine + 1, column: tokenStartCol + 1 });
-                    });
+                    }
                     currentToken = "";
                 }
                 tokens.push(char);
@@ -167,14 +167,14 @@ export function tokenize(fullInput) {
                             const offsetMatch = attrToken.match(/offset=([^\s]+)/);
                             const alignMatch = attrToken.match(/align=([^\s]+)/);
 
-                            if (offsetMatch && isNaN(parseInt(offsetMatch[1], 10))) {
+                            if (offsetMatch && Number.isNaN(Number.parseInt(offsetMatch[1], 10))) {
                                 throw new createError(
                                     `Invalid offset value "${offsetMatch[1]}" at line ${tokenStartLine + 1}, column ${tokenStartCol + 1 + currentToken.length + attrToken.indexOf('offset=')}`,
                                     tokenStartLine + 1,
                                     tokenStartCol + 1);
                             }
 
-                            if (alignMatch && isNaN(parseInt(alignMatch[1], 10))) {
+                            if (alignMatch && Number.isNaN(Number.parseInt(alignMatch[1], 10))) {
                                 throw new createError(
                                     `Invalid align value "${alignMatch[1]}" at line ${tokenStartLine + 1}, column ${tokenStartCol + 1 + currentToken.length + attrToken.indexOf('align=')}`,
                                     tokenStartLine + 1,
@@ -189,10 +189,10 @@ export function tokenize(fullInput) {
 
                     // Default behavior for other tokens
                     const splitTokens = currentToken.trim().split(/\s+/).filter(t => t);
-                    splitTokens.forEach(t => {
+                    for (const t of splitTokens) {
                         tokens.push(t);
                         sourceMap.set(tokens.length - 1, { line: tokenStartLine + 1, column: tokenStartCol + 1 });
-                    });
+                    }
                     currentToken = "";
                 }
                 // Prepare for next token
@@ -239,10 +239,10 @@ export function tokenize(fullInput) {
             sourceMap.set(tokens.length - 1, { line: stringStartLine + 1, column: stringStartCol + 1 });
         } else {
             const splitTokens = currentToken.trim().split(/\s+/).filter(t => t);
-            splitTokens.forEach(t => {
+            for (const t of splitTokens) {
                 tokens.push(t);
                 sourceMap.set(tokens.length - 1, { line: tokenStartLine + 1, column: tokenStartCol + 1 });
-            });
+            }
         }
     }
 

@@ -3,10 +3,10 @@ import { atEnd, peekToken, skipToken, getToken } from './tape.mjs';
 export function parseElement() {
     // Parse element section: (elem (i32.const <offset>) <funcref> <funcref>...) or (elem passive funcref <funcref>...)
     let offset = 0;
-    let functionIndices = [];
+    const functionIndices = [];
     let tableIndex = 0; // Default to the first table
     let mode = 'active'; // 'active' by default
-    let type = 'funcref'; // Default type
+    const type = 'funcref'; // Default type
     let id = null; // Element segment identifier
 
     // Check for element segment ID, passive segment, or table index
@@ -14,7 +14,7 @@ export function parseElement() {
         if (peekToken().startsWith('$')) {
             // This could be either an element segment ID or a table reference
             const token = getToken();
-            
+
             // Check the next token to determine if this was an ID or table reference
             if (!atEnd() && peekToken() === 'func') {
                 // If next token is 'func', the $ was an element segment ID
@@ -26,7 +26,7 @@ export function parseElement() {
         } else if (peekToken() === 'passive') {
             mode = 'passive';
             skipToken(); // Skip 'passive'
-            
+
             // Check for type declaration
             if (!atEnd() && peekToken() === 'funcref') {
                 skipToken(); // Skip type
@@ -65,7 +65,7 @@ export function parseElement() {
             skipToken(); // Skip i32.const
 
             if (!atEnd() && /^-?\d+$/.test(peekToken())) {
-                offset = parseInt(getToken(), 10);
+                offset = Number.parseInt(getToken(), 10);
             }
 
             // Skip closing paren of the offset expression

@@ -2,7 +2,7 @@
 const readWATFileNode = async (filePath) => {
     try {
         // Use dynamic import for fs in ES module environment
-        const { readFile } = await import('fs/promises');
+        const { readFile } = await import('node:fs/promises');
         return await readFile(filePath, 'utf8');
     } catch (error) {
         console.error(`Error reading file from disk: ${error}`);
@@ -30,8 +30,8 @@ const readWATString = (watString) => {
 }
 
 // Detect environment and export appropriate function
-const isNode = typeof process !== 'undefined' && 
-    process.versions != null && 
+const isNode = typeof process !== 'undefined' &&
+    process.versions != null &&
     process.versions.node != null;
 
 const readWATFile = isNode ? readWATFileNode : readWATFileBrowser;
