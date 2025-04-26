@@ -1,0 +1,169 @@
+import { parseType } from './parse-type.mjs';
+import { parseTable } from './parse-table.mjs';
+import { parseElement } from './parse-element.mjs';
+import { parseData } from './parse-data.mjs';
+import { parseMemory } from './parse-memory.mjs';
+import { parseExport } from './parse-export.mjs';
+import { parseGlobal } from './parse-global.mjs';
+import { parseFunction } from './parse-function.mjs';
+import { peekToken, getCurrentCursor, atEnd, skipToken } from './tape.mjs';
+import { createError } from './parse-util.mjs';
+
+export function parseModule() {
+    const modulePos = getCurrentCursor();
+    const module = {
+        functions: [],
+        exports: {},
+        memories: [],
+        datas: [],
+        globals: [],
+        tables: [],
+        elements: [],  // Add elements array to store element segments
+        start: null,   // Add start property to store the start function
+        types: [],     // Add types array to store function types
+        position: modulePos
+    };
+
+    while (!atEnd() && peekToken() !== ')') {
+        if (peekToken() === '(') {
+            skipToken() // Skip opening paren of sub-expression
+
+            if (!atEnd()) {
+                const sectionType = peekToken();
+                const sectionPos = getCurrentCursor();
+                skipToken() // Skip section type token
+
+                if (sectionType === 'func') {
+                    const func = parseFunction();
+                    if (func) {
+                        // Add function to the module's functions array
+                        module.functions.push(func);
+
+                        // Handle inline exports
+                        if (func.export) {
+                            module.exports[func.export] = {
+                                kind: 'func',
+                                index: module.functions.length - 1
+                            };
+                        }
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'memory') {
+                    // Parse memory declaration
+                    const memory = parseMemory();
+                    if (memory) {
+                        module.memories.push(memory);
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'data') {
+                    // Parse data section
+                    const data = parseData();
+                    if (data) {
+                        module.datas.push(data);
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'export') {
+                    // Parse export section
+                    const exportItem = parseExport();
+                    if (exportItem && exportItem.name) {
+                        if (exportItem.kind === 'func') {
+                            // Find function index by name
+                            let funcIndex = -1;
+                            if (exportItem.index.startsWith('$')) {
+                                funcIndex = module.functions.findIndex(f => f.name === exportItem.index);
+                                if (funcIndex === -1) {
+                                    throw createError(`Unknown exported function: ${exportItem.index}`);
+                                }
+                            } else {
+                                funcIndex = parseInt(exportItem.index, 10) || 0;
+                            }
+                            module.exports[exportItem.name] = {
+                                kind: 'func',
+                                index: funcIndex
+                            };
+                        } else if (exportItem.kind === 'memory') {
+                            module.exports[exportItem.name] = {
+                                kind: 'memory',
+                                index: parseInt(exportItem.index, 10) || 0
+                            };
+                        } else if (exportItem.kind === 'global') {
+                            // Find global index by name
+                            let globalIndex = -1;
+                            if (exportItem.index.startsWith('$')) {
+                                globalIndex = module.globals.findIndex(g => g.name === exportItem.index);
+                                if (globalIndex === -1) {
+                                    throw createError(`Unknown exported global variable: ${exportItem.index}`);
+                                }
+                            } else {
+                                globalIndex = parseInt(exportItem.index, 10) || 0;
+                            }
+                            module.exports[exportItem.name] = {
+                                kind: 'global',
+                                index: globalIndex
+                            };
+                        } else if (exportItem.kind === 'table') {
+                            module.exports[exportItem.name] = {
+                                kind: 'table',
+                                index: parseInt(exportItem.index, 10) || 0
+                            };
+                        }
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'global') {
+                    // Handle global variable declaration
+                    const global = parseGlobal();
+                    if (global) {
+                        module.globals.push(global);
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'table') {
+                    // Add support for table declarations
+                    const table = parseTable();
+                    if (table) {
+                        module.tables.push(table);
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'elem') {
+                    // Parse element section
+                    const elem = parseElement();
+                    if (elem) {
+                        module.elements.push(elem);
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'start') {
+                    // Generated by 🤖
+                    // Parse start section: (start $function) or (start <index>)
+                    if (!atEnd()) {
+                        const funcRef = peekToken();
+                        module.start = funcRef;
+                        skipToken()
+                    }
+                    skipToken() // Skip closing paren
+                } else if (sectionType === 'type') {
+                    // Generated by 🤖
+                    // Parse type section: (type $name (func (param i32 i32) (result i32)))
+                    const typeDecl = parseType();
+                    if (typeDecl) {
+                        module.types.push(typeDecl);
+                    }
+                    skipToken() // Skip closing paren
+                } else {
+                    // Skip unrecognized sections
+                    console.log("⚠️ Skipping unrecognized section:", sectionType);
+                    while (!atEnd() && peekToken() !== ')') {
+                        skipToken()
+                    }
+                    skipToken() // Skip closing paren
+                }
+            }
+        } else {
+            console.log("⚠️ Skipping unrecognized token:", peekToken());
+            skipToken() // Skip any unexpected tokens
+        }
+    }
+
+    // Skip the closing paren of the module
+    skipToken()
+
+    return module;
+}
