@@ -81,22 +81,22 @@ export function parseGlobal() {
 
             if (instrType === 'i32.const') {
                 if (!atEnd()) {
-                    const value = parseInt(getToken(), 10);
+                    const value = Number.parseInt(getToken(), 10);
                     init = { type: 'i32.const', value };
                 }
             } else if (instrType === 'f32.const') {
                 if (!atEnd()) {
-                    const value = parseFloat(getToken());
+                    const value = Number.parseFloat(getToken());
                     init = { type: 'f32.const', value };
                 }
             } else if (instrType === 'i64.const') {
                 if (!atEnd()) {
-                    const value = parseInt(getToken(), 10);
+                    const value = Number.parseInt(getToken(), 10);
                     init = { type: 'i64.const', value };
                 }
             } else if (instrType === 'f64.const') {
                 if (!atEnd()) {
-                    const value = parseFloat(getToken());
+                    const value = Number.parseFloat(getToken());
                     init = { type: 'f64.const', value };
                 }
             }
@@ -111,11 +111,11 @@ export function parseGlobal() {
         }
     }
 
-    return { 
-        name, 
-        type, 
-        mutable, 
-        init, 
+    return {
+        name,
+        type,
+        mutable,
+        init,
         position,
         import: importModule && importName ? { module: importModule, field: importName } : null
     };

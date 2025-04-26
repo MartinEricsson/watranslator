@@ -5,7 +5,7 @@ export function isLabel(candidate) {
     if (typeof candidate === 'string' && candidate.startsWith('$')) {
         return true;
     }
-    if (!isNaN(parseInt(candidate, 10))) {
+    if (!Number.isNaN(Number.parseInt(candidate, 10))) {
         return true;
     }
 
@@ -13,7 +13,7 @@ export function isLabel(candidate) {
 }
 
 export function isIndex(candidate) {
-    return !isNaN(parseInt(candidate, 10));
+    return !Number.isNaN(Number.parseInt(candidate, 10));
 }
 
 export function isString(candidate) {
@@ -44,9 +44,9 @@ export function openParenthesis() {
 
 export function parseDecimalOrHex(token) {
     if (token.startsWith('0x')) {
-        return parseInt(token, 16);
+        return Number.parseInt(token, 16);
     }
-    return parseInt(token, 10);
+    return Number.parseInt(token, 10);
 }
 
 export function parseSigned64BitHex(hexString) {

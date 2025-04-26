@@ -17,7 +17,7 @@ function variableByIndexName(instr, func) {
             }
         }
     } else {
-        varIndex = parseInt(instr.operand, 10) || 0;
+        varIndex = Number.parseInt(instr.operand, 10) || 0;
     }
 
     if (varIndex === -1) {
@@ -25,7 +25,7 @@ function variableByIndexName(instr, func) {
     }
 
     // If we have a local variable map, use it to find the reordered index
-    if (func.localMap && func.localMap.has(varIndex)) {
+    if (func.localMap?.has(varIndex)) {
         return func.localMap.get(varIndex);
     }
 
@@ -74,7 +74,7 @@ export function compileVariableAccess(instr, func, body, moduleGlobals, module) 
         if (instr.operand.startsWith('$')) {
             globalIndex = moduleGlobals.findIndex(g => g.name === instr.operand);
         } else {
-            globalIndex = parseInt(instr.operand, 10) || 0;
+            globalIndex = Number.parseInt(instr.operand, 10) || 0;
         }
 
         if (globalIndex === -1) {
@@ -96,7 +96,7 @@ export function compileVariableAccess(instr, func, body, moduleGlobals, module) 
                 throw createError(instr, func, module, `Cannot set immutable global: ${instr.operand}. Add (mut) qualifier to make the global mutable.`);
             }
         } else {
-            globalIndex = parseInt(instr.operand, 10) || 0;
+            globalIndex = Number.parseInt(instr.operand, 10) || 0;
         }
 
         if (globalIndex === -1) {

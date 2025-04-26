@@ -4,8 +4,8 @@ export function parseType() {
     const typePos = getCurrentCursor();
     // Parse type declaration: (type $name (func (param i32 i32) (result i32)))
     let name = null;
-    let params = [];
-    let results = [];
+    const params = [];
+    const results = [];
 
     // Check for type name
     if (!atEnd() && peekToken().startsWith('$')) {

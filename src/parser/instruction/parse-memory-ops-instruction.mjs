@@ -19,14 +19,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present in the token
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present in the token
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Determine instruction type
@@ -49,14 +49,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 
         // Extract offset if present
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Determine instruction type
@@ -72,14 +72,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 
         // Extract offset if present
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Determine instruction type
@@ -95,14 +95,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 
         // Extract offset if present
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Determine instruction type
@@ -119,14 +119,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present in the token
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present in the token
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Create instruction object
@@ -147,14 +147,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present in the token
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present in the token
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Determine instruction type
@@ -182,14 +182,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Determine instruction type
@@ -210,14 +210,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present in the token
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present in the token
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Create instruction object
@@ -233,14 +233,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present in the token
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present in the token
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Create instruction object
@@ -256,14 +256,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present in the token
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present in the token
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Create instruction object
@@ -279,14 +279,14 @@ export function parseMemoryOpsInstruction(instrToken, position) {
         // Extract offset if present in the token
         let offset = 0;
         const offsetMatch = instrToken.match(/offset=(\d+)/);
-        if (offsetMatch && offsetMatch[1]) {
-            offset = parseInt(offsetMatch[1], 10);
+        if (offsetMatch?.[1]) {
+            offset = Number.parseInt(offsetMatch[1], 10);
         }
 
         // Extract align if present in the token
         const alignMatch = instrToken.match(/align=(-?\d+)/);
-        if (alignMatch && alignMatch[1]) {
-            align = parseInt(alignMatch[1], 10);
+        if (alignMatch?.[1]) {
+            align = Number.parseInt(alignMatch[1], 10);
         }
 
         // Create instruction object

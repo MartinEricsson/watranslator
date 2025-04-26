@@ -14,11 +14,15 @@ export function compileVariableConstants(instr, body) {
         body.push(INSTR.I32_CONST);
         body.push(...encodeSLEB128(instr.value));
         return true;
-    } else if (instr.type === 'i64.const') {
+    }
+
+    if (instr.type === 'i64.const') {
         body.push(INSTR.I64_CONST);
         body.push(...encodeSLEB128BigInt(instr.value));
         return true;
-    } else if (instr.type === 'f32.const') {
+    }
+
+    if (instr.type === 'f32.const') {
         body.push(INSTR.F32_CONST);
 
         // Convert the float to its IEEE 754 representation and add to the binary
@@ -27,7 +31,9 @@ export function compileVariableConstants(instr, body) {
         const bytes = new Uint8Array(buffer);
         body.push(...bytes);
         return true;
-    } else if (instr.type === 'f64.const') {
+    }
+
+    if (instr.type === 'f64.const') {
         body.push(INSTR.F64_CONST);
         body.push(...encodeF64(instr.value));
         return true;

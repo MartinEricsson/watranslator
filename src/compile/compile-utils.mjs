@@ -5,7 +5,8 @@ const {
 } = wasmConstants;
 
 // Helper function to encode unsigned LEB128 integer
-export function encodeULEB128(value) {
+export function encodeULEB128(inputvalue) {
+    let value = inputvalue;
     const result = [];
     do {
         let byte = value & 0x7F;
@@ -19,7 +20,8 @@ export function encodeULEB128(value) {
 }
 
 // Helper function to encode signed LEB128 integer for data section offsets
-export function encodeSLEB128(value) {
+export function encodeSLEB128(inputvalue) {
+    let value = inputvalue;
     const result = [];
     let more = true;
 
@@ -41,7 +43,8 @@ export function encodeSLEB128(value) {
 }
 
 // Helper function to encode signed LEB128 integer from BigInt values for i64.const
-export function encodeSLEB128BigInt(value) {
+export function encodeSLEB128BigInt(inputvalue) {
+    let value = inputvalue;
     const result = [];
     let more = true;
 
@@ -119,7 +122,7 @@ export function encodeBytes(str) {
 
                     // Handle numeric escapes (\0-\9)
                     if (c >= '0' && c <= '9') {
-                        bytes.push(parseInt(c, 10));
+                        bytes.push(Number.parseInt(c, 10));
                     }
                     // Handle hex escapes
                     else if ((c === 'f' || c === 'F') && i + 1 < str.length && (str[i + 1] === 'f' || str[i + 1] === 'F')) {
@@ -155,7 +158,7 @@ export function encodeBytes(str) {
             if (i < str.length) {
                 const c = str[i];
                 if (c >= '0' && c <= '9') {
-                    bytes.push(parseInt(c, 10));
+                    bytes.push(Number.parseInt(c, 10));
                 } else if (c === 'f') {
                     if (i + 1 < str.length && str[i + 1] === 'f') {
                         bytes.push(255);
@@ -241,7 +244,7 @@ export function getWasmType(type) {
         case 'externref': return TYPE.EXTERNREF;
         case 'anyref': return TYPE.ANYREF;
         default: {
-            let err = new Error(`Unknown type: ${type}`);
+            const err = new Error(`Unknown type: ${type}`);
             err.context = {
                 type: type,
                 expectedTypes: ['i32', 'i64', 'f32', 'f64', 'v128', 'funcref', 'externref', 'anyref'],
@@ -263,13 +266,13 @@ export function getLabelIndex(label, func) {
     // For blocks, we need to branch to the block's parent depth to exit the block
 
     // If label is a number or numeric string, use it directly
-    if (typeof label === 'number' || (typeof label === 'string' && !isNaN(parseInt(label)))) {
-        return parseInt(label);
+    if (typeof label === 'number' || (typeof label === 'string' && !Number.isNaN(Number.parseInt(label)))) {
+        return Number.parseInt(label);
     }
 
     // For named labels, we need to count block nesting levels from innermost to outermost
-    let blocks = [];
-    let blockTypes = [];  // Store the type of each block ('block', 'loop', etc.)
+    const blocks = [];
+    const blockTypes = [];  // Store the type of each block ('block', 'loop', etc.)
     let foundTable = false;
     let isDefault = false;
 
@@ -287,7 +290,7 @@ export function getLabelIndex(label, func) {
             } else if (instr.type === 'br_table') {
                 // Check if this label is the default label
                 isDefault = instr.defaultLabel === label;
-                if (isDefault || (instr.labels && instr.labels.includes(label))) {
+                if (isDefault || (instr.labels?.includes(label))) {
                     foundTable = true;
                     break;
                 }
@@ -296,7 +299,7 @@ export function getLabelIndex(label, func) {
     };
 
     // Find the blocks and br_table
-    if (func && func.instructions) {
+    if (func?.instructions) {
         collectBlocks(func.instructions);
     }
 
@@ -335,10 +338,9 @@ export function getLabelIndex(label, func) {
             if (blockType === 'loop' && label !== '$break') {
                 // For loop labels, we always use 0 to branch to the loop start
                 return 0;
-            } else {
-                // For blocks or breaking out of loops, use the proper depth
-                return labelIndex;
             }
+            // For blocks or breaking out of loops, use the proper depth
+            return labelIndex;
         }
     }
 
@@ -361,28 +363,28 @@ export function sanitizeAST(ast) {
     // Initialize module properties
     moduleObj.exports = moduleObj.exports || {};
     moduleObj.functions = moduleObj.functions || [];
-    
+
     // Clear any existing functions to rebuild them properly
     const originalInModuleFunctions = [...moduleObj.functions];
-    
+
     // Reset functions array
     moduleObj.functions = [];
-    
+
     // Re-add original functions from the module
     moduleObj.functions.push(...originalInModuleFunctions);
-    
+
     // Find all standalone function objects in the AST (outside the module object)
-    const funcs = ast.filter(item => 
-        item && typeof item === 'object' && 
-        Array.isArray(item.instructions) && 
+    const funcs = ast.filter(item =>
+        item && typeof item === 'object' &&
+        Array.isArray(item.instructions) &&
         item !== moduleObj
     );
-    
+
     // Process standalone functions
-    funcs.forEach((func) => {
+    for (const func of funcs) {
         // Add to module's functions array
         moduleObj.functions.push(func);
-        
+
         // Handle exports - the index is the current length - 1
         if (func.export && typeof func.export === 'string') {
             moduleObj.exports[func.export] = {
@@ -390,7 +392,7 @@ export function sanitizeAST(ast) {
                 index: moduleObj.functions.length - 1
             };
         }
-    });
+    }
 
     return moduleObj; // Generated by 🤖
 }
