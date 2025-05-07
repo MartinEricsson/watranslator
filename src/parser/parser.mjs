@@ -42,6 +42,52 @@ export function parseWAT(src) {
         return func;
     }
 
+    // Process imports and resolve exports
+    for (const item of ast) {
+        if (item && typeof item === 'object') {
+            // Find a module object
+            if (item.functions !== undefined) {
+                const moduleObj = item;
+
+                // Initialize imports collection if it doesn't exist
+                if (!moduleObj.imports) {
+                    moduleObj.imports = [];
+                }
+
+                // Find all imports and add them to the module
+                for (let i = 0; i < ast.length; i++) {
+                    const astItem = ast[i];
+                    if (astItem && astItem.type === 'import') {
+                        // Add imported item to module's imports
+                        moduleObj.imports.push(astItem);
+
+                        // If it's a function import, also add it to the functions list
+                        if (astItem.kind === 'func' && astItem.name) {
+                            // Create a function object for the import
+                            const importedFunc = {
+                                name: astItem.name,
+                                parameters: astItem.params.map((type, index) => ({
+                                    name: index.toString(),
+                                    type
+                                })),
+                                results: astItem.results,
+                                instructions: [],   // Imported function has no instructions
+                                import: {
+                                    module: astItem.module,
+                                    field: astItem.field
+                                },
+                                position: astItem.position
+                            };
+
+                            // Add to module's functions list
+                            moduleObj.functions.push(importedFunc);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Resolve function and global exports
     for (const moduleObj of ast) {
         if (moduleObj && typeof moduleObj === 'object') {
