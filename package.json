@@ -1,10 +1,10 @@
 {
 	"name": "watranslator",
-	"version": "0.1.0",
+	"version": "0.2.1",
 	"description": "WebAssembly Text Format (WAT) to WebAssembly Binary Format compiler",
-	"main": "dist/watranslator.js",
-	"module": "dist/watranslator.esm.js",
-	"browser": "dist/watranslator.min.js",
+	"main": "watranslator.js",
+	"module": "watranslator.js",
+	"browser": "watranslator.js",
 	"directories": {
 		"test": "tests"
 	},
@@ -70,7 +70,7 @@
 	"keywords": ["webassembly", "wat", "wasm"],
 	"author": "LME",
 	"license": "ISC",
-	"files": ["dist", "README.md", "LICENSE"],
+	"files": ["watranslator.js", "README.md", "LICENSE"],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/MartinEricsson/watranslator.git"

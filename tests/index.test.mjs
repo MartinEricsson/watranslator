@@ -86,6 +86,7 @@ import testSIMDi64x2Ops from "./simd-i64x2-ops/simd-i64x2-ops-test.mjs";
 import testSIMDf32x4Ops from "./simd-f32x4-ops/simd-f32x4-ops-test.mjs";
 import testSIMDf64x2Ops from "./simd-f64x2-ops/simd-f64x2-ops-test.mjs";
 import testSIMDConversionOps from "./simd-conversion-ops/simd-conversion-ops-test.mjs";
+import testImportedFunctionOrdered from "./imported-functions/imported-functions-ordered-test.mjs";
 
 const args = process.argv.slice(2);
 const debug = args.includes('--debug');
@@ -149,6 +150,7 @@ async function runTests() {
         { name: "Integration loop sum", test: testLoopSum },
         { name: "Imported Global Variables", test: testImportedGlobals },
         { name: "Imported Function Calls", test: testImportedFunctions },
+        { name: "Imported Function Calls Ordered", test: testImportedFunctionOrdered },
         { name: "Local Variables", test: testLocalVariables },
         { name: "Memory fill", test: testMemoryFill },
         { name: "Memory Init", test: testMemoryInit },
@@ -174,7 +176,7 @@ async function runTests() {
         { name: "SIMD I64x2 Compare", test: testSIMDI64x2Compare },
         { name: "SIMD I64x2 Ops", test: testSIMDi64x2Ops },
         { name: "SIMD I8x16 Ops", test: testSIMDi8x16Ops },
-        { name: "SIMD I16x8 Ops", test: testSIMDi16x8Ops },        
+        { name: "SIMD I16x8 Ops", test: testSIMDi16x8Ops },
         { name: "SIMD F32x4 Compare", test: testSIMDf32x4Compare },
         { name: "SIMD F32x4 Ops", test: testSIMDf32x4Ops },
         { name: "SIMD F64x2 Compare", test: testSIMDF64x2Compare },
