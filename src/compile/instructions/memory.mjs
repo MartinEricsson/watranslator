@@ -1,4 +1,6 @@
 import wasmConstants from "../constants.mjs";
+import { encodeULEB128 } from "../compile-utils.mjs";
+import { createError } from "./error.mjs";
 
 const {
     INSTR
@@ -20,16 +22,62 @@ function compileMemoryInit(body, instr) {
     body.push(0x00);                // Memory index - must be 0 in the MVP
 }
 
-export function compileMemoryInstruction(instr, body) {
+export function compileMemoryInstruction(instr, body, module) {
     if (instr.type === 'memory.size') {
-        body.push(INSTR.MEMORY_SIZE);
-        body.push(0x00); // Reserved value - must be 0 in the current version
+        // Check if we have a memory reference for multiple memories
+        if (instr.memoryRef !== null) {
+            // Handle multi-memory size operation
+            body.push(INSTR.BULK_PREFIX);  // 0xFC prefix for extended operations
+            body.push(0x08);               // opcode for multi-memory size
+
+            // Determine memory index
+            let memIndex = 0;
+            if (typeof instr.memoryRef === 'string' && instr.memoryRef.startsWith('$')) {
+                // Find memory by name
+                const memory = module.memories.find(m => m.id === instr.memoryRef);
+                if (!memory) {
+                    throw createError(instr, null, module, `Unknown memory reference: ${instr.memoryRef}`);
+                }
+                memIndex = memory.index;
+            } else if (typeof instr.memoryRef === 'number') {
+                memIndex = instr.memoryRef;
+            }
+
+            body.push(...encodeULEB128(memIndex));
+        } else {
+            // Standard memory.size for default memory
+            body.push(INSTR.MEMORY_SIZE);
+            body.push(0x00); // Memory index 0 in single-memory mode
+        }
         return true;
     }
 
     if (instr.type === 'memory.grow') {
-        body.push(INSTR.MEMORY_GROW);
-        body.push(0x00); // Reserved value - must be 0 in the current version
+        // Check if we have a memory reference for multiple memories
+        if (instr.memoryRef !== null) {
+            // Handle multi-memory grow operation
+            body.push(INSTR.BULK_PREFIX);  // 0xFC prefix for extended operations
+            body.push(0x09);               // opcode for multi-memory grow
+
+            // Determine memory index
+            let memIndex = 0;
+            if (typeof instr.memoryRef === 'string' && instr.memoryRef.startsWith('$')) {
+                // Find memory by name
+                const memory = module.memories.find(m => m.id === instr.memoryRef);
+                if (!memory) {
+                    throw createError(instr, null, module, `Unknown memory reference: ${instr.memoryRef}`);
+                }
+                memIndex = memory.index;
+            } else if (typeof instr.memoryRef === 'number') {
+                memIndex = instr.memoryRef;
+            }
+
+            body.push(...encodeULEB128(memIndex));
+        } else {
+            // Standard memory.grow for default memory
+            body.push(INSTR.MEMORY_GROW);
+            body.push(0x00); // Memory index 0 in single-memory mode
+        }
         return true;
     }
 

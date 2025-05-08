@@ -20,14 +20,14 @@ export function memorySection(module, binary) {
             return 0;
         });
 
-        // Memory entries count
+        // Memory entries count - THIS IS THE CRITICAL PART FOR MULTI-MEMORY
         const memoryEntries = [...encodeULEB128(sortedMemories.length)];
 
         // Add each memory entry
         for (const memory of sortedMemories) {
             // Check if memory should be shared
             let needsSharedMemory = memory.shared || false;
-            
+
             // Also check for atomic operations if not explicitly shared
             if (!needsSharedMemory && module.functions) {
                 for (const func of module.functions) {
@@ -36,6 +36,13 @@ export function memorySection(module, binary) {
                         break;
                     }
                 }
+            }
+
+            // Check if there are data segments and ensure min is at least 1 page
+            let effectiveMin = memory.min;
+            if (module.datas && module.datas.length > 0 && effectiveMin === 0) {
+                // If there are data segments, ensure at least 1 page of memory
+                effectiveMin = 1;
             }
 
             // For shared memory, ensure max is defined (WebAssembly requirement)
@@ -52,14 +59,33 @@ export function memorySection(module, binary) {
 
             memoryEntries.push(flags);
 
-            // Minimum size
-            memoryEntries.push(...encodeULEB128(memory.min));
+            // Minimum size - use the potentially adjusted value
+            memoryEntries.push(...encodeULEB128(effectiveMin));
 
             // Maximum size (always include for shared memory)
             if (effectiveMax !== null) {
                 memoryEntries.push(...encodeULEB128(effectiveMax));
             }
         }
+
+        // Calculate section size
+        const sectionSize = memoryEntries.length;
+        memorySection.push(...encodeULEB128(sectionSize));
+
+        // Add section content
+        memorySection.push(...memoryEntries);
+
+        binary.push(...memorySection);
+    } else if (module.datas && module.datas.length > 0) {
+        // If we have data segments but no explicit memory, create a default memory section
+        let memorySection = [SECTION.MEMORY]; // Section ID
+
+        // Just one memory entry
+        const memoryEntries = [...encodeULEB128(1)];
+
+        // No flags, initial size of 1 page
+        memoryEntries.push(0); // No flags
+        memoryEntries.push(...encodeULEB128(1)); // Min size = 1 page
 
         // Calculate section size
         const sectionSize = memoryEntries.length;
