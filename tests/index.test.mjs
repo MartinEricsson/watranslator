@@ -87,6 +87,8 @@ import testSIMDf32x4Ops from "./simd-f32x4-ops/simd-f32x4-ops-test.mjs";
 import testSIMDf64x2Ops from "./simd-f64x2-ops/simd-f64x2-ops-test.mjs";
 import testSIMDConversionOps from "./simd-conversion-ops/simd-conversion-ops-test.mjs";
 import testImportedFunctionOrdered from "./imported-functions/imported-functions-ordered-test.mjs";
+import testMultiMemory from "./multi-memory/multi-memory-test.mjs";
+import testMultiMemoryIndexes from "./multi-memory/multi-memory-indexes-test.mjs";
 
 const args = process.argv.slice(2);
 const debug = args.includes('--debug');
@@ -161,6 +163,8 @@ async function runTests() {
         { name: "Memory Size and Grow", test: testMemorySizeGrow },
         { name: "Memory Store", test: testMemoryStore },
         { name: "Multiple Function Arguments", test: testMultipleFunctionArguments },
+        { name: "Multi Memory", test: testMultiMemory },
+        { name: "Multi Memory Indexes", test: testMultiMemoryIndexes },
         { name: "Multi Value", test: testMultiValue },
         { name: "Reference Is Null", test: testRefIsNull },
         { name: "Remainder", test: testRemainder },
