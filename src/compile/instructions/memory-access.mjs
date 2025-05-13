@@ -67,8 +67,22 @@ export function compileMemoryAccess(instr, func, body, module) {
             body.push(MEMORY_ACCESS_INSTR.get(instr.type));
         }
 
+        // Validate alignment
+        const align = instr.align || 0;
+        if (align < 0) {
+            throw createError(instr, func, module, `Invalid alignment value: ${align}`);
+        }
+
+        // Get natural alignment for this instruction type
+        const naturalAlign = getInstructionNaturalAlignment(instr.type);
+
+        // Validate that alignment doesn't exceed natural alignment
+        if (align > naturalAlign) {
+            throw createError(instr, func, module, `Invalid alignment value: ${align}. Cannot exceed natural alignment of ${naturalAlign}`);
+        }
+
         // Memory arguments: alignment and offset
-        body.push(...encodeULEB128(instr.align || 0));
+        body.push(...encodeULEB128(align));
         body.push(...encodeULEB128(instr.offset || 0));
 
         return true;
