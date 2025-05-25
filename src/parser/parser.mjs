@@ -4,9 +4,8 @@ import { parseExpression } from './parse-expression.mjs';
 
 export function parseWAT(src) {
     const tokens = tokenize(src);
-    const sourceMap = tokens.sourceMap || new Map();
 
-    initTape(tokens, sourceMap);
+    initTape(tokens);
 
     // Start parsing from the beginning of the tokens
     const ast = [];
@@ -76,7 +75,7 @@ export function parseWAT(src) {
                                     module: astItem.module,
                                     field: astItem.field
                                 },
-                                position: astItem.position
+                                loc: astItem.loc // Changed from position to loc
                             };
 
                             // Add to module's functions list
