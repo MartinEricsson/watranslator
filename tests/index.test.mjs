@@ -90,6 +90,7 @@ import testSIMDf64x2Ops from "./simd-f64x2-ops/simd-f64x2-ops-test.mjs";
 import testSIMDConversionOps from "./simd-conversion-ops/simd-conversion-ops-test.mjs";
 import testImportedFunctionOrdered from "./imported-functions/imported-functions-ordered-test.mjs";
 import testSIMDi8x16Compare from "./simd-i8x16-compare/simd-i8x16-compare-test.mjs"
+import testParameters from "./parameters/parameters-test.mjs";
 
 
 const args = process.argv.slice(2);
@@ -168,6 +169,7 @@ async function runTests() {
         { name: "Memory Store", test: testMemoryStore },
         { name: "Multiple Function Arguments", test: testMultipleFunctionArguments },
         { name: "Multi Value", test: testMultiValue },
+        { name: "Parameters", test: testParameters },
         { name: "Reference Is Null", test: testRefIsNull },
         { name: "Remainder", test: testRemainder },
         { name: "Simple Loop", test: testSimpleLoop },
