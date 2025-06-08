@@ -2,9 +2,10 @@ import { readTestData } from "../test-utils.mjs";
 
 async function testSIMDConstError(debug = false) {
     try {
-        const { wasmBuffer } = await readTestData('simd-const/simd-const-error.wat', debug);
+
 
         try {
+            const { wasmBuffer } = await readTestData('simd-const/simd-const-error.wat', debug);
             // Try to compile - this should fail due to incorrect number of immediates
             const { instance } = await WebAssembly.instantiate(wasmBuffer, {});
 
@@ -13,14 +14,15 @@ async function testSIMDConstError(debug = false) {
             return false;
         } catch (error) {
             // Expected error - verify it's the right type of error
+            console.log(error.message)
             if (error.message.includes('v128.const requires exactly 16 i8 values')) {
                 console.log('PASSED: Correctly caught error with invalid number of immediates for v128.const');
                 return true;
-            } else {
-                // Wrong error type
-                console.error('FAILED: Got error but not for the expected reason:', error.message);
-                return false;
             }
+
+            // Wrong error type
+            console.error('FAILED: Got error but not for the expected reason:', error.message);
+            return false;
         }
     } catch (error) {
         console.error('Error during SIMD v128.const error test:', error);
