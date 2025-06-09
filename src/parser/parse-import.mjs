@@ -9,6 +9,9 @@ export function parseImport() {
     let name = null;
     let params = [];
     let results = [];
+    let min = 0;
+    let max = null;
+    let shared = false;
 
     // Parse module name (first string)
     if (!atEnd() && peekToken().startsWith('"') && peekToken().endsWith('"')) {
@@ -71,8 +74,30 @@ export function parseImport() {
                         skipToken(); // Skip other tokens
                     }
                 }
+            } else if (kind === 'memory') {
+                // Parse memory import: (memory <min> [<max>] [shared])
+                // Parse minimum size (required)
+                if (!atEnd() && /^\d+$/.test(peekToken())) {
+                    min = Number.parseInt(getToken(), 10);
+
+                    // Parse maximum size (optional)
+                    if (!atEnd() && /^\d+$/.test(peekToken())) {
+                        max = Number.parseInt(getToken(), 10);
+                    }
+                }
+
+                // Check for shared attribute
+                if (!atEnd() && peekToken() === 'shared') {
+                    getToken(); // consume 'shared' token
+                    shared = true;
+                }
+
+                // Skip any remaining tokens until closing paren
+                while (!atEnd() && peekToken() !== ')') {
+                    skipToken();
+                }
             } else {
-                // For other import types (global, memory, table)
+                // For other import types (global, table)
                 // Skip all tokens until closing paren
                 while (!atEnd() && peekToken() !== ')') {
                     skipToken();
@@ -97,6 +122,10 @@ export function parseImport() {
         importDecl.name = name;
         importDecl.params = params;
         importDecl.results = results;
+    } else if (kind === 'memory') {
+        importDecl.min = min;
+        importDecl.max = max;
+        importDecl.shared = shared;
     }
 
     return importDecl;
