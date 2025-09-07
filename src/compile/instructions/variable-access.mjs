@@ -24,8 +24,8 @@ function variableByIndexName(instr, func) {
         throw new Error(`Unknown variable: ${instr.operand}`);
     }
 
-    // If we have a local variable map, use it to find the reordered index
-    if (func.localMap?.has(varIndex)) {
+    // Parameters keep their original indices, only local variables need remapping
+    if (varIndex >= func.parameters.length && func.localMap?.has(varIndex)) {
         return func.localMap.get(varIndex);
     }
 
