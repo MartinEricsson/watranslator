@@ -93,6 +93,8 @@ import testImportedFunctionOrdered from "./imported-functions/imported-functions
 import testSIMDi8x16Compare from "./simd-i8x16-compare/simd-i8x16-compare-test.mjs"
 import testParameters from "./parameters/parameters-test.mjs";
 
+import testMultiMemory from "./multi-memory/multi-memory-test.mjs";
+import testMultiMemoryIndexes from "./multi-memory/multi-memory-indexes-test.mjs";
 
 const args = process.argv.slice(2);
 const debug = args.includes('--debug');
@@ -170,6 +172,8 @@ async function runTests() {
         { name: "Memory Size and Grow", test: testMemorySizeGrow },
         { name: "Memory Store", test: testMemoryStore },
         { name: "Multiple Function Arguments", test: testMultipleFunctionArguments },
+        { name: "Multi Memory", test: testMultiMemory },
+        { name: "Multi Memory Indexes", test: testMultiMemoryIndexes },
         { name: "Multi Value", test: testMultiValue },
         { name: "Parameters", test: testParameters },
         { name: "Reference Is Null", test: testRefIsNull },

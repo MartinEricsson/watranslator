@@ -114,9 +114,27 @@ export function parseModule() {
                                 index: funcIndex
                             };
                         } else if (exportItem.kind === 'memory') {
+                            // Update memory export handling for multi-memory support
+                            let memIndex = 0;
+
+                            // For named memory references ($mem0, $mem1, etc.)
+                            if (exportItem.index.startsWith('$')) {
+                                const memoryName = exportItem.index;
+                                // Find memory index by name
+                                const memoryIdx = module.memories.findIndex(mem => mem.id === memoryName);
+                                if (memoryIdx !== -1) {
+                                    memIndex = memoryIdx;
+                                } else {
+                                    throw createError(`Unknown exported memory: ${memoryName}`);
+                                }
+                            } else {
+                                // For numeric memory indices (0, 1, etc.)
+                                memIndex = Number.parseInt(exportItem.index, 10) || 0;
+                            }
+
                             module.exports[exportItem.name] = {
                                 kind: 'memory',
-                                index: Number.parseInt(exportItem.index, 10) || 0
+                                index: memIndex
                             };
                         } else if (exportItem.kind === 'global') {
                             // Find global index by name

@@ -37,7 +37,7 @@ export function compileInstruction(instr, func, body, moduleFunctions, moduleGlo
         return;
     }
 
-    if (compileMemoryInstruction(instr, body)) {
+    if (compileMemoryInstruction(instr, body, module)) {
         return;
     }
 
