@@ -1,6 +1,6 @@
 {
 	"name": "watranslator",
-	"version": "0.2.1",
+	"version": "0.3.1",
 	"description": "WebAssembly Text Format (WAT) to WebAssembly Binary Format compiler",
 	"main": "watranslator.js",
 	"module": "watranslator.js",
@@ -16,6 +16,9 @@
 		"build": "node build.mjs",
 		"build:dev": "NODE_ENV=development node build.mjs",
 		"build:prod": "NODE_ENV=production node build.mjs",
+		"changeset": "changeset",
+		"changeset:version": "changeset version && pnpm install --no-frozen-lockfile && pnpm build",
+		"release": "changeset publish",
 		"biome:check": "biome check ./",
 		"biome:check-src": "biome check ./src",
 		"biome:check-tests": "biome check ./tests",
@@ -79,11 +82,14 @@
 		"url": "https://github.com/MartinEricsson/watranslator/issues"
 	},
 	"homepage": "https://github.com/MartinEricsson/watranslator#readme",
+	"packageManager": "pnpm@9.10.0",
 	"engines": {
 		"node": ">=22.0.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"esbuild": "^0.25.1"
+		"esbuild": "^0.25.1",
+		"@changesets/cli": "^2.27.9",
+		"@changesets/changelog-github": "^0.5.0"
 	}
 }
