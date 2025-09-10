@@ -12,4 +12,6 @@ Only solve the problem given, do not refactor other code or change any comments 
 
 Always add tests to all new features or changes.
 
-Always run the tests after making changes to ensure everything works as expected, `npm test`.
+Always run the tests after making changes to ensure everything works as expected, `pnpm test`.
+
+Always run `biome:check` to ensure the code is properly formatted, `pnpm biome:check`.

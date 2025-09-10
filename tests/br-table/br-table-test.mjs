@@ -2,55 +2,77 @@
 import { readTestData } from "../test-utils.mjs";
 
 async function testBrTable(debug = false) {
-    try {
-        const { wasmBuffer } = await readTestData('br-table/br-table.wat', debug);
-        const { instance } = await WebAssembly.instantiate(wasmBuffer, {});
+	try {
+		const { wasmBuffer } = await readTestData("br-table/br-table.wat", debug);
+		const { instance } = await WebAssembly.instantiate(wasmBuffer, {});
 
-        const tests = [
-            { name: "default", expected: undefined, func: "default", params: [] },
-            { name: "early_exit", expected: 10, func: "early_exit", params: [] },
-            { name: "switch_0", expected: 50, func: "switch", params: [0] },
-            { name: "switch_1", expected: 100, func: "switch", params: [1] },
-            { name: "switch_2", expected: 200, func: "switch", params: [2] },
-            { name: "switch_x", expected: 0, func: "switch", params: [1000] },
-            { name: "switch_direct_0", expected: 100, func: "switch_direct", params: [0] },
-            { name: "switch_direct_1", expected: 200, func: "switch_direct", params: [1] },
-            { name: "switch_direct_2", expected: 300, func: "switch_direct", params: [2] },
-            { name: "switch_direct_x", expected: 400, func: "switch_direct", params: [1000] },
-            /*{ name: "mixed_labels_0", expected: 10, func: "mixed_labels", params: [0] },
+		const tests = [
+			{ name: "default", expected: undefined, func: "default", params: [] },
+			{ name: "early_exit", expected: 10, func: "early_exit", params: [] },
+			{ name: "switch_0", expected: 50, func: "switch", params: [0] },
+			{ name: "switch_1", expected: 100, func: "switch", params: [1] },
+			{ name: "switch_2", expected: 200, func: "switch", params: [2] },
+			{ name: "switch_x", expected: 0, func: "switch", params: [1000] },
+			{
+				name: "switch_direct_0",
+				expected: 100,
+				func: "switch_direct",
+				params: [0],
+			},
+			{
+				name: "switch_direct_1",
+				expected: 200,
+				func: "switch_direct",
+				params: [1],
+			},
+			{
+				name: "switch_direct_2",
+				expected: 300,
+				func: "switch_direct",
+				params: [2],
+			},
+			{
+				name: "switch_direct_x",
+				expected: 400,
+				func: "switch_direct",
+				params: [1000],
+			},
+			/*{ name: "mixed_labels_0", expected: 10, func: "mixed_labels", params: [0] },
             { name: "mixed_labels_1", expected: 20, func: "mixed_labels", params: [1] },
             { name: "mixed_labels_x", expected: 30, func: "mixed_labels", params: [1000] },*/
-        ];
+		];
 
-        let results = [];
-        for (const { name, expected, func, params } of tests) {
-            const result = instance.exports[func](...params);
+		const results = [];
+		for (const { name, expected, func, params } of tests) {
+			const result = instance.exports[func](...params);
 
-            const resultRes = result === expected;
-            console.assert(resultRes, `❌ ${name} should return ${expected}, got ${result}`);
-            results.push(resultRes);
-            if (debug) {
-                console.log(`Debug: ${name} - Expected: ${expected}, Got: ${result}`);
-            }
-            if (resultRes) {
-                console.log(`✅ ${name} test passed!`);
-            } else {
-                console.error(`❌ ${name} test failed.`);
-            }
-        }
-        // check if all tests passed
-        const allTestsPassed = results.every(result => result);
-        if (allTestsPassed) {
-            console.log("✅ All br_table tests passed!");
-            return true;
-        } else {
-            console.error("❌ Some br_table tests failed.");
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ Error during br_table test:', error);
-        return false;
-    }
+			const resultRes = result === expected;
+			console.assert(
+				resultRes,
+				`❌ ${name} should return ${expected}, got ${result}`,
+			);
+			results.push(resultRes);
+			if (debug) {
+				console.log(`Debug: ${name} - Expected: ${expected}, Got: ${result}`);
+			}
+			if (resultRes) {
+				console.log(`✅ ${name} test passed!`);
+			} else {
+				console.error(`❌ ${name} test failed.`);
+			}
+		}
+		// check if all tests passed
+		const allTestsPassed = results.every((result) => result);
+		if (allTestsPassed) {
+			console.log("✅ All br_table tests passed!");
+			return true;
+		}
+		console.error("❌ Some br_table tests failed.");
+		return false;
+	} catch (error) {
+		console.error("❌ Error during br_table test:", error);
+		return false;
+	}
 }
 
 export default testBrTable;

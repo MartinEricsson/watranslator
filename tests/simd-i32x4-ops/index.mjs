@@ -3,9 +3,8 @@ import { testRunner } from "../test-utils.mjs";
 import testSIMDi32x4Ops from "./simd-i32x4-ops-test.mjs";
 
 try {
-    await testRunner(testSIMDi32x4Ops, "simd-i32x4-ops", true);
-}
-catch (error) {
-    console.error(`Test failed: ${error.message}`);
-    process.exit(1);
+	await testRunner(testSIMDi32x4Ops, "simd-i32x4-ops", true);
+} catch (error) {
+	console.error(`Test failed: ${error.message}`);
+	process.exit(1);
 }

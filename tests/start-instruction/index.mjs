@@ -2,13 +2,13 @@
 import testStartInstruction from "./start-instruction-test.mjs";
 
 testStartInstruction()
-  .then((result) => {
-    if (result) {
-      console.log("All tests passed!");
-    } else {
-      console.error("Some tests failed.");
-    }
-  })
-  .catch((error) => {
-    console.error("Error running tests:", error);
-  });
+	.then((result) => {
+		if (result) {
+			console.log("All tests passed!");
+		} else {
+			console.error("Some tests failed.");
+		}
+	})
+	.catch((error) => {
+		console.error("Error running tests:", error);
+	});
