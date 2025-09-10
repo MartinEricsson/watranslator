@@ -1,20 +1,20 @@
-import { atEnd, peekToken, getToken, getCurrentCursor } from './tape.mjs';
+import { atEnd, getCurrentCursor, getToken, peekToken } from "./tape.mjs";
 
 export function parseLocalVar() {
-    let name = null;
-    let type = null;
+	let name = null;
+	let type = null;
 
-    // Parse local name if present
-    if (!atEnd() && peekToken().startsWith('$')) {
-        name = getToken();
-    }
+	// Parse local name if present
+	if (!atEnd() && peekToken().startsWith("$")) {
+		name = getToken();
+	}
 
-    // Parse type if present
-    if (!atEnd()) {
-        type = getToken();
-    }
+	// Parse type if present
+	if (!atEnd()) {
+		type = getToken();
+	}
 
-    const position = getCurrentCursor();
+	const position = getCurrentCursor();
 
-    return { name, type, position };
+	return { name, type, position };
 }

@@ -1,105 +1,120 @@
-import { atEnd, peekToken, skipToken, getToken } from './tape.mjs';
+import { atEnd, getToken, peekToken, skipToken } from "./tape.mjs";
 
 export function parseData() {
-    // Parse data section: (data (i32.const <offset>) "<bytes>") or passive (data $name "<bytes>")
-    let offset = 0;
-    let bytes = "";
-    let id = null;
-    let isPassive = true;
+	// Parse data section: (data (i32.const <offset>) "<bytes>") or passive (data $name "<bytes>")
+	let offset = 0;
+	let bytes = "";
+	let id = null;
+	let isPassive = true;
 
-    // Check for data segment identifier
-    if (!atEnd() && peekToken().startsWith('$')) {
-        id = getToken();
-    }
+	// Check for data segment identifier
+	if (!atEnd() && peekToken().startsWith("$")) {
+		id = getToken();
+	}
 
-    // Parse offset expression or continue with passive segment
-    if (!atEnd() && peekToken() === '(') {
-        skipToken() // Skip opening paren
-        isPassive = false; // If we have offset expression, it's an active segment
+	// Parse offset expression or continue with passive segment
+	if (!atEnd() && peekToken() === "(") {
+		skipToken(); // Skip opening paren
+		isPassive = false; // If we have offset expression, it's an active segment
 
-        if (!atEnd() && peekToken() === 'i32.const') {
-            skipToken() // Skip i32.const
+		if (!atEnd() && peekToken() === "i32.const") {
+			skipToken(); // Skip i32.const
 
-            if (!atEnd() && /^-?\d+$/.test(peekToken())) {
-                offset = Number.parseInt(getToken(), 10);
-            }
+			if (!atEnd() && /^-?\d+$/.test(peekToken())) {
+				offset = Number.parseInt(getToken(), 10);
+			}
 
-            // Skip closing paren of the offset expression
-            if (!atEnd() && peekToken() === ')') {
-                skipToken()
-            }
-        } else {
-            // Skip unknown expression
-            while (!atEnd() && peekToken() !== ')') {
-                skipToken()
-            }
-            skipToken() // Skip closing paren
-        }
-    }
+			// Skip closing paren of the offset expression
+			if (!atEnd() && peekToken() === ")") {
+				skipToken();
+			}
+		} else {
+			// Skip unknown expression
+			while (!atEnd() && peekToken() !== ")") {
+				skipToken();
+			}
+			skipToken(); // Skip closing paren
+		}
+	}
 
-    // Parse bytes strings (can be multiple string literals in one data segment)
-    const rawStrings = [];
-    const processedBytes = [];
+	// Parse bytes strings (can be multiple string literals in one data segment)
+	const rawStrings = [];
+	const processedBytes = [];
 
-    while (!atEnd() && peekToken().startsWith('"') && peekToken().endsWith('"')) {
-        // Extract string content between quotes
-        let rawString = peekToken();
-        // Remove surrounding quotes
-        rawString = rawString.substring(1, rawString.length - 1);
+	while (!atEnd() && peekToken().startsWith('"') && peekToken().endsWith('"')) {
+		// Extract string content between quotes
+		let rawString = peekToken();
+		// Remove surrounding quotes
+		rawString = rawString.substring(1, rawString.length - 1);
 
-        rawStrings.push(rawString);
+		rawStrings.push(rawString);
 
-        // Process raw string to get the actual byte values
-        for (let i = 0; i < rawString.length; i++) {
-            if (rawString[i] === '\\') {
-                i++; // Skip the backslash
-                if (i < rawString.length) {
-                    const c = rawString[i];
+		// Process raw string to get the actual byte values
+		for (let i = 0; i < rawString.length; i++) {
+			if (rawString[i] === "\\") {
+				i++; // Skip the backslash
+				if (i < rawString.length) {
+					const c = rawString[i];
 
-                    // Handle 2-digit hex escapes \00 to \FF
-                    if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
-                        // Check if we have a second hex digit
-                        if (i + 1 < rawString.length) {
-                            const c2 = rawString[i + 1];
-                            if ((c2 >= '0' && c2 <= '9') || (c2 >= 'a' && c2 <= 'f') || (c2 >= 'A' && c2 <= 'F')) {
-                                // Two-digit hex escape
-                                const hexEscape = c + c2;
-                                processedBytes.push(Number.parseInt(hexEscape, 16));
-                                i++; // Skip the second hex digit
-                                continue;
-                            }
-                        }
+					// Handle 2-digit hex escapes \00 to \FF
+					if (
+						(c >= "0" && c <= "9") ||
+						(c >= "a" && c <= "f") ||
+						(c >= "A" && c <= "F")
+					) {
+						// Check if we have a second hex digit
+						if (i + 1 < rawString.length) {
+							const c2 = rawString[i + 1];
+							if (
+								(c2 >= "0" && c2 <= "9") ||
+								(c2 >= "a" && c2 <= "f") ||
+								(c2 >= "A" && c2 <= "F")
+							) {
+								// Two-digit hex escape
+								const hexEscape = c + c2;
+								processedBytes.push(Number.parseInt(hexEscape, 16));
+								i++; // Skip the second hex digit
+								continue;
+							}
+						}
 
-                        // Single digit hex
-                        processedBytes.push(Number.parseInt(c, 16));
-                    }
-                    // Common escape sequences
-                    else if (c === 't') processedBytes.push(9);   // Tab
-                    else if (c === 'n') processedBytes.push(10);  // Newline
-                    else if (c === 'r') processedBytes.push(13);  // Carriage return
-                    else if (c === '0') processedBytes.push(0);   // Null character
-                    else if (c === '\\') processedBytes.push(92); // Backslash
-                    else if (c === '"') processedBytes.push(34);  // Double quote
-                    else if (c === '\'') processedBytes.push(39); // Single quote
-                    else {
-                        // Unknown escape, treat it as the literal character
-                        processedBytes.push(rawString.charCodeAt(i));
-                    }
-                }
-            } else {
-                // Regular character
-                processedBytes.push(rawString.charCodeAt(i));
-            }
-        }
+						// Single digit hex
+						processedBytes.push(Number.parseInt(c, 16));
+					}
+					// Common escape sequences
+					else if (c === "t")
+						processedBytes.push(9); // Tab
+					else if (c === "n")
+						processedBytes.push(10); // Newline
+					else if (c === "r")
+						processedBytes.push(13); // Carriage return
+					else if (c === "0")
+						processedBytes.push(0); // Null character
+					else if (c === "\\")
+						processedBytes.push(92); // Backslash
+					else if (c === '"')
+						processedBytes.push(34); // Double quote
+					else if (c === "'")
+						processedBytes.push(39); // Single quote
+					else {
+						// Unknown escape, treat it as the literal character
+						processedBytes.push(rawString.charCodeAt(i));
+					}
+				}
+			} else {
+				// Regular character
+				processedBytes.push(rawString.charCodeAt(i));
+			}
+		}
 
-        skipToken();
-    }
+		skipToken();
+	}
 
-    // Store the processed bytes directly in a format our compiler can use
-    bytes = {
-        raw: rawStrings.join(''),
-        processedBytes: processedBytes
-    }; // Generated by 🤖
+	// Store the processed bytes directly in a format our compiler can use
+	bytes = {
+		raw: rawStrings.join(""),
+		processedBytes: processedBytes,
+	}; // Generated by 🤖
 
-    return { id, offset, bytes, isPassive };
+	return { id, offset, bytes, isPassive };
 }

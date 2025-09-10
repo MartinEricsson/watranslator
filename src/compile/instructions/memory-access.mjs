@@ -1,92 +1,117 @@
+import {
+	encodeULEB128,
+	getInstructionNaturalAlignment,
+} from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
-import { encodeULEB128, getInstructionNaturalAlignment } from "../compile-utils.mjs";
 import { createError } from "./error.mjs";
 
-const {
-    INSTR
-} = wasmConstants;
+const { INSTR } = wasmConstants;
 
 const MEMORY_ACCESS_INSTR = new Map([
-    ['i32.load', INSTR.I32_LOAD],
-    ['i32.load8_s', INSTR.I32_LOAD8_S],
-    ['i32.load8_u', INSTR.I32_LOAD8_U],
-    ['i32.load16_s', INSTR.I32_LOAD16_S],
-    ['i32.load16_u', INSTR.I32_LOAD16_U],
-    ['i64.load', INSTR.I64_LOAD],
-    ['i64.load8_s', INSTR.I64_LOAD8_S],
-    ['i64.load8_u', INSTR.I64_LOAD8_U],
-    ['i64.load16_s', INSTR.I64_LOAD16_S],
-    ['i64.load16_u', INSTR.I64_LOAD16_U],
-    ['i64.load32_s', INSTR.I64_LOAD32_S],
-    ['i64.load32_u', INSTR.I64_LOAD32_U],
-    ['f32.load', INSTR.F32_LOAD],
-    ['f64.load', INSTR.F64_LOAD],
-    ['i32.store', INSTR.I32_STORE],
-    ['i32.store8', INSTR.I32_STORE8],
-    ['i32.store16', INSTR.I32_STORE16],
-    ['i64.store', INSTR.I64_STORE],
-    ['i64.store8', INSTR.I64_STORE8],
-    ['i64.store16', INSTR.I64_STORE16],
-    ['i64.store32', INSTR.I64_STORE32],
-    ['f32.store', INSTR.F32_STORE],
-    ['f64.store', INSTR.F64_STORE]
+	["i32.load", INSTR.I32_LOAD],
+	["i32.load8_s", INSTR.I32_LOAD8_S],
+	["i32.load8_u", INSTR.I32_LOAD8_U],
+	["i32.load16_s", INSTR.I32_LOAD16_S],
+	["i32.load16_u", INSTR.I32_LOAD16_U],
+	["i64.load", INSTR.I64_LOAD],
+	["i64.load8_s", INSTR.I64_LOAD8_S],
+	["i64.load8_u", INSTR.I64_LOAD8_U],
+	["i64.load16_s", INSTR.I64_LOAD16_S],
+	["i64.load16_u", INSTR.I64_LOAD16_U],
+	["i64.load32_s", INSTR.I64_LOAD32_S],
+	["i64.load32_u", INSTR.I64_LOAD32_U],
+	["f32.load", INSTR.F32_LOAD],
+	["f64.load", INSTR.F64_LOAD],
+	["i32.store", INSTR.I32_STORE],
+	["i32.store8", INSTR.I32_STORE8],
+	["i32.store16", INSTR.I32_STORE16],
+	["i64.store", INSTR.I64_STORE],
+	["i64.store8", INSTR.I64_STORE8],
+	["i64.store16", INSTR.I64_STORE16],
+	["i64.store32", INSTR.I64_STORE32],
+	["f32.store", INSTR.F32_STORE],
+	["f64.store", INSTR.F64_STORE],
 ]);
 
 // Modified to properly handle imported memories
 export function compileMemoryAccess(instr, func, body, module) {
-    if (MEMORY_ACCESS_INSTR.has(instr.type)) {
-        // When using multi-memory, we need to correctly identify memory references
-        if (instr.memoryRef !== null) {
-            // Get memory index from either a name or numeric reference
-            let memoryIndex = 0;
+	if (MEMORY_ACCESS_INSTR.has(instr.type)) {
+		// When using multi-memory, we need to correctly identify memory references
+		if (instr.memoryRef !== null) {
+			// Get memory index from either a name or numeric reference
+			let memoryIndex = 0;
 
-            if (typeof instr.memoryRef === 'string' && instr.memoryRef.startsWith('$')) {
-                // For named memory reference, check the imports first
-                const importedMemIndex = module.imports
-                    .filter(imp => imp.kind === 'memory')
-                    .findIndex(imp => imp.field === instr.memoryRef.substring(1) || imp.name === instr.memoryRef);
+			if (
+				typeof instr.memoryRef === "string" &&
+				instr.memoryRef.startsWith("$")
+			) {
+				// For named memory reference, check the imports first
+				const importedMemIndex = module.imports
+					.filter((imp) => imp.kind === "memory")
+					.findIndex(
+						(imp) =>
+							imp.field === instr.memoryRef.substring(1) ||
+							imp.name === instr.memoryRef,
+					);
 
-                if (importedMemIndex !== -1) {
-                    memoryIndex = importedMemIndex;
-                } else {
-                    throw createError(instr, func, module, `Unknown memory reference: ${instr.memoryRef}`);
-                }
-            } else if (typeof instr.memoryRef === 'number') {
-                memoryIndex = instr.memoryRef;
-            }
+				if (importedMemIndex !== -1) {
+					memoryIndex = importedMemIndex;
+				} else {
+					throw createError(
+						instr,
+						func,
+						module,
+						`Unknown memory reference: ${instr.memoryRef}`,
+					);
+				}
+			} else if (typeof instr.memoryRef === "number") {
+				memoryIndex = instr.memoryRef;
+			}
 
-            // In the current standard WebAssembly implementation, multi-memory
-            // operations are handled differently - we use the default memory
-            // opcode but emit a warning that multi-memory might not be supported
-            console.warn(`⚠️ Multi-memory operation detected (${instr.type} with memory ${memoryIndex}). Note that explicit memory references are part of the multi-memory proposal and may not be supported in all environments.`);
+			// In the current standard WebAssembly implementation, multi-memory
+			// operations are handled differently - we use the default memory
+			// opcode but emit a warning that multi-memory might not be supported
+			console.warn(
+				`⚠️ Multi-memory operation detected (${instr.type} with memory ${memoryIndex}). Note that explicit memory references are part of the multi-memory proposal and may not be supported in all environments.`,
+			);
 
-            // Use standard memory access instruction for now (memory 0)
-            body.push(MEMORY_ACCESS_INSTR.get(instr.type));
-        } else {
-            // Standard single-memory operation (memory 0)
-            body.push(MEMORY_ACCESS_INSTR.get(instr.type));
-        }
+			// Use standard memory access instruction for now (memory 0)
+			body.push(MEMORY_ACCESS_INSTR.get(instr.type));
+		} else {
+			// Standard single-memory operation (memory 0)
+			body.push(MEMORY_ACCESS_INSTR.get(instr.type));
+		}
 
-        // Validate alignment
-        const align = instr.align || 0;
-        if (align < 0) {
-            throw createError(instr, func, module, `Invalid alignment value: ${align}`);
-        }
+		// Validate alignment
+		const align = instr.align || 0;
+		if (align < 0) {
+			throw createError(
+				instr,
+				func,
+				module,
+				`Invalid alignment value: ${align}`,
+			);
+		}
 
-        // Get natural alignment for this instruction type
-        const naturalAlign = getInstructionNaturalAlignment(instr.type);
+		// Get natural alignment for this instruction type
+		const naturalAlign = getInstructionNaturalAlignment(instr.type);
 
-        // Validate that alignment doesn't exceed natural alignment
-        if (align > naturalAlign) {
-            throw createError(instr, func, module, `Invalid alignment value: ${align}. Cannot exceed natural alignment of ${naturalAlign}`);
-        }
+		// Validate that alignment doesn't exceed natural alignment
+		if (align > naturalAlign) {
+			throw createError(
+				instr,
+				func,
+				module,
+				`Invalid alignment value: ${align}. Cannot exceed natural alignment of ${naturalAlign}`,
+			);
+		}
 
-        // Memory arguments: alignment and offset
-        body.push(...encodeULEB128(align));
-        body.push(...encodeULEB128(instr.offset || 0));
+		// Memory arguments: alignment and offset
+		body.push(...encodeULEB128(align));
+		body.push(...encodeULEB128(instr.offset || 0));
 
-        return true;
-    }
+		return true;
+	}
 
-    return false;
+	return false;
 } // Generated by 🤖
