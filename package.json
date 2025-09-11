@@ -68,7 +68,9 @@
 		"test:simd-replace-lane": "node tests/simd-replace-lane/index.mjs",
 		"test:simd-extract-lanei16x8": "node tests/simd-extract-lane-i16x8/index.mjs",
 		"test:simd-memory": "node tests/simd-memory/index.mjs",
-		"test:simd-swizzle-splat": "node tests/simd-swizzle-splat/index.mjs"
+		"test:simd-swizzle-splat": "node tests/simd-swizzle-splat/index.mjs",
+		"test:large-module": "node tests/large-module/index.mjs",
+		"bench": "node bench/run.mjs"
 	},
 	"keywords": ["webassembly", "wat", "wasm"],
 	"author": "LME",
