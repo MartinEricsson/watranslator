@@ -12,6 +12,7 @@ import { multivalueSection } from "./sections/multivalue.mjs";
 import { startSection } from "./sections/start.mjs";
 import { tableSection } from "./sections/table.mjs";
 import { typeSection } from "./sections/type.mjs";
+import { SourceMapManager } from "../sourcemap.mjs";
 
 const { BINARY } = wasmConstants;
 
@@ -20,6 +21,13 @@ const compileToWASM = (ast, options = {}) => {
 	const tStart = (typeof process !== "undefined" && process.hrtime?.bigint)
 		? process.hrtime.bigint()
 		: BigInt(Math.floor(performance.now() * 1e6));
+	
+	// Initialize source map manager if requested
+	let sourceMapManager = null;
+	if (options.sourceMap) {
+		sourceMapManager = new SourceMapManager();
+	}
+	
 	// Clean up and validate the AST
 	const module = sanitizeAST(ast);
 
@@ -81,7 +89,7 @@ const compileToWASM = (ast, options = {}) => {
 	}
 
 	// =================== CODE SECTION ===================
-	codeSection(functions, globals, module, binary);
+	codeSection(functions, globals, module, binary, sourceMapManager, options);
 
 	// =================== DATA SECTION ===================
 	if (module.datas && module.datas.length > 0) {
@@ -96,6 +104,15 @@ const compileToWASM = (ast, options = {}) => {
 		profile.compile_ns = Number(tEnd - tStart);
 		profile.wasm_bytes = result.byteLength;
 	}
+	
+	// Return object with binary and sourceMap if source mapping is enabled
+	if (sourceMapManager) {
+		return {
+			binary: result,
+			sourceMap: sourceMapManager.toJSON()
+		};
+	}
+	
 	return result;
 };
 
