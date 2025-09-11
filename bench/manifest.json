@@ -1,4 +1,4 @@
 [
-  { "path": "tests/large-module/large-module.wat", "tag": "large" },
-  { "path": "tests/simple-loop/simple-loop.wat", "tag": "small" }
+	{ "path": "tests/large-module/large-module.wat", "tag": "large" },
+	{ "path": "tests/simple-loop/simple-loop.wat", "tag": "small" }
 ]
