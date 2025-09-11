@@ -15,7 +15,11 @@ import { typeSection } from "./sections/type.mjs";
 
 const { BINARY } = wasmConstants;
 
-const compileToWASM = (ast) => {
+const compileToWASM = (ast, options = {}) => {
+	const profile = options.profile || null;
+	const tStart = (typeof process !== "undefined" && process.hrtime?.bigint)
+		? process.hrtime.bigint()
+		: BigInt(Math.floor(performance.now() * 1e6));
 	// Clean up and validate the AST
 	const module = sanitizeAST(ast);
 
@@ -88,7 +92,15 @@ const compileToWASM = (ast) => {
 		dataSection(module, binary);
 	}
 
-	return new Uint8Array(binary);
+	const result = new Uint8Array(binary);
+	if (profile) {
+		const tEnd = (typeof process !== "undefined" && process.hrtime?.bigint)
+			? process.hrtime.bigint()
+			: BigInt(Math.floor(performance.now() * 1e6));
+		profile.compile_ns = Number(tEnd - tStart);
+		profile.wasm_bytes = result.byteLength;
+	}
+	return result;
 };
 
 export { compileToWASM };

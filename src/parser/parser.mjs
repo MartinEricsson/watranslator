@@ -2,8 +2,19 @@ import { tokenize } from "../tokenize.mjs";
 import { parseExpression } from "./parse-expression.mjs";
 import { atEnd, initTape } from "./tape.mjs";
 
-export function parseWAT(src) {
+export function parseWAT(src, options = {}) {
+	const profile = options.profile || null;
+	const tStart = (typeof process !== "undefined" && process.hrtime?.bigint)
+		? process.hrtime.bigint()
+		: BigInt(Math.floor(performance.now() * 1e6));
+	const tTokStart = tStart;
 	const tokens = tokenize(src);
+	const tTokEnd = (typeof process !== "undefined" && process.hrtime?.bigint)
+		? process.hrtime.bigint()
+		: BigInt(Math.floor(performance.now() * 1e6));
+	if (profile) {
+		profile.tokenize_ns = Number(tTokEnd - tTokStart);
+	}
 	const sourceMap = tokens.sourceMap || new Map();
 
 	initTape(tokens, sourceMap);
@@ -158,5 +169,11 @@ export function parseWAT(src) {
 		}
 	}
 
+	const tParseEnd = (typeof process !== "undefined" && process.hrtime?.bigint)
+		? process.hrtime.bigint()
+		: BigInt(Math.floor(performance.now() * 1e6));
+	if (profile) {
+		profile.parse_ns = Number(tParseEnd - tTokEnd);
+	}
 	return ast;
 }
