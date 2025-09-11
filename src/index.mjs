@@ -10,7 +10,17 @@ const compile = async (wat, options = {}) => {
 	// Backwards compatible: if profiling requested, use profile helper
 	if (options?.profile) return compileWithProfile(wat);
 	const parsed = parseWAT(wat, options);
-	return compileToWASM(parsed, options);
+	const result = compileToWASM(parsed, options);
+	
+	// If source map is requested, return object with binary and sourceMap
+	if (options?.sourceMap) {
+		return {
+			binary: result.binary || result,
+			sourceMap: result.sourceMap
+		};
+	}
+	
+	return result.binary || result;
 };
 
 const compileWithProfile = async (wat) => {

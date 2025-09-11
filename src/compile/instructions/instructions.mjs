@@ -16,6 +16,22 @@ import { compileTableInstruction } from "./table.mjs";
 import { compileVariableAccess } from "./variable-access.mjs";
 import { compileVariableConstants } from "./variable-constants.mjs";
 
+/**
+ * Record source map entry before emitting opcode bytes
+ */
+function recordSourceMap(instr, sourceMapManager, funcIndex, body, options) {
+	if (sourceMapManager && instr.position && funcIndex !== null) {
+		const filename = options.filename || "input.wat";
+		sourceMapManager.addMapping({
+			file: filename,
+			line: instr.position.line - 1, // Convert to 0-based
+			column: instr.position.column - 1, // Convert to 0-based
+			funcIndex: funcIndex,
+			bodyOffset: body.length
+		});
+	}
+}
+
 export function compileInstruction(
 	instr,
 	func,
@@ -23,7 +39,13 @@ export function compileInstruction(
 	moduleFunctions,
 	moduleGlobals,
 	module,
+	sourceMapManager = null,
+	funcIndex = null,
+	options = {}
 ) {
+	// Record source map for this instruction
+	recordSourceMap(instr, sourceMapManager, funcIndex, body, options);
+
 	if (compileVariableAccess(instr, func, body, moduleGlobals, module)) {
 		return;
 	}
@@ -40,6 +62,9 @@ export function compileInstruction(
 			moduleFunctions,
 			moduleGlobals,
 			module,
+			sourceMapManager,
+			funcIndex,
+			options
 		)
 	) {
 		return;
