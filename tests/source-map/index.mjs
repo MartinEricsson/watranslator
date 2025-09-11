@@ -50,6 +50,7 @@ async function testSourceMap() {
 				console.log("✅ Source map entry has required fields");
 			} else {
 				console.log("❌ Source map entry missing required fields");
+				return false;
 			}
 			
 			// Validate that values are 0-based
@@ -58,14 +59,16 @@ async function testSourceMap() {
 				console.log("✅ Source map uses 0-based indexing");
 			} else {
 				console.log("❌ Source map should use 0-based indexing");
+				return false;
 			}
 		}
 		
 		console.log("✅ Source map test passed!");
+		return true; // Return true to indicate test passed
 		
 	} catch (error) {
 		console.error("❌ Source map test failed:", error);
-		throw error;
+		return false; // Return false to indicate test failed
 	}
 }
 
