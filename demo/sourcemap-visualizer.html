@@ -79,7 +79,7 @@
 
       .source-line {
         display: block;
-        padding: 2px 5px;
+        padding: 2px 0;
         border-radius: 3px;
         cursor: pointer;
       }
@@ -91,11 +91,15 @@
       .source-line.highlight {
         background-color: rgba(247, 186, 43, 0.3);
         border-left: 3px solid #f7ba2b;
+        padding-left: 5px;
       }
 
       .line-number {
         color: #6272a4;
-        margin-right: 10px;
+        display: inline-block;
+        width: 35px;
+        text-align: right;
+        margin-right: 8px;
         user-select: none;
       }
 
@@ -375,7 +379,7 @@
           const lineNumber = index + 1;
           const escapedLine = line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
           return `<div class="source-line" data-line="${lineNumber}">
-            <span class="line-number">${lineNumber.toString().padStart(3, ' ')}</span>${escapedLine}
+            <span class="line-number">${lineNumber}</span>${escapedLine}
           </div>`;
         }).join('');
         
