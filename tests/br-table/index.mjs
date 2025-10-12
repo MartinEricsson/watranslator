@@ -2,16 +2,16 @@
 import testBrTable from "./br-table-test.mjs";
 
 testBrTable(true)
-  .then((result) => {
-    if (result) {
-      console.log("All tests passed!");
-      process.exit(0);
-    } else {
-      console.error("Some tests failed.");
-      process.exit(1);
-    }
-  })
-  .catch((error) => {
-    console.error("Error running tests:", error);
-    process.exit(1);
-  });
+	.then((result) => {
+		if (result) {
+			console.log("All tests passed!");
+			process.exit(0);
+		} else {
+			console.error("Some tests failed.");
+			process.exit(1);
+		}
+	})
+	.catch((error) => {
+		console.error("Error running tests:", error);
+		process.exit(1);
+	});

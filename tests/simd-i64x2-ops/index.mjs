@@ -3,8 +3,8 @@ import testSIMDI64x2Ops from "./simd-i64x2-ops-test.mjs";
 
 // Run the test
 try {
-    await testRunner(testSIMDI64x2Ops, { debug: true });
+	await testRunner(testSIMDI64x2Ops, { debug: true });
 } catch (error) {
-    console.error("Test failed:", error);
-    process.exit(1);
+	console.error("Test failed:", error);
+	process.exit(1);
 }

@@ -4,10 +4,9 @@ import { testRunner } from "../test-utils.mjs";
 import testSIMDConversionOps from "./simd-conversion-ops-test.mjs";
 
 try {
-    await testRunner(testSIMDConversionOps, "simd-conversion-ops", true);
-    console.log('✅ All simd-conversion-ops tests passed successfully!');
-}
-catch (error) {
-    console.error(`❌ Test failed: ${error.message}`);
-    process.exit(1);
+	await testRunner(testSIMDConversionOps, "simd-conversion-ops", true);
+	console.log("✅ All simd-conversion-ops tests passed successfully!");
+} catch (error) {
+	console.error(`❌ Test failed: ${error.message}`);
+	process.exit(1);
 }

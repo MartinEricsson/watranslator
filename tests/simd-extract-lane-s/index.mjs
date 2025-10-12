@@ -1,13 +1,13 @@
-import simdExtractLaneSTest from './simd-extract-lane-s-test.mjs';
-import { testRunner } from '../test-utils.mjs';
+import { testRunner } from "../test-utils.mjs";
+import simdExtractLaneSTest from "./simd-extract-lane-s-test.mjs";
 try {
-    const results = await Promise.all([
-        testRunner(simdExtractLaneSTest, 'simd-extract-lane-s', true),
-    ]);
-    if (results.includes(false)) {
-        throw new Error('One or more tests failed');
-    }
+	const results = await Promise.all([
+		testRunner(simdExtractLaneSTest, "simd-extract-lane-s", true),
+	]);
+	if (results.includes(false)) {
+		throw new Error("One or more tests failed");
+	}
 } catch (e) {
-    console.error('Test failed:', e);
-    process.exit(1);
+	console.error("Test failed:", e);
+	process.exit(1);
 }

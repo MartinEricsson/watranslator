@@ -2,49 +2,107 @@
 import { readTestData } from "../test-utils.mjs";
 
 async function testErrorHandling(debug = false) {
-  let passed = 0;
-  let failed = 0;
+	let passed = 0;
+	let failed = 0;
 
-  const tests = [
-    { name: 'Exceed natural alignment for i32.load', file: 'exceed-natural-alignment-i32', expectedErrorMessage: 'Invalid alignment value: 3. Cannot exceed natural alignment of 2', line: 5 },
-    { name: 'Exceed natural alignment for i64.load', file: 'exceed-natural-alignment-i64', expectedErrorMessage: 'Invalid alignment value: 4. Cannot exceed natural alignment of 3', line: 5 },
-    { name: "Immutable global set", file: 'immutable-global-set', expectedErrorMessage: 'Cannot set immutable global', line: 5 },
-    { name: 'Unclosed comment', file: 'unclosed-comment', expectedErrorMessage: 'Unclosed multi-line comment', line: 2 },
-    //⚠️{ name: 'Unclosed parenthesis', file: 'unclosed-parenthesis', expectedErrorMessage: 'No more tokens to skip', line: 3 },
-    { name: 'Invalid instruction', file: 'invalid-instruction', expectedErrorMessage: 'Unrecognized instruction', line: 3 },
-    { name: 'Invalid memory offset', file: 'invalid-memory-offset', expectedErrorMessage: 'Invalid offset value', line: 5 },
-    { name: 'Unclosed string', file: 'unclosed-string', expectedErrorMessage: 'Unclosed string', line: 2 },
-    { name: 'Invalid memory align', file: 'invalid-memory-align', expectedErrorMessage: 'Invalid align value', line: 5 },
-    { name: 'Undefined function call', file: 'undefined-function', expectedErrorMessage: 'Unknown function', line: 4 },
-    //⚠️{ name: 'Type mismatch', file: 'type-mismatch', expectedErrorMessage: 'Type mismatch', line: 9 },
-    //⚠️{ name: 'Invalid branch target', file: 'invalid-branch-target', expectedErrorMessage: 'Invalid branch target', line: 4 },
-    //⚠️{ name: 'Invalid result type', file: 'invalid-result-type', expectedErrorMessage: 'Unknown type', line: 2 },
-    { name: "Negative alignment i32", file: "negative-alignment-i32", expectedErrorMessage: "Invalid alignment value", line: 5 }
-  ]
+	const tests = [
+		{
+			name: "Exceed natural alignment for i32.load",
+			file: "exceed-natural-alignment-i32",
+			expectedErrorMessage:
+				"Invalid alignment value: 3. Cannot exceed natural alignment of 2",
+			line: 5,
+		},
+		{
+			name: "Exceed natural alignment for i64.load",
+			file: "exceed-natural-alignment-i64",
+			expectedErrorMessage:
+				"Invalid alignment value: 4. Cannot exceed natural alignment of 3",
+			line: 5,
+		},
+		{
+			name: "Immutable global set",
+			file: "immutable-global-set",
+			expectedErrorMessage: "Cannot set immutable global",
+			line: 5,
+		},
+		{
+			name: "Unclosed comment",
+			file: "unclosed-comment",
+			expectedErrorMessage: "Unclosed multi-line comment",
+			line: 2,
+		},
+		//⚠️{ name: 'Unclosed parenthesis', file: 'unclosed-parenthesis', expectedErrorMessage: 'No more tokens to skip', line: 3 },
+		{
+			name: "Invalid instruction",
+			file: "invalid-instruction",
+			expectedErrorMessage: "Unrecognized instruction",
+			line: 3,
+		},
+		{
+			name: "Invalid memory offset",
+			file: "invalid-memory-offset",
+			expectedErrorMessage: "Invalid offset value",
+			line: 5,
+		},
+		{
+			name: "Unclosed string",
+			file: "unclosed-string",
+			expectedErrorMessage: "Unclosed string",
+			line: 2,
+		},
+		{
+			name: "Invalid memory align",
+			file: "invalid-memory-align",
+			expectedErrorMessage: "Invalid align value",
+			line: 5,
+		},
+		{
+			name: "Undefined function call",
+			file: "undefined-function",
+			expectedErrorMessage: "Unknown function",
+			line: 4,
+		},
+		//⚠️{ name: 'Type mismatch', file: 'type-mismatch', expectedErrorMessage: 'Type mismatch', line: 9 },
+		//⚠️{ name: 'Invalid branch target', file: 'invalid-branch-target', expectedErrorMessage: 'Invalid branch target', line: 4 },
+		//⚠️{ name: 'Invalid result type', file: 'invalid-result-type', expectedErrorMessage: 'Unknown type', line: 2 },
+		{
+			name: "Negative alignment i32",
+			file: "negative-alignment-i32",
+			expectedErrorMessage: "Invalid alignment value",
+			line: 5,
+		},
+	];
 
-  for (const { name, file, expectedErrorMessage, line } of tests) {
-    try {
-      await readTestData(`error-handling/${file}.wat`, debug);
-      console.log(`❌❌ Test ${name} compiled: Compilation succeeded not as expected`);
-      failed++;
-    } catch (error) {
-      //console.error(`✅ Test ${name} failed to compile:`);
-      if (error.message.includes(expectedErrorMessage)) {
-        if (line && error.context.position.line !== line) {
-          console.log(`❌ Test ${name} failed: Expected line number ${line}, but got ${error.line}`);
-          failed++;
-        } else {
-          console.log(`✅ Test ${name} passed: Expected line number ${line}`);
-          passed++;
-        }
-      } else {
-        console.log(`❌ Test ${name} failed: Expected error message "${expectedErrorMessage}", but got "${error.message}"`);
-        failed++;
-      }
-    }
-  }
+	for (const { name, file, expectedErrorMessage, line } of tests) {
+		try {
+			await readTestData(`error-handling/${file}.wat`, debug);
+			console.log(
+				`❌❌ Test ${name} compiled: Compilation succeeded not as expected`,
+			);
+			failed++;
+		} catch (error) {
+			//console.error(`✅ Test ${name} failed to compile:`);
+			if (error.message.includes(expectedErrorMessage)) {
+				if (line && error.context.position.line !== line) {
+					console.log(
+						`❌ Test ${name} failed: Expected line number ${line}, but got ${error.line}`,
+					);
+					failed++;
+				} else {
+					console.log(`✅ Test ${name} passed: Expected line number ${line}`);
+					passed++;
+				}
+			} else {
+				console.log(
+					`❌ Test ${name} failed: Expected error message "${expectedErrorMessage}", but got "${error.message}"`,
+				);
+				failed++;
+			}
+		}
+	}
 
-  return passed === tests.length;
+	return passed === tests.length;
 }
 
 export default testErrorHandling;
