@@ -7,6 +7,13 @@
         select (result i32)  ;; typed select with explicit result type
     )
     
+    (func $select_i64 (param $condition i32) (param $a i64) (param $b i64) (result i64)
+        local.get $a    ;; value1
+        local.get $b    ;; value2
+        local.get $condition
+        select (result i64)  ;; typed select with explicit result type
+    )
+    
     (func $select_f32 (param $condition i32) (param $a f32) (param $b f32) (result f32)
         local.get $a    ;; value1
         local.get $b    ;; value2
@@ -14,6 +21,15 @@
         select (result f32)  ;; typed select with explicit result type
     )
     
+    (func $select_f64 (param $condition i32) (param $a f64) (param $b f64) (result f64)
+        local.get $a    ;; value1
+        local.get $b    ;; value2
+        local.get $condition
+        select (result f64)  ;; typed select with explicit result type
+    )
+    
     (export "select_i32" (func $select_i32))
+    (export "select_i64" (func $select_i64))
     (export "select_f32" (func $select_f32))
+    (export "select_f64" (func $select_f64))
 )

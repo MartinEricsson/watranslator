@@ -19,6 +19,39 @@ async function testTypedSelect(debug = false) {
 				func: "select_i32",
 				params: [0, 1, 0],
 			},
+			{
+				name: "select_i32_3",
+				expected: 10,
+				func: "select_i32",
+				params: [1, 10, 20],
+			},
+			{
+				name: "select_i32_4",
+				expected: 20,
+				func: "select_i32",
+				params: [0, 10, 20],
+			},
+		];
+
+		const i64Tests = [
+			{
+				name: "select_i64_1",
+				expected: 100n,
+				func: "select_i64",
+				params: [1, 100n, 200n],
+			},
+			{
+				name: "select_i64_2",
+				expected: 200n,
+				func: "select_i64",
+				params: [0, 100n, 200n],
+			},
+			{
+				name: "select_i64_3",
+				expected: 9007199254740991n,
+				func: "select_i64",
+				params: [1, 9007199254740991n, 1n],
+			},
 		];
 
 		const f32Tests = [
@@ -36,12 +69,36 @@ async function testTypedSelect(debug = false) {
 			},
 		];
 
-		const allTests = [...i32Tests, ...f32Tests];
+		const f64Tests = [
+			{
+				name: "select_f64_1",
+				expected: 3.14,
+				func: "select_f64",
+				params: [1, 3.14, 2.71],
+			},
+			{
+				name: "select_f64_2",
+				expected: 2.71,
+				func: "select_f64",
+				params: [0, 3.14, 2.71],
+			},
+			{
+				name: "select_f64_3",
+				expected: 1.5,
+				func: "select_f64",
+				params: [1, 1.5, 2.5],
+			},
+		];
+
+		const allTests = [...i32Tests, ...i64Tests, ...f32Tests, ...f64Tests];
 		const results = [];
 
 		for (const { name, expected, func, params } of allTests) {
 			const result = instance.exports[func](...params);
-			const resultRes = Math.abs(result - expected) < 0.0001; // Allow small float differences
+			// Handle BigInt comparisons for i64 tests
+			const resultRes = typeof expected === 'bigint' 
+				? result === expected 
+				: Math.abs(result - expected) < 0.0001; // Allow small float differences
 			console.assert(
 				resultRes,
 				`❌ ${name} should return ${expected}, got ${result}`,

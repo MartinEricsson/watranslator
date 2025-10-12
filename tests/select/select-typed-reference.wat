@@ -2,18 +2,27 @@
 (module
     (table $t 4 funcref)
     
-    (func $dummy)
+    (func $dummy
+        nop
+    )
     
-    (func $select_funcref (param $condition i32) (param $idx1 i32) (param $idx2 i32) (result funcref)
-        local.get $idx1
+    (func $select_funcref (param $condition i32) (result funcref)
+        i32.const 0
         table.get $t
-        local.get $idx2
-        table.get $t
+        ref.null func
         local.get $condition
         select (result funcref)  ;; typed select with reference type
     )
     
-    (elem (table $t) (i32.const 0) func $dummy)
+    (func $select_externref (param $a externref) (param $b externref) (param $condition i32) (result externref)
+        local.get $a
+        local.get $b
+        local.get $condition
+        select (result externref)  ;; typed select with externref
+    )
+    
+    (elem (i32.const 0) $dummy)
     
     (export "select_funcref" (func $select_funcref))
+    (export "select_externref" (func $select_externref))
 )
