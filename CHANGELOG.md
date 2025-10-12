@@ -1,15 +1,19 @@
 # watranslator
 
+## 0.4.0
+
+### Minor Changes
+
+- [#6](https://github.com/MartinEricsson/watranslator/pull/6) [`5e0ff33`](https://github.com/MartinEricsson/watranslator/commit/5e0ff337c9ff3f1cedf6e1b51abf3b2bd085658c) Thanks [@MartinEricsson](https://github.com/MartinEricsson)! - Initial version bump adding pnpm + Changesets integration.
+
 ## 0.3.1
 
 ### Patch Changes
 
 - Restore changelog generation using @changesets/changelog-github.
 
-
 ## 0.3.0
 
 ### Minor Changes
 
 - Initial version bump adding pnpm + Changesets integration.
-
