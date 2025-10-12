@@ -62,6 +62,7 @@ import testRemainder from "./remainder/remainder-test.mjs";
 import testSelect from "./select/select-test.mjs";
 import testSelectReference from "./select/select-typed-reference-test.mjs";
 import testTypedSelect from "./select/select-typed-test.mjs";
+import testSignExtension from "./sign-extension/sign-extension-test.mjs";
 import testSIMDConstError from "./simd-const/simd-const-error-test.mjs";
 import testSIMDConst from "./simd-const/simd-const-test.mjs";
 import testSIMDConversionOps from "./simd-conversion-ops/simd-conversion-ops-test.mjs";
@@ -225,6 +226,7 @@ async function runTests() {
 		{ name: "SIMD Replace All Lane", test: simdReplaceAllLaneTest },
 		{ name: "SIMD Vector Ops", test: testSIMDVectorOps },
 		{ name: "Select", test: testSelect },
+		{ name: "Sign Extension", test: testSignExtension },
 		{ name: "Subtraction", test: testSubtraction },
 		{ name: "Start instruction", test: testStartInstruction },
 		{ name: "Table Copy", test: testTableCopy },
