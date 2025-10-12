@@ -1,5 +1,11 @@
 # watranslator
 
+## 0.5.1
+
+### Patch Changes
+
+- [#19](https://github.com/MartinEricsson/watranslator/pull/19) [`5b4891e`](https://github.com/MartinEricsson/watranslator/commit/5b4891ef21e3da0381eaee7e2a0829dcf4f2b865) Thanks [@MartinEricsson](https://github.com/MartinEricsson)! - Linted the code.
+
 ## 0.5.0
 
 ### Minor Changes
