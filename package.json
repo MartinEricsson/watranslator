@@ -18,7 +18,7 @@
 		"build:prod": "NODE_ENV=production node build.mjs",
 		"changeset": "changeset",
 		"changeset:version": "changeset version && pnpm install --no-frozen-lockfile && pnpm build",
-		"release": "changeset publish",
+		"release": "pnpm build && changeset publish",
 		"biome:check": "biome check ./",
 		"biome:check-src": "biome check ./src",
 		"biome:check-tests": "biome check ./tests",
@@ -84,6 +84,9 @@
 		"url": "https://github.com/MartinEricsson/watranslator/issues"
 	},
 	"homepage": "https://github.com/MartinEricsson/watranslator#readme",
+	"publishConfig": {
+		"access": "public"
+	},
 	"packageManager": "pnpm@9.10.0",
 	"engines": {
 		"node": ">=22.0.0"
