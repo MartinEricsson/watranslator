@@ -19,8 +19,42 @@ async function testSelectReference(debug = false) {
 		const result1 = instance.exports.select_funcref(1);
 		const result2 = instance.exports.select_funcref(0);
 
-		// If we get here without errors, the test passes
+		// Verify result1 is not null (should be the dummy function)
+		// Verify result2 is null (should be ref.null func)
+		if (result1 === null) {
+			throw new Error("Expected result1 to be non-null function reference");
+		}
+		if (result2 !== null) {
+			throw new Error("Expected result2 to be null");
+		}
+
 		console.log("✅ Typed select with funcref test passed!");
+
+		// Test externref
+		if (typeof instance.exports.select_externref !== "function") {
+			throw new Error("select_externref export not found or not a function");
+		}
+
+		// Create external references (JavaScript objects)
+		const ref1 = { value: "first" };
+		const ref2 = { value: "second" };
+
+		// Test selecting ref1 when condition is 1
+		const externResult1 = instance.exports.select_externref(ref1, ref2, 1);
+		if (externResult1 !== ref1) {
+			throw new Error("Expected externResult1 to be ref1");
+		}
+
+		// Test selecting ref2 when condition is 0
+		const externResult2 = instance.exports.select_externref(ref1, ref2, 0);
+		if (externResult2 !== ref2) {
+			throw new Error("Expected externResult2 to be ref2");
+		}
+
+		console.log("✅ Typed select with externref test passed!");
+
+		// If we get here without errors, the test passes
+		console.log("✅ All typed select reference tests passed!");
 		return true;
 	} catch (error) {
 		console.error("❌ Error testing typed select with reference type:", error);
