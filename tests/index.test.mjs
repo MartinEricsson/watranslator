@@ -102,6 +102,7 @@ import testCompilation from "./test-compiler/test-compiler.mjs";
 import { testTypeConversionF64 } from "./type-conversion-f64/type-conversion-f64-test.mjs";
 import { testTypeConversionI64ToF64 } from "./type-conversion-i64-f64/type-conversion-i64-f64-test.mjs";
 import testTypeConversion from "./type-conversion/type-conversion.mjs";
+import testNonTrappingConversions from "./non-trapping-conversions/non-trapping-conversions-test.mjs";
 import testUnreachable from "./unreachable/unreachable-test.mjs";
 
 import testMultiMemoryIndexes from "./multi-memory/multi-memory-indexes-test.mjs";
@@ -243,6 +244,7 @@ async function runTests() {
 		{ name: "Type Conversion", test: testTypeConversion },
 		{ name: "Type Conversion F64", test: testTypeConversionF64 },
 		{ name: "Type Conversion i64 to F64", test: testTypeConversionI64ToF64 },
+		{ name: "Non-Trapping Conversions", test: testNonTrappingConversions },
 		{ name: "Typed Select", test: testTypedSelect },
 		//{ name: "Typed Select Funcref", test: testSelectReference },
 		{ name: "Unreachable", test: testUnreachable },
