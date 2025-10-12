@@ -55,6 +55,7 @@ import testMemoryStorei64 from "./memory-store/i64-store-test.mjs";
 import testMemoryStore from "./memory-store/memory-store-test.mjs";
 import testMultiValue from "./multi-value/multi-value-test.mjs";
 import { testMultipleFunctionArguments } from "./multiple-function-arguments/multiple-function-arguments.mjs";
+import testNop from "./nop/nop-test.mjs";
 import testParameters from "./parameters/parameters-test.mjs";
 import testProfile from "./performance/profile-test.mjs";
 import testRefIsNull from "./reference-opcodes/ref-is-null-test.mjs";
@@ -194,6 +195,7 @@ async function runTests() {
 		{ name: "Multi Memory", test: testMultiMemory },
 		{ name: "Multi Memory Indexes", test: testMultiMemoryIndexes },
 		{ name: "Multi Value", test: testMultiValue },
+		{ name: "Nop", test: testNop },
 		{ name: "Parameters", test: testParameters },
 		{ name: "Reference Is Null", test: testRefIsNull },
 		{ name: "Remainder", test: testRemainder },

@@ -47,6 +47,7 @@
 		"test:f64-math-and-ops": "node tests/f64-math-and-ops/index.mjs",
 		"test:bulk-memory": "node tests/bulk-memory/index.mjs",
 		"test:multi-value": "node tests/multi-value/index.mjs",
+		"test:nop": "node tests/nop/index.mjs",
 		"test:memory-init": "node tests/memory-init/index.mjs",
 		"test:memory-fill": "node tests/memory-fill/index.mjs",
 		"test:table-funcref": "node tests/table-funcref/index.mjs",
