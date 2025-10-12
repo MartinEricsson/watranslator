@@ -21,17 +21,71 @@ function compileMemoryInit(body, instr, module) {
 }
 
 export function compileMemoryInstruction(instr, body, module) {
+	// Helper function to resolve memory index
+	const resolveMemoryIndex = (memoryRef) => {
+		if (memoryRef === null || memoryRef === undefined) {
+			return 0; // Default to memory 0
+		}
+
+		if (typeof memoryRef === "number") {
+			return memoryRef;
+		}
+
+		if (typeof memoryRef === "string" && memoryRef.startsWith("$")) {
+			const memoryName = memoryRef.substring(1);
+
+			// Check imported memories first
+			const importedMemIndex = module.imports
+				?.filter((imp) => imp.kind === "memory")
+				.findIndex(
+					(imp) => imp.field === memoryName || imp.name === memoryRef,
+				);
+
+			if (importedMemIndex !== -1) {
+				return importedMemIndex;
+			}
+
+			// Check module-defined memories
+			if (module.memories) {
+				const localMemIndex = module.memories.findIndex(
+					(mem) => mem.id === memoryRef || mem.name === memoryName,
+				);
+				if (localMemIndex !== -1) {
+					// Add offset for imported memories
+					const importedMemCount =
+						module.imports?.filter((imp) => imp.kind === "memory").length || 0;
+					return importedMemCount + localMemIndex;
+				}
+			}
+
+			throw createError(
+				instr,
+				null,
+				module,
+				`Unknown memory reference: ${memoryRef}`,
+			);
+		}
+
+		return 0;
+	};
+
 	if (instr.type === "memory.size") {
-		// Standard memory.size for default memory - no special handling needed
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const memoryIndex = hasMultipleMemories || instr.memoryRef !== null ? resolveMemoryIndex(instr.memoryRef) : 0;
 		body.push(INSTR.MEMORY_SIZE);
-		body.push(0x00); // Memory index 0 in single-memory mode
+		body.push(...encodeULEB128(memoryIndex));
 		return true;
 	}
 
 	if (instr.type === "memory.grow") {
-		// Standard memory.grow for default memory - no special handling needed
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const memoryIndex = hasMultipleMemories || instr.memoryRef !== null ? resolveMemoryIndex(instr.memoryRef) : 0;
 		body.push(INSTR.MEMORY_GROW);
-		body.push(0x00); // Memory index 0 in single-memory mode
+		body.push(...encodeULEB128(memoryIndex));
 		return true;
 	}
 
@@ -50,19 +104,26 @@ export function compileMemoryInstruction(instr, body, module) {
 
 	// Handle memory operations that don't strictly need data segments
 	if (instr.type === "memory.fill") {
-		// memory.fill is a bulk memory operation with prefix
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const memoryIndex = hasMultipleMemories || instr.memoryRef !== null ? resolveMemoryIndex(instr.memoryRef) : 0;
 		body.push(INSTR.BULK_PREFIX); // 0xFC prefix for bulk memory operations
 		body.push(0x0b); // 0x0B opcode for memory.fill
-		body.push(0x00); // Reserved value (memory index) - must be 0 in the MVP
+		body.push(...encodeULEB128(memoryIndex));
 		return true;
 	}
 
 	if (instr.type === "memory.copy") {
-		// memory.copy is a bulk memory operation with prefix
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const destMemoryIndex = hasMultipleMemories || instr.destMemoryRef !== null ? resolveMemoryIndex(instr.destMemoryRef) : 0;
+		const srcMemoryIndex = hasMultipleMemories || instr.srcMemoryRef !== null ? resolveMemoryIndex(instr.srcMemoryRef) : 0;
 		body.push(INSTR.BULK_PREFIX); // 0xFC prefix for bulk memory operations
 		body.push(INSTR.MEMORY_COPY); // 0x0A opcode for memory.copy
-		body.push(0x00); // Destination memory index - must be 0 in the MVP
-		body.push(0x00); // Source memory index - must be 0 in the MVP
+		body.push(...encodeULEB128(destMemoryIndex));
+		body.push(...encodeULEB128(srcMemoryIndex));
 		return true;
 	}
 

@@ -107,6 +107,7 @@ import testUnreachable from "./unreachable/unreachable-test.mjs";
 
 import testMultiMemoryIndexes from "./multi-memory/multi-memory-indexes-test.mjs";
 import testMultiMemory from "./multi-memory/multi-memory-test.mjs";
+import testMultiMemoryExplicitIndices from "./multi-memory/multi-memory-explicit-indices-test.mjs";
 
 const args = process.argv.slice(2);
 const debug = args.includes("--debug");
@@ -195,6 +196,10 @@ async function runTests() {
 		},
 		{ name: "Multi Memory", test: testMultiMemory },
 		{ name: "Multi Memory Indexes", test: testMultiMemoryIndexes },
+		{
+			name: "Multi Memory Explicit Indices",
+			test: testMultiMemoryExplicitIndices,
+		},
 		{ name: "Multi Value", test: testMultiValue },
 		{ name: "Nop", test: testNop },
 		{ name: "Parameters", test: testParameters },
