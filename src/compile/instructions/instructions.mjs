@@ -27,7 +27,7 @@ function recordSourceMap(instr, sourceMapManager, funcIndex, body, options) {
 			line: instr.position.line - 1, // Convert to 0-based
 			column: instr.position.column - 1, // Convert to 0-based
 			funcIndex: funcIndex,
-			bodyOffset: body.length
+			bodyOffset: body.length,
 		});
 	}
 }
@@ -41,7 +41,7 @@ export function compileInstruction(
 	module,
 	sourceMapManager = null,
 	funcIndex = null,
-	options = {}
+	options = {},
 ) {
 	// Record source map for this instruction
 	recordSourceMap(instr, sourceMapManager, funcIndex, body, options);
@@ -64,7 +64,7 @@ export function compileInstruction(
 			module,
 			sourceMapManager,
 			funcIndex,
-			options
+			options,
 		)
 	) {
 		return;

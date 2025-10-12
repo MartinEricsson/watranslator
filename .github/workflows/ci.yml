@@ -36,5 +36,5 @@ jobs:
     - name: Run tests
       run: pnpm test
       
-    - name: Build production
+    - name: Build production (with benchmarks)
       run: pnpm run build:prod
