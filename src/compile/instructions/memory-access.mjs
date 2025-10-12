@@ -36,51 +36,8 @@ const MEMORY_ACCESS_INSTR = new Map([
 // Modified to properly handle imported memories
 export function compileMemoryAccess(instr, func, body, module) {
 	if (MEMORY_ACCESS_INSTR.has(instr.type)) {
-		// When using multi-memory, we need to correctly identify memory references
-		if (instr.memoryRef !== null) {
-			// Get memory index from either a name or numeric reference
-			let memoryIndex = 0;
-
-			if (
-				typeof instr.memoryRef === "string" &&
-				instr.memoryRef.startsWith("$")
-			) {
-				// For named memory reference, check the imports first
-				const importedMemIndex = module.imports
-					.filter((imp) => imp.kind === "memory")
-					.findIndex(
-						(imp) =>
-							imp.field === instr.memoryRef.substring(1) ||
-							imp.name === instr.memoryRef,
-					);
-
-				if (importedMemIndex !== -1) {
-					memoryIndex = importedMemIndex;
-				} else {
-					throw createError(
-						instr,
-						func,
-						module,
-						`Unknown memory reference: ${instr.memoryRef}`,
-					);
-				}
-			} else if (typeof instr.memoryRef === "number") {
-				memoryIndex = instr.memoryRef;
-			}
-
-			// In the current standard WebAssembly implementation, multi-memory
-			// operations are handled differently - we use the default memory
-			// opcode but emit a warning that multi-memory might not be supported
-			console.warn(
-				`⚠️ Multi-memory operation detected (${instr.type} with memory ${memoryIndex}). Note that explicit memory references are part of the multi-memory proposal and may not be supported in all environments.`,
-			);
-
-			// Use standard memory access instruction for now (memory 0)
-			body.push(MEMORY_ACCESS_INSTR.get(instr.type));
-		} else {
-			// Standard single-memory operation (memory 0)
-			body.push(MEMORY_ACCESS_INSTR.get(instr.type));
-		}
+		// Use standard memory access instruction
+		body.push(MEMORY_ACCESS_INSTR.get(instr.type));
 
 		// Validate alignment
 		const align = instr.align || 0;
@@ -109,6 +66,54 @@ export function compileMemoryAccess(instr, func, body, module) {
 		// Memory arguments: alignment and offset
 		body.push(...encodeULEB128(align));
 		body.push(...encodeULEB128(instr.offset || 0));
+
+		// When using multi-memory, encode the memory index
+		if (instr.memoryRef !== null && instr.memoryRef !== undefined) {
+			let memoryIndex = 0;
+
+			if (
+				typeof instr.memoryRef === "string" &&
+				instr.memoryRef.startsWith("$")
+			) {
+				// For named memory reference, find the memory index
+				const memoryName = instr.memoryRef.substring(1);
+				
+				// Check imported memories first
+				const importedMemIndex = module.imports
+					?.filter((imp) => imp.kind === "memory")
+					.findIndex(
+						(imp) => imp.field === memoryName || imp.name === instr.memoryRef,
+					);
+
+				if (importedMemIndex !== -1) {
+					memoryIndex = importedMemIndex;
+				} else if (module.memories) {
+					// Check module-defined memories
+					const localMemIndex = module.memories.findIndex(
+						(mem) => mem.id === instr.memoryRef || mem.name === memoryName,
+					);
+					if (localMemIndex !== -1) {
+						// Add offset for imported memories
+						const importedMemCount = module.imports?.filter(
+							(imp) => imp.kind === "memory",
+						).length || 0;
+						memoryIndex = importedMemCount + localMemIndex;
+					} else {
+						throw createError(
+							instr,
+							func,
+							module,
+							`Unknown memory reference: ${instr.memoryRef}`,
+						);
+					}
+				}
+			} else if (typeof instr.memoryRef === "number") {
+				memoryIndex = instr.memoryRef;
+			}
+
+			// Encode memory index as LEB128
+			body.push(...encodeULEB128(memoryIndex));
+		}
 
 		return true;
 	}
