@@ -1,6 +1,6 @@
 /**
  * Source Map Manager for WAT to WASM compilation
- * 
+ *
  * Manages collection and formatting of source map data according to the plan:
  * - Map one entry per instruction opcode and for structured markers (block/loop/if/else/end)
  * - Offsets as (funcIndex, funcBodyOffset) relative to function body start

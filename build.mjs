@@ -56,17 +56,28 @@ async function build() {
     const esmGzipSize = gzipSync(esmContent).length;
     const minGzipSize = gzipSync(minContent).length;
 
-    console.log('\n==== Build Complete ====');
-    console.log(`ESM Bundle:  ${formatBytes(esmSize)} (${formatBytes(esmGzipSize)} gzipped)`);
-    console.log(`Min Bundle:  ${formatBytes(minSize)} (${formatBytes(minGzipSize)} gzipped)`);
-    console.log('======================');
+    console.log('\n╔════════════════════════════════════════╗');
+    console.log('║         Build Complete ✓               ║');
+    console.log('╠════════════════════════════════════════╣');
+    console.log(`║ ESM Bundle:  ${formatBytes(esmSize).padEnd(26)}║`);
+    console.log(`║   Gzipped:   ${formatBytes(esmGzipSize).padEnd(26)}║`);
+    console.log('╠════════════════════════════════════════╣');
+    console.log(`║ Min Bundle:  ${formatBytes(minSize).padEnd(26)}║`);
+    console.log(`║   Gzipped:   ${formatBytes(minGzipSize).padEnd(26)}║`);
+    console.log('╚════════════════════════════════════════╝\n');
 
     // Copy minified bundle to root as watranslator.js for npm
     copyFileSync('dist/watranslator.min.js', 'watranslator.js');
-    console.log('Copied watranslator.min.js to watranslator.js for npm package');
+    console.log('✓ Copied watranslator.min.js to watranslator.js for npm package\n');
 
     // Create a demo import map to use the new bundle
     updateDemoImportMap();
+
+    // Run benchmarks in production mode
+    if (isProd) {
+      console.log('Running benchmarks...\n');
+      await runBenchmarks();
+    }
 
   } catch (error) {
     console.error('Build failed:', error);
@@ -93,6 +104,36 @@ function updateDemoImportMap() {
   }
 
   console.log('Updating demo import map to use the new bundle');
+}
+
+async function runBenchmarks() {
+  try {
+    const { spawn } = await import('node:child_process');
+
+    return new Promise((resolve, reject) => {
+      const bench = spawn('node', ['bench/run.mjs'], {
+        stdio: 'inherit',
+        cwd: __dirname
+      });
+
+      bench.on('close', (code) => {
+        if (code === 0) {
+          console.log('\n✓ Benchmarks completed\n');
+          resolve();
+        } else {
+          console.log('\n⚠ Benchmarks failed with code:', code, '\n');
+          resolve(); // Don't fail the build
+        }
+      });
+
+      bench.on('error', (err) => {
+        console.log('\n⚠ Could not run benchmarks:', err.message, '\n');
+        resolve(); // Don't fail the build
+      });
+    });
+  } catch (error) {
+    console.log('\n⚠ Benchmark skipped:', error.message, '\n');
+  }
 }
 
 // Run the build

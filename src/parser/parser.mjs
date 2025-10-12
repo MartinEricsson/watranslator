@@ -4,14 +4,16 @@ import { atEnd, initTape } from "./tape.mjs";
 
 export function parseWAT(src, options = {}) {
 	const profile = options.profile || null;
-	const tStart = (typeof process !== "undefined" && process.hrtime?.bigint)
-		? process.hrtime.bigint()
-		: BigInt(Math.floor(performance.now() * 1e6));
+	const tStart =
+		typeof process !== "undefined" && process.hrtime?.bigint
+			? process.hrtime.bigint()
+			: BigInt(Math.floor(performance.now() * 1e6));
 	const tTokStart = tStart;
 	const tokens = tokenize(src);
-	const tTokEnd = (typeof process !== "undefined" && process.hrtime?.bigint)
-		? process.hrtime.bigint()
-		: BigInt(Math.floor(performance.now() * 1e6));
+	const tTokEnd =
+		typeof process !== "undefined" && process.hrtime?.bigint
+			? process.hrtime.bigint()
+			: BigInt(Math.floor(performance.now() * 1e6));
 	if (profile) {
 		profile.tokenize_ns = Number(tTokEnd - tTokStart);
 	}
@@ -169,9 +171,10 @@ export function parseWAT(src, options = {}) {
 		}
 	}
 
-	const tParseEnd = (typeof process !== "undefined" && process.hrtime?.bigint)
-		? process.hrtime.bigint()
-		: BigInt(Math.floor(performance.now() * 1e6));
+	const tParseEnd =
+		typeof process !== "undefined" && process.hrtime?.bigint
+			? process.hrtime.bigint()
+			: BigInt(Math.floor(performance.now() * 1e6));
 	if (profile) {
 		profile.parse_ns = Number(tParseEnd - tTokEnd);
 	}

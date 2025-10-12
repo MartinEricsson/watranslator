@@ -1,3 +1,4 @@
+import { SourceMapManager } from "../sourcemap.mjs";
 import { sanitizeAST } from "./compile-utils.mjs";
 import wasmConstants from "./constants.mjs";
 import { codeSection } from "./sections/code.mjs";
@@ -12,22 +13,22 @@ import { multivalueSection } from "./sections/multivalue.mjs";
 import { startSection } from "./sections/start.mjs";
 import { tableSection } from "./sections/table.mjs";
 import { typeSection } from "./sections/type.mjs";
-import { SourceMapManager } from "../sourcemap.mjs";
 
 const { BINARY } = wasmConstants;
 
 const compileToWASM = (ast, options = {}) => {
 	const profile = options.profile || null;
-	const tStart = (typeof process !== "undefined" && process.hrtime?.bigint)
-		? process.hrtime.bigint()
-		: BigInt(Math.floor(performance.now() * 1e6));
-	
+	const tStart =
+		typeof process !== "undefined" && process.hrtime?.bigint
+			? process.hrtime.bigint()
+			: BigInt(Math.floor(performance.now() * 1e6));
+
 	// Initialize source map manager if requested
 	let sourceMapManager = null;
 	if (options.sourceMap) {
 		sourceMapManager = new SourceMapManager();
 	}
-	
+
 	// Clean up and validate the AST
 	const module = sanitizeAST(ast);
 
@@ -98,21 +99,22 @@ const compileToWASM = (ast, options = {}) => {
 
 	const result = new Uint8Array(binary);
 	if (profile) {
-		const tEnd = (typeof process !== "undefined" && process.hrtime?.bigint)
-			? process.hrtime.bigint()
-			: BigInt(Math.floor(performance.now() * 1e6));
+		const tEnd =
+			typeof process !== "undefined" && process.hrtime?.bigint
+				? process.hrtime.bigint()
+				: BigInt(Math.floor(performance.now() * 1e6));
 		profile.compile_ns = Number(tEnd - tStart);
 		profile.wasm_bytes = result.byteLength;
 	}
-	
+
 	// Return object with binary and sourceMap if source mapping is enabled
 	if (sourceMapManager) {
 		return {
 			binary: result,
-			sourceMap: sourceMapManager.toJSON()
+			sourceMap: sourceMapManager.toJSON(),
 		};
 	}
-	
+
 	return result;
 };
 
