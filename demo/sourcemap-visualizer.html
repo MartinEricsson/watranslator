@@ -409,9 +409,29 @@
           
           const watContent = currentSourceLines.join('\n');
           const result = await compile(watContent, { sourceMap: true });
-          
-          currentBinary = result.binary;
-          currentSourceMap = JSON.parse(result.sourceMap);
+
+          // Support both old dist (returns Uint8Array) and new API (returns { binary, sourceMap })
+          if (result instanceof Uint8Array) {
+            currentBinary = result;
+            currentSourceMap = [];
+          } else if (result && typeof result === 'object') {
+            currentBinary = result.binary || null;
+            const sm = result.sourceMap;
+            if (Array.isArray(sm)) {
+              currentSourceMap = sm;
+            } else if (typeof sm === 'string') {
+              try {
+                currentSourceMap = JSON.parse(sm);
+              } catch {
+                currentSourceMap = [];
+              }
+            } else {
+              currentSourceMap = [];
+            }
+          } else {
+            currentBinary = null;
+            currentSourceMap = [];
+          }
           
           displayBinary(currentBinary);
           displaySourceMap(currentSourceMap);
@@ -445,13 +465,17 @@
         
         binaryView.innerHTML = html;
         
-        // Add click handlers for binary lines
-        document.querySelectorAll('.binary-line').forEach(line => {
-          line.addEventListener('click', () => {
+        // Attach a single delegated click handler for all binary lines
+        if (!binaryView.dataset.clickBound) {
+          binaryView.addEventListener('click', (e) => {
+            const line = e.target.closest('.binary-line');
+            if (!line) return;
             const offset = parseInt(line.dataset.offset);
-            highlightBinaryOffset(offset);
+            if (!Number.isFinite(offset)) return;
+            handleBinaryClick(offset);
           });
-        });
+          binaryView.dataset.clickBound = '1';
+        }
       }
 
       function displaySourceMap(sourceMap) {
@@ -473,15 +497,18 @@
         
         mappingList.innerHTML = html;
         
-        // Add click handlers for mapping rows
-        document.querySelectorAll('.mapping-row').forEach(row => {
-          row.addEventListener('click', () => {
+        // Attach a single delegated click handler for mapping rows
+        if (!mappingList.dataset.clickBound) {
+          mappingList.addEventListener('click', (e) => {
+            const row = e.target.closest('.mapping-row');
+            if (!row) return;
             const index = parseInt(row.dataset.index);
-            if (index >= 0) {
+            if (Number.isFinite(index) && index >= 0) {
               highlightMapping(index);
             }
           });
-        });
+          mappingList.dataset.clickBound = '1';
+        }
       }
 
       function highlightSourceLine(lineNumber) {
@@ -492,6 +519,9 @@
         document.querySelectorAll('.mapping-row.highlight').forEach(el => {
           el.classList.remove('highlight');
         });
+        document.querySelectorAll('.binary-line.highlight').forEach(el => {
+          el.classList.remove('highlight');
+        });
 
         // Highlight source line
         const sourceLine = document.querySelector(`[data-line="${lineNumber}"]`);
@@ -499,16 +529,17 @@
           sourceLine.classList.add('highlight');
         }
 
-        // Find and highlight related mappings
-        if (currentSourceMap) {
+        // Find and highlight related mappings and corresponding binary lines
+        if (currentSourceMap && Array.isArray(currentSourceMap)) {
+          const related = [];
           currentSourceMap.forEach((mapping, index) => {
             if (mapping.line + 1 === lineNumber) {
               const mappingRow = document.querySelector(`[data-index="${index}"]`);
-              if (mappingRow) {
-                mappingRow.classList.add('highlight');
-              }
+              if (mappingRow) mappingRow.classList.add('highlight');
+              related.push(mapping);
             }
           });
+          highlightBinaryForMappings(related);
         }
       }
 
@@ -546,11 +577,61 @@
 
         // Try to highlight related binary offset (approximate)
         // Note: This is a simplified mapping - in practice, you'd need more detailed offset information
-        const approximateOffset = mapping.bodyOffset;
-        const binaryLine = document.querySelector(`[data-offset="${Math.floor(approximateOffset / 16) * 16}"]`);
+        // Use the best available offset field from the mapping
+        const rawOffset = (typeof mapping.bodyOffset === 'number' ? mapping.bodyOffset
+                          : typeof mapping.binaryOffset === 'number' ? mapping.binaryOffset
+                          : typeof mapping.offset === 'number' ? mapping.offset
+                          : 0);
+        const approxLineOffset = Math.floor(rawOffset / 16) * 16;
+        const binaryLine = document.querySelector(`[data-offset="${approxLineOffset}"]`);
         if (binaryLine) {
           binaryLine.classList.add('highlight');
+          // Ensure the highlighted line is visible
+          binaryLine.scrollIntoView({ block: 'nearest' });
         }
+      }
+
+      // Highlight binary lines for a set of mappings
+      function highlightBinaryForMappings(mappings) {
+        if (!mappings || mappings.length === 0) return;
+        // Clear existing binary highlights
+        document.querySelectorAll('.binary-line.highlight').forEach(el => el.classList.remove('highlight'));
+        // Highlight each mapping's approximate offset line
+        let firstLine = null;
+        mappings.forEach(m => {
+          const raw = (typeof m.bodyOffset === 'number' ? m.bodyOffset
+                      : typeof m.binaryOffset === 'number' ? m.binaryOffset
+                      : typeof m.offset === 'number' ? m.offset
+                      : null);
+          if (raw !== null) {
+            const approx = Math.floor(raw / 16) * 16;
+            const line = document.querySelector(`[data-offset="${approx}"]`);
+            if (line) {
+              if (!firstLine) firstLine = line;
+              line.classList.add('highlight');
+            }
+          }
+        });
+        if (firstLine) firstLine.scrollIntoView({ block: 'nearest' });
+      }
+
+      // Handle clicking in the binary pane: find nearest mapping and highlight all panes via highlightMapping
+      function handleBinaryClick(offset) {
+        if (!currentSourceMap || currentSourceMap.length === 0) {
+          highlightBinaryOffset(offset);
+          return;
+        }
+        let bestIdx = 0;
+        let bestDiff = Number.POSITIVE_INFINITY;
+        for (let i = 0; i < currentSourceMap.length; i++) {
+          const m = currentSourceMap[i];
+          const diff = Math.abs(((m && typeof m.bodyOffset === 'number') ? m.bodyOffset : 0) - offset);
+          if (diff < bestDiff) {
+            bestDiff = diff;
+            bestIdx = i;
+          }
+        }
+        highlightMapping(bestIdx);
       }
 
       function updateStats() {
