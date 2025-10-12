@@ -94,6 +94,7 @@ import testTableFill from "./table-fill/table-fill-test.mjs";
 import testTableFuncref from "./table-funcref/table-funcref-test.mjs";
 import testTableGrow from "./table-grow/table-grow-test.mjs";
 import testTableInit from "./table-init/table-init-test.mjs";
+import testTableSize from "./table-size/table-size-test.mjs";
 import testCompilation from "./test-compiler/test-compiler.mjs";
 import { testTypeConversionF64 } from "./type-conversion-f64/type-conversion-f64-test.mjs";
 import { testTypeConversionI64ToF64 } from "./type-conversion-i64-f64/type-conversion-i64-f64-test.mjs";
@@ -231,6 +232,7 @@ async function runTests() {
 		{ name: "Table Fill", test: testTableFill },
 		//{ name: "Table Init", test: testTableInit },
 		{ name: "Table Grow", test: testTableGrow },
+		{ name: "Table Size", test: testTableSize },
 		{ name: "Table Funcref", test: testTableFuncref },
 		{ name: "Type Conversion", test: testTypeConversion },
 		{ name: "Type Conversion F64", test: testTypeConversionF64 },
