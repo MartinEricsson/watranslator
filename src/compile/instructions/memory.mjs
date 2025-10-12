@@ -70,14 +70,20 @@ export function compileMemoryInstruction(instr, body, module) {
 	};
 
 	if (instr.type === "memory.size") {
-		const memoryIndex = resolveMemoryIndex(instr.memoryRef);
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const memoryIndex = hasMultipleMemories || instr.memoryRef !== null ? resolveMemoryIndex(instr.memoryRef) : 0;
 		body.push(INSTR.MEMORY_SIZE);
 		body.push(...encodeULEB128(memoryIndex));
 		return true;
 	}
 
 	if (instr.type === "memory.grow") {
-		const memoryIndex = resolveMemoryIndex(instr.memoryRef);
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const memoryIndex = hasMultipleMemories || instr.memoryRef !== null ? resolveMemoryIndex(instr.memoryRef) : 0;
 		body.push(INSTR.MEMORY_GROW);
 		body.push(...encodeULEB128(memoryIndex));
 		return true;
@@ -98,7 +104,10 @@ export function compileMemoryInstruction(instr, body, module) {
 
 	// Handle memory operations that don't strictly need data segments
 	if (instr.type === "memory.fill") {
-		const memoryIndex = resolveMemoryIndex(instr.memoryRef);
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const memoryIndex = hasMultipleMemories || instr.memoryRef !== null ? resolveMemoryIndex(instr.memoryRef) : 0;
 		body.push(INSTR.BULK_PREFIX); // 0xFC prefix for bulk memory operations
 		body.push(0x0b); // 0x0B opcode for memory.fill
 		body.push(...encodeULEB128(memoryIndex));
@@ -106,8 +115,11 @@ export function compileMemoryInstruction(instr, body, module) {
 	}
 
 	if (instr.type === "memory.copy") {
-		const destMemoryIndex = resolveMemoryIndex(instr.destMemoryRef);
-		const srcMemoryIndex = resolveMemoryIndex(instr.srcMemoryRef);
+		const hasMultipleMemories = 
+			(module.memories && module.memories.length > 1) ||
+			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
+		const destMemoryIndex = hasMultipleMemories || instr.destMemoryRef !== null ? resolveMemoryIndex(instr.destMemoryRef) : 0;
+		const srcMemoryIndex = hasMultipleMemories || instr.srcMemoryRef !== null ? resolveMemoryIndex(instr.srcMemoryRef) : 0;
 		body.push(INSTR.BULK_PREFIX); // 0xFC prefix for bulk memory operations
 		body.push(INSTR.MEMORY_COPY); // 0x0A opcode for memory.copy
 		body.push(...encodeULEB128(destMemoryIndex));

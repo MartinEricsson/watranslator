@@ -508,7 +508,8 @@ export function parseInstruction(blockLabels) {
 	// Handle memory.init instruction with optional memory reference and segment index
 	if (instrType === "memory.init") {
 		let memoryRef = null;
-		let segmentIdx = 1; // Default to 1 if not specified
+		// Default to segment 1 for backward compatibility with existing tests that use passive data segments
+		let segmentIdx = 1;
 		
 		// Check for memory reference first (can be $name or number)
 		if (!atEnd()) {

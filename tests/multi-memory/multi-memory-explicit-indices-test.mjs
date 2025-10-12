@@ -18,7 +18,12 @@ async function testMultiMemoryExplicitIndices(debug = false) {
 		assert.ok(wasmBuffer.length > 0, "WASM buffer should not be empty");
 
 		// Test 2: Check for WASM magic number
-		const magicNumber = new Uint32Array(wasmBuffer.slice(0, 4).buffer)[0];
+		const magicBytes = wasmBuffer.slice(0, 4);
+		const magicNumber = 
+			magicBytes[0] | 
+			(magicBytes[1] << 8) | 
+			(magicBytes[2] << 16) | 
+			(magicBytes[3] << 24);
 		assert.strictEqual(
 			magicNumber,
 			0x6d736100,
@@ -26,7 +31,12 @@ async function testMultiMemoryExplicitIndices(debug = false) {
 		);
 
 		// Test 3: Check for WASM version
-		const version = new Uint32Array(wasmBuffer.slice(4, 8).buffer)[0];
+		const versionBytes = wasmBuffer.slice(4, 8);
+		const version = 
+			versionBytes[0] | 
+			(versionBytes[1] << 8) | 
+			(versionBytes[2] << 16) | 
+			(versionBytes[3] << 24);
 		assert.strictEqual(version, 1, "Should have correct WASM version");
 
 		// Test 4: Verify memory section exists with 3 memories
