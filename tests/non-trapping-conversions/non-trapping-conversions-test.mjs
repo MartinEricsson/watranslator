@@ -233,7 +233,7 @@ async function testNonTrappingConversions(debug = false) {
 			},
 			{
 				name: "i64_trunc_sat_f32_u +Infinity to max",
-				expected: -1n,
+				expected: -1n, // -1n in BigInt represents max u64 (0xFFFFFFFFFFFFFFFF)
 				func: "i64_trunc_sat_f32_u",
 				params: [Number.POSITIVE_INFINITY],
 			},
@@ -251,7 +251,7 @@ async function testNonTrappingConversions(debug = false) {
 			},
 			{
 				name: "i64_trunc_sat_f32_u overflow to max",
-				expected: -1n,
+				expected: -1n, // -1n in BigInt represents max u64 (0xFFFFFFFFFFFFFFFF)
 				func: "i64_trunc_sat_f32_u",
 				params: [1e20],
 			},
@@ -315,7 +315,7 @@ async function testNonTrappingConversions(debug = false) {
 			},
 			{
 				name: "i64_trunc_sat_f64_u +Infinity to max",
-				expected: -1n,
+				expected: -1n, // -1n in BigInt represents max u64 (0xFFFFFFFFFFFFFFFF)
 				func: "i64_trunc_sat_f64_u",
 				params: [Number.POSITIVE_INFINITY],
 			},
@@ -333,7 +333,7 @@ async function testNonTrappingConversions(debug = false) {
 			},
 			{
 				name: "i64_trunc_sat_f64_u overflow to max",
-				expected: -1n,
+				expected: -1n, // -1n in BigInt represents max u64 (0xFFFFFFFFFFFFFFFF)
 				func: "i64_trunc_sat_f64_u",
 				params: [1e20],
 			},
