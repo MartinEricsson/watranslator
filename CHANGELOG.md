@@ -1,5 +1,11 @@
 # watranslator
 
+## 0.5.0
+
+### Minor Changes
+
+- [`ab4cae8`](https://github.com/MartinEricsson/watranslator/commit/ab4cae8770826388089dd1b3bf9fd2516f9b8c05) Thanks [@MartinEricsson](https://github.com/MartinEricsson)! - Include the correct files
+
 ## 0.4.0
 
 ### Minor Changes
