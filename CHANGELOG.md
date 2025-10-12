@@ -1,5 +1,11 @@
 # watranslator
 
+## 0.5.2
+
+### Patch Changes
+
+- [#21](https://github.com/MartinEricsson/watranslator/pull/21) [`37d448f`](https://github.com/MartinEricsson/watranslator/commit/37d448f0d404877998f3561984a23e776693cebe) Thanks [@MartinEricsson](https://github.com/MartinEricsson)! - Linting of tests
+
 ## 0.5.1
 
 ### Patch Changes
