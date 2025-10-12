@@ -34,6 +34,7 @@ import testFunctionCalls from "./function-calls/function-calls-test.mjs";
 import testGlobalVariables from "./global-variables/global-variables-test.mjs";
 import testi64MathAndOps from "./i64-math-and-ops/i64-math-and-ops-test.mjs";
 import testI64ReinterpretF64 from "./i64-reinterpret-f64/i64-reinterpret-f64-test.mjs";
+import testReinterpretOps from "./reinterpret-ops/reinterpret-ops-test.mjs";
 import testImportedFunctionOrdered from "./imported-functions/imported-functions-ordered-test.mjs";
 import testImportedFunctions from "./imported-functions/imported-functions-test.mjs";
 import testImportedGlobals from "./imported-globals/imported-globals-test.mjs";
@@ -164,6 +165,7 @@ async function runTests() {
 		{ name: "Global Variables", test: testGlobalVariables },
 		{ name: "i64 Math and Ops", test: testi64MathAndOps },
 		{ name: "i64 Reinterpret F64", test: testI64ReinterpretF64 },
+		{ name: "Reinterpret Operations", test: testReinterpretOps },
 		{ name: "Integration loop sum", test: testLoopSum },
 		{ name: "Imported Global Variables", test: testImportedGlobals },
 		{ name: "Imported Function Calls", test: testImportedFunctions },
