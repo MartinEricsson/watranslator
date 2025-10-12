@@ -1,14 +1,14 @@
-import testSIMDShuffle from './simd-shuffle-test.mjs';
-import { testRunner } from '../test-utils.mjs';
+import { testRunner } from "../test-utils.mjs";
+import testSIMDShuffle from "./simd-shuffle-test.mjs";
 
 try {
-    const results = await Promise.all([
-        testRunner(testSIMDShuffle, 'simd-shuffle', true),
-    ]);
-    if (results.includes(false)) {
-        throw new Error('One or more tests failed');
-    }
+	const results = await Promise.all([
+		testRunner(testSIMDShuffle, "simd-shuffle", true),
+	]);
+	if (results.includes(false)) {
+		throw new Error("One or more tests failed");
+	}
 } catch (e) {
-    console.error('Test failed:', e);
-    process.exit(1);
+	console.error("Test failed:", e);
+	process.exit(1);
 }

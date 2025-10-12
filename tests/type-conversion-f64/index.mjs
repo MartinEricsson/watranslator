@@ -1,15 +1,15 @@
-import { testTypeConversionF64 } from './type-conversion-f64-test.mjs';
-import { testRunner } from '../test-utils.mjs';
+import { testRunner } from "../test-utils.mjs";
+import { testTypeConversionF64 } from "./type-conversion-f64-test.mjs";
 
 try {
-  const results = await Promise.all([
-    testRunner(testTypeConversionF64, 'type-conversion-f64', true),
-  ]);
-  if (results.includes(false)) {
-    throw new Error('One or more tests failed');
-  }
-  console.log('✅ All type conversion f64 tests passed!');
+	const results = await Promise.all([
+		testRunner(testTypeConversionF64, "type-conversion-f64", true),
+	]);
+	if (results.includes(false)) {
+		throw new Error("One or more tests failed");
+	}
+	console.log("✅ All type conversion f64 tests passed!");
 } catch (e) {
-  console.error('Test failed:', e);
-  process.exit(1);
+	console.error("Test failed:", e);
+	process.exit(1);
 }

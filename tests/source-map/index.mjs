@@ -8,51 +8,51 @@ const wat = `(module
 
 async function testSourceMap() {
 	console.log("Testing source map generation...");
-	
+
 	try {
 		// Test with source map disabled (default behavior)
 		const resultNoSourceMap = await compile(wat);
 		console.log("✅ Compilation without source map works");
 		console.log("Binary length:", resultNoSourceMap.length);
-		
+
 		// Test with source map enabled
-		const resultWithSourceMap = await compile(wat, { 
-			sourceMap: true, 
-			filename: "test.wat" 
+		const resultWithSourceMap = await compile(wat, {
+			sourceMap: true,
+			filename: "test.wat",
 		});
-		
+
 		console.log("✅ Compilation with source map works");
 		console.log("Binary length:", resultWithSourceMap.binary.length);
 		console.log("Source map generated:", !!resultWithSourceMap.sourceMap);
-		
+
 		// Parse and validate source map
 		const sourceMap = JSON.parse(resultWithSourceMap.sourceMap);
 		console.log("Source map entries:", sourceMap.length);
-		
+
 		// Show all entries to understand the mapping
 		console.log("All source map entries:");
 		sourceMap.forEach((entry, i) => {
 			console.log(`  [${i}]:`, entry);
 		});
-		
+
 		if (sourceMap.length > 0) {
 			console.log("Sample source map entry:", sourceMap[0]);
-			
+
 			// Validate schema
 			const entry = sourceMap[0];
-			const hasRequiredFields = entry.hasOwnProperty('file') && 
-									   entry.hasOwnProperty('line') &&
-									   entry.hasOwnProperty('column') &&
-									   entry.hasOwnProperty('funcIndex') &&
-									   entry.hasOwnProperty('bodyOffset');
-			
+			const hasRequiredFields =
+				Object.hasOwn(entry, "file") &&
+				Object.hasOwn(entry, "line") &&
+				Object.hasOwn(entry, "column") &&
+				Object.hasOwn(entry, "funcIndex") &&
+				Object.hasOwn(entry, "bodyOffset");
 			if (hasRequiredFields) {
 				console.log("✅ Source map entry has required fields");
 			} else {
 				console.log("❌ Source map entry missing required fields");
 				return false;
 			}
-			
+
 			// Validate that values are 0-based
 			const isZeroBased = entry.line >= 0 && entry.column >= 0;
 			if (isZeroBased) {
@@ -62,10 +62,9 @@ async function testSourceMap() {
 				return false;
 			}
 		}
-		
+
 		console.log("✅ Source map test passed!");
 		return true; // Return true to indicate test passed
-		
 	} catch (error) {
 		console.error("❌ Source map test failed:", error);
 		return false; // Return false to indicate test failed
@@ -76,7 +75,7 @@ export { testSourceMap };
 
 // Run test if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-	testSourceMap().catch(err => {
+	testSourceMap().catch((err) => {
 		console.error(err);
 		process.exit(1);
 	});
