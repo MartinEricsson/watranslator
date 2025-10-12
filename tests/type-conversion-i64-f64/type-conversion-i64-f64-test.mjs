@@ -30,21 +30,21 @@ async function testTypeConversionI64ToF64(debug = false) {
 				expected: 0.0,
 				func: "convert_i64_s_to_f64",
 				params: [0n],
-		},
-		{
-			name: "convert_i64_s_to_f64",
-			// biome-ignore lint/correctness/noPrecisionLoss: Testing boundary conditions where precision loss is expected
-			expected: 9223372036854775807,
-			func: "convert_i64_s_to_f64",
-			params: [9223372036854775807n],
-		}, // Max i64
-		{
-			name: "convert_i64_s_to_f64",
-			// biome-ignore lint/correctness/noPrecisionLoss: Testing boundary conditions where precision loss is expected
-			expected: -9223372036854775808,
-			func: "convert_i64_s_to_f64",
-			params: [-9223372036854775808n],
-		}, // Min i64			// Unsigned conversion tests
+			},
+			{
+				name: "convert_i64_s_to_f64",
+				// biome-ignore lint/correctness/noPrecisionLoss: Testing boundary conditions where precision loss is expected
+				expected: 9223372036854775807,
+				func: "convert_i64_s_to_f64",
+				params: [9223372036854775807n],
+			}, // Max i64
+			{
+				name: "convert_i64_s_to_f64",
+				// biome-ignore lint/correctness/noPrecisionLoss: Testing boundary conditions where precision loss is expected
+				expected: -9223372036854775808,
+				func: "convert_i64_s_to_f64",
+				params: [-9223372036854775808n],
+			}, // Min i64			// Unsigned conversion tests
 			{
 				name: "convert_i64_u_to_f64",
 				expected: 42.0,
