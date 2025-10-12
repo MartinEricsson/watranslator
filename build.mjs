@@ -1,5 +1,5 @@
 import * as esbuild from 'esbuild';
-import { readFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
@@ -60,6 +60,10 @@ async function build() {
     console.log(`ESM Bundle:  ${formatBytes(esmSize)} (${formatBytes(esmGzipSize)} gzipped)`);
     console.log(`Min Bundle:  ${formatBytes(minSize)} (${formatBytes(minGzipSize)} gzipped)`);
     console.log('======================');
+
+    // Copy minified bundle to root as watranslator.js for npm
+    copyFileSync('dist/watranslator.min.js', 'watranslator.js');
+    console.log('Copied watranslator.min.js to watranslator.js for npm package');
 
     // Create a demo import map to use the new bundle
     updateDemoImportMap();
