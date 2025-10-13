@@ -1,6 +1,6 @@
 {
 	"name": "watranslator",
-	"version": "0.5.2",
+	"version": "0.6.0",
 	"description": "WebAssembly Text Format (WAT) to WebAssembly Binary Format compiler",
 	"main": "watranslator.js",
 	"module": "watranslator.js",
