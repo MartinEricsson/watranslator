@@ -290,7 +290,7 @@ export function compileControlFlow(
 
 		try {
 			// Branch target (label depth)
-			const labelIndex = getLabelIndex(instr.label, func);
+			const labelIndex = getLabelIndex(instr.label, func, instr);
 			body.push(...encodeULEB128(labelIndex));
 		} catch (err) {
 			throw createError(
@@ -309,7 +309,7 @@ export function compileControlFlow(
 
 		try {
 			// Branch target (label depth)
-			const labelIndex = getLabelIndex(instr.label, func);
+			const labelIndex = getLabelIndex(instr.label, func, instr);
 			body.push(...encodeULEB128(labelIndex));
 		} catch (err) {
 			throw createError(
@@ -333,12 +333,12 @@ export function compileControlFlow(
 
 			// Add each label's depth
 			for (const label of instr.labels) {
-				const labelIndex = getLabelIndex(label, func);
+				const labelIndex = getLabelIndex(label, func, instr);
 				body.push(...encodeULEB128(labelIndex));
 			}
 
 			// Add the default label's depth
-			const defaultLabelIndex = getLabelIndex(instr.defaultLabel, func);
+			const defaultLabelIndex = getLabelIndex(instr.defaultLabel, func, instr);
 			body.push(...encodeULEB128(defaultLabelIndex));
 		} catch (err) {
 			throw createError(

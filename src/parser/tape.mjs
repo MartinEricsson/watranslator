@@ -28,6 +28,14 @@ export function peekToken() {
 	return tokens[position];
 }
 
+export function peekTokenN(offset) {
+	const targetIndex = position + offset;
+	if (targetIndex < 0 || targetIndex >= tokens.length) {
+		return null;
+	}
+	return tokens[targetIndex];
+}
+
 export function skipToken() {
 	if (position < tokens.length) {
 		position++;

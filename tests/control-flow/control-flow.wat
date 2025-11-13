@@ -55,6 +55,69 @@
     local.get $sum
   )
 
+  ;; Regression: nested loops expressed in folded S-expression form
+  (func (export "foldedLoops") (result i32)
+    (local $row i32)
+    (local $col i32)
+    (local $sum i32)
+
+    ;; Initialise counters
+    i32.const 0
+    local.set $row
+    i32.const 0
+    local.set $sum
+
+    (block $outer_exit
+      (loop $outer
+        ;; Stop outer loop when row >= 3
+        local.get $row
+        i32.const 3
+        i32.ge_s
+        br_if $outer_exit
+
+        ;; Reset column counter
+        i32.const 0
+        local.set $col
+
+        (block $inner_exit
+          (loop $inner
+            ;; Stop inner loop when col >= 2
+            local.get $col
+            i32.const 2
+            i32.ge_s
+            br_if $inner_exit
+
+            ;; Accumulate row + col into sum
+            local.get $sum
+            local.get $row
+            local.get $col
+            i32.add
+            i32.add
+            local.set $sum
+
+            ;; Advance column
+            local.get $col
+            i32.const 1
+            i32.add
+            local.set $col
+
+            ;; Continue inner loop
+            br $inner
+          )
+        )
+
+        ;; Advance row and continue outer loop
+        local.get $row
+        i32.const 1
+        i32.add
+        local.set $row
+        br $outer
+      )
+    )
+
+    local.get $sum
+  )
+
   (func (export "tee") (param $a i32) (result i32)
     local.get $a
     local.tee $a

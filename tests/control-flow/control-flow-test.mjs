@@ -15,6 +15,7 @@ async function testControlFlow(debug = false) {
 			{ name: "count_to_n", expected: 15, func: "countToN", params: [5] },
 			{ name: "count_to_n_10", expected: 55, func: "countToN", params: [10] },
 			{ name: "count_to_n_1", expected: 1, func: "countToN", params: [1] },
+			{ name: "folded_loops", expected: 9, func: "foldedLoops", params: [] },
 			{ name: "tee", expected: 5, func: "tee", params: [5] },
 		];
 
