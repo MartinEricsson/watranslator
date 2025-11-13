@@ -1,5 +1,11 @@
 # watranslator
 
+## 0.6.1
+
+### Patch Changes
+
+- [`1f700d9`](https://github.com/MartinEricsson/watranslator/commit/1f700d91db997120d96f50aca0f7c2775761756a) Thanks [@MartinEricsson](https://github.com/MartinEricsson)! - Fix for folded loops not returning
+
 ## 0.6.0
 
 ### Minor Changes
