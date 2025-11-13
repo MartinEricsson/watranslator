@@ -1,5 +1,11 @@
 # watranslator
 
+## 0.6.0
+
+### Minor Changes
+
+- [#35](https://github.com/MartinEricsson/watranslator/pull/35) [`7bc2932`](https://github.com/MartinEricsson/watranslator/commit/7bc29326144064ca16f0e52dd6228a861b60e3ff) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add support for explicit memory indices in multi-memory operations according to WebAssembly 2.0 specification. Memory operations now correctly encode memory indices when multiple memories are present, enabling proper multi-memory support while maintaining backward compatibility with single-memory modules.
+
 ## 0.5.2
 
 ### Patch Changes
