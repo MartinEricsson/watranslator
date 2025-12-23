@@ -45,7 +45,17 @@ const compileToWASM = (ast, options = {}) => {
 		(!module.elements || module.elements.length === 0) &&
 		(!module.exports || Object.keys(module.exports).length === 0)
 	) {
-		return new Uint8Array(binary);
+		const result = new Uint8Array(binary);
+		
+		// Return object with binary and sourceMap if source mapping is enabled
+		if (sourceMapManager) {
+			return {
+				binary: result,
+				sourceMap: sourceMapManager.toJSON()
+			};
+		}
+		
+		return result;
 	}
 
 	const functions = module.functions || [];

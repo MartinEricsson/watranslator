@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WAT Source Map Visualizer</title>
+    <style>
+      body {
+        font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #111;
+        color: #f8f8f2;
+      }
+
+      .header {
+        text-align: center;
+        color: #f7ba2b;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .panel {
+        background: linear-gradient(145deg, #282a36, #1e1f29);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .panel h3 {
+        color: #f7ba2b;
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+      }
+
+      .file-input {
+        width: 100%;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 2px dashed #00a97f;
+        border-radius: 8px;
+        background-color: transparent;
+        color: #f8f8f2;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .file-input:hover {
+        border-color: #f7ba2b;
+        background-color: rgba(247, 186, 43, 0.1);
+      }
+
+      .file-input input[type="file"] {
+        display: none;
+      }
+
+      .source-code {
+        background-color: #1e1f29;
+        border: 1px solid #44475a;
+        border-radius: 6px;
+        padding: 10px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        height: 300px;
+        overflow-y: auto;
+        white-space: pre;
+        line-height: 1.4;
+      }
+
+      .source-line {
+        display: block;
+        padding: 2px 0;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .source-line:hover {
+        background-color: rgba(68, 71, 90, 0.5);
+      }
+
+      .source-line.highlight {
+        background-color: rgba(247, 186, 43, 0.3);
+        border-left: 3px solid #f7ba2b;
+        padding-left: 5px;
+      }
+
+      .line-number {
+        color: #6272a4;
+        display: inline-block;
+        width: 35px;
+        text-align: right;
+        margin-right: 8px;
+        user-select: none;
+      }
+
+      .binary-view {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        height: 300px;
+        overflow-y: auto;
+        background-color: #1e1f29;
+        border: 1px solid #44475a;
+        border-radius: 6px;
+        padding: 10px;
+      }
+
+      .binary-line {
+        padding: 2px 0;
+        cursor: pointer;
+      }
+
+      .binary-line:hover {
+        background-color: rgba(68, 71, 90, 0.5);
+      }
+
+      .binary-line.highlight {
+        background-color: rgba(0, 169, 127, 0.3);
+        border-left: 3px solid #00a97f;
+      }
+
+      .offset {
+        color: #8be9fd;
+        margin-right: 10px;
+      }
+
+      .hex-bytes {
+        color: #50fa7b;
+        margin-right: 10px;
+      }
+
+      .mapping-table {
+        height: 300px;
+        overflow-y: auto;
+        background-color: #1e1f29;
+        border: 1px solid #44475a;
+        border-radius: 6px;
+      }
+
+      .mapping-header {
+        background-color: #44475a;
+        padding: 8px;
+        font-weight: bold;
+        color: #f7ba2b;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 10px;
+        font-size: 11px;
+      }
+
+      .mapping-row {
+        padding: 5px 8px;
+        border-bottom: 1px solid #44475a;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 10px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .mapping-row:hover {
+        background-color: rgba(68, 71, 90, 0.5);
+      }
+
+      .mapping-row.highlight {
+        background-color: rgba(255, 121, 198, 0.3);
+        border-left: 3px solid #ff79c6;
+      }
+
+      .button {
+        border: 1px solid #00a97f;
+        background-color: transparent;
+        padding: 0.8em 1.7em;
+        border-radius: 0.3em;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: 0.5s;
+        color: #00a97f;
+        font-weight: 400;
+        font-size: 14px;
+        margin: 10px 5px;
+      }
+
+      .button:hover {
+        background-color: #00a97f;
+        color: #111;
+      }
+
+      .status {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        min-height: 20px;
+      }
+
+      .status.success {
+        background-color: rgba(80, 250, 123, 0.2);
+        border: 1px solid #50fa7b;
+        color: #50fa7b;
+      }
+
+      .status.error {
+        background-color: rgba(255, 85, 85, 0.2);
+        border: 1px solid #ff5555;
+        color: #ff5555;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 8px;
+        background-color: rgba(68, 71, 90, 0.3);
+        border-radius: 6px;
+      }
+
+      .stat-value {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #f7ba2b;
+      }
+
+      .stat-label {
+        font-size: 0.9em;
+        color: #8be9fd;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1 class="header">WAT Source Map Visualizer</h1>
+
+    <div class="container">
+      <div class="panel">
+        <h3>📂 WAT Source Code</h3>
+        <div class="file-input" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" accept=".wat" />
+          Click to select a .wat file or drag & drop here
+        </div>
+        <div class="source-code" id="sourceCode">
+          <div class="source-line">
+            <span class="line-number">1</span>Select a .wat file to view source code
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>🔧 WASM Binary</h3>
+        <div>
+          <button class="button" id="compileBtn">Compile & Generate Source Map</button>
+        </div>
+        <div class="binary-view" id="binaryView">
+          Binary will appear here after compilation...
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>🗺️ Source Map</h3>
+        <div class="mapping-table">
+          <div class="mapping-header">
+            <div>Line:Col</div>
+            <div>Function</div>
+            <div>Offset</div>
+            <div>File</div>
+          </div>
+          <div id="mappingList">
+            <div class="mapping-row">
+              <div colspan="4" style="text-align: center; color: #6272a4; padding: 20px;">
+                Compile a WAT file to see source mappings
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>📊 Statistics</h3>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value" id="lineCount">0</div>
+          <div class="stat-label">Source Lines</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="binarySize">0</div>
+          <div class="stat-label">Binary Size (bytes)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="mappingCount">0</div>
+          <div class="stat-label">Source Mappings</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="functionCount">0</div>
+          <div class="stat-label">Functions</div>
+        </div>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <script type="module">
+      import { compile } from "../dist/watranslator.min.js";
+
+      let currentSourceLines = [];
+      let currentBinary = null;
+      let currentSourceMap = null;
+
+      // File handling
+      const fileInput = document.getElementById('fileInput');
+      const sourceCode = document.getElementById('sourceCode');
+      const status = document.getElementById('status');
+
+      fileInput.addEventListener('change', handleFileSelect);
+
+      // Drag and drop support
+      const fileInputDiv = document.querySelector('.file-input');
+      fileInputDiv.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileInputDiv.style.borderColor = '#f7ba2b';
+        fileInputDiv.style.backgroundColor = 'rgba(247, 186, 43, 0.1)';
+      });
+
+      fileInputDiv.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        fileInputDiv.style.borderColor = '#00a97f';
+        fileInputDiv.style.backgroundColor = 'transparent';
+      });
+
+      fileInputDiv.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileInputDiv.style.borderColor = '#00a97f';
+        fileInputDiv.style.backgroundColor = 'transparent';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          fileInput.files = files;
+          handleFileSelect({ target: { files } });
+        }
+      });
+
+      function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.wat')) {
+          showStatus('Please select a .wat file', 'error');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const watContent = e.target.result;
+          displaySourceCode(watContent, file.name);
+          showStatus(`Loaded ${file.name} (${watContent.length} characters)`, 'success');
+        };
+        reader.readAsText(file);
+      }
+
+      function displaySourceCode(content, filename) {
+        currentSourceLines = content.split('\n');
+        
+        const sourceHtml = currentSourceLines.map((line, index) => {
+          const lineNumber = index + 1;
+          const escapedLine = line.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          return `<div class="source-line" data-line="${lineNumber}">
+            <span class="line-number">${lineNumber}</span>${escapedLine}
+          </div>`;
+        }).join('');
+        
+        sourceCode.innerHTML = sourceHtml;
+        
+        // Update stats
+        document.getElementById('lineCount').textContent = currentSourceLines.length;
+        
+        // Add click handlers for source lines
+        document.querySelectorAll('.source-line').forEach(line => {
+          line.addEventListener('click', () => {
+            const lineNum = parseInt(line.dataset.line);
+            highlightSourceLine(lineNum);
+          });
+        });
+      }
+
+      // Compilation
+      document.getElementById('compileBtn').addEventListener('click', async () => {
+        if (!currentSourceLines.length) {
+          showStatus('Please load a .wat file first', 'error');
+          return;
+        }
+
+        try {
+          showStatus('Compiling...', 'success');
+          
+          const watContent = currentSourceLines.join('\n');
+          const result = await compile(watContent, { sourceMap: true });
+
+          // Support both old dist (returns Uint8Array) and new API (returns { binary, sourceMap })
+          if (result instanceof Uint8Array) {
+            currentBinary = result;
+            currentSourceMap = [];
+          } else if (result && typeof result === 'object') {
+            currentBinary = result.binary || null;
+            const sm = result.sourceMap;
+            if (Array.isArray(sm)) {
+              currentSourceMap = sm;
+            } else if (typeof sm === 'string') {
+              try {
+                currentSourceMap = JSON.parse(sm);
+              } catch {
+                currentSourceMap = [];
+              }
+            } else {
+              currentSourceMap = [];
+            }
+          } else {
+            currentBinary = null;
+            currentSourceMap = [];
+          }
+          
+          displayBinary(currentBinary);
+          displaySourceMap(currentSourceMap);
+          updateStats();
+          
+          showStatus('Compilation successful! Click on source lines or mappings to explore.', 'success');
+          
+        } catch (error) {
+          showStatus(`Compilation failed: ${error.message}`, 'error');
+          console.error(error);
+        }
+      });
+
+      function displayBinary(binary) {
+        const binaryView = document.getElementById('binaryView');
+        const bytes = new Uint8Array(binary);
+        
+        let html = '';
+        for (let i = 0; i < bytes.length; i += 16) {
+          const chunk = bytes.slice(i, i + 16);
+          const offset = i.toString(16).padStart(8, '0').toUpperCase();
+          const hexBytes = Array.from(chunk)
+            .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+            .join(' ');
+          
+          html += `<div class="binary-line" data-offset="${i}">
+            <span class="offset">${offset}</span>
+            <span class="hex-bytes">${hexBytes}</span>
+          </div>`;
+        }
+        
+        binaryView.innerHTML = html;
+        
+        // Attach a single delegated click handler for all binary lines
+        if (!binaryView.dataset.clickBound) {
+          binaryView.addEventListener('click', (e) => {
+            const line = e.target.closest('.binary-line');
+            if (!line) return;
+            const offset = parseInt(line.dataset.offset);
+            if (!Number.isFinite(offset)) return;
+            handleBinaryClick(offset);
+          });
+          binaryView.dataset.clickBound = '1';
+        }
+      }
+
+      function displaySourceMap(sourceMap) {
+        const mappingList = document.getElementById('mappingList');
+        
+        if (!sourceMap || sourceMap.length === 0) {
+          mappingList.innerHTML = '<div class="mapping-row"><div colspan="4" style="text-align: center; color: #6272a4; padding: 20px;">No source mappings found</div></div>';
+          return;
+        }
+
+        const html = sourceMap.map((mapping, index) => {
+          return `<div class="mapping-row" data-index="${index}">
+            <div>${mapping.line + 1}:${mapping.column + 1}</div>
+            <div>func[${mapping.funcIndex}]</div>
+            <div>+${mapping.bodyOffset}</div>
+            <div>${mapping.file || 'unknown'}</div>
+          </div>`;
+        }).join('');
+        
+        mappingList.innerHTML = html;
+        
+        // Attach a single delegated click handler for mapping rows
+        if (!mappingList.dataset.clickBound) {
+          mappingList.addEventListener('click', (e) => {
+            const row = e.target.closest('.mapping-row');
+            if (!row) return;
+            const index = parseInt(row.dataset.index);
+            if (Number.isFinite(index) && index >= 0) {
+              highlightMapping(index);
+            }
+          });
+          mappingList.dataset.clickBound = '1';
+        }
+      }
+
+      function highlightSourceLine(lineNumber) {
+        // Clear previous highlights
+        document.querySelectorAll('.source-line.highlight').forEach(el => {
+          el.classList.remove('highlight');
+        });
+        document.querySelectorAll('.mapping-row.highlight').forEach(el => {
+          el.classList.remove('highlight');
+        });
+        document.querySelectorAll('.binary-line.highlight').forEach(el => {
+          el.classList.remove('highlight');
+        });
+
+        // Highlight source line
+        const sourceLine = document.querySelector(`[data-line="${lineNumber}"]`);
+        if (sourceLine) {
+          sourceLine.classList.add('highlight');
+        }
+
+        // Find and highlight related mappings and corresponding binary lines
+        if (currentSourceMap && Array.isArray(currentSourceMap)) {
+          const related = [];
+          currentSourceMap.forEach((mapping, index) => {
+            if (mapping.line + 1 === lineNumber) {
+              const mappingRow = document.querySelector(`[data-index="${index}"]`);
+              if (mappingRow) mappingRow.classList.add('highlight');
+              related.push(mapping);
+            }
+          });
+          highlightBinaryForMappings(related);
+        }
+      }
+
+      function highlightBinaryOffset(offset) {
+        // Clear previous highlights
+        document.querySelectorAll('.binary-line.highlight').forEach(el => {
+          el.classList.remove('highlight');
+        });
+
+        // Highlight binary line
+        const binaryLine = document.querySelector(`[data-offset="${offset}"]`);
+        if (binaryLine) {
+          binaryLine.classList.add('highlight');
+        }
+      }
+
+      function highlightMapping(index) {
+        if (!currentSourceMap || index >= currentSourceMap.length) return;
+
+        const mapping = currentSourceMap[index];
+
+        // Clear previous highlights
+        document.querySelectorAll('.source-line.highlight, .mapping-row.highlight, .binary-line.highlight').forEach(el => {
+          el.classList.remove('highlight');
+        });
+
+        // Highlight source line
+        highlightSourceLine(mapping.line + 1);
+
+        // Highlight mapping row
+        const mappingRow = document.querySelector(`[data-index="${index}"]`);
+        if (mappingRow) {
+          mappingRow.classList.add('highlight');
+        }
+
+        // Try to highlight related binary offset (approximate)
+        // Note: This is a simplified mapping - in practice, you'd need more detailed offset information
+        // Use the best available offset field from the mapping
+        const rawOffset = (typeof mapping.bodyOffset === 'number' ? mapping.bodyOffset
+                          : typeof mapping.binaryOffset === 'number' ? mapping.binaryOffset
+                          : typeof mapping.offset === 'number' ? mapping.offset
+                          : 0);
+        const approxLineOffset = Math.floor(rawOffset / 16) * 16;
+        const binaryLine = document.querySelector(`[data-offset="${approxLineOffset}"]`);
+        if (binaryLine) {
+          binaryLine.classList.add('highlight');
+          // Ensure the highlighted line is visible
+          binaryLine.scrollIntoView({ block: 'nearest' });
+        }
+      }
+
+      // Highlight binary lines for a set of mappings
+      function highlightBinaryForMappings(mappings) {
+        if (!mappings || mappings.length === 0) return;
+        // Clear existing binary highlights
+        document.querySelectorAll('.binary-line.highlight').forEach(el => el.classList.remove('highlight'));
+        // Highlight each mapping's approximate offset line
+        let firstLine = null;
+        mappings.forEach(m => {
+          const raw = (typeof m.bodyOffset === 'number' ? m.bodyOffset
+                      : typeof m.binaryOffset === 'number' ? m.binaryOffset
+                      : typeof m.offset === 'number' ? m.offset
+                      : null);
+          if (raw !== null) {
+            const approx = Math.floor(raw / 16) * 16;
+            const line = document.querySelector(`[data-offset="${approx}"]`);
+            if (line) {
+              if (!firstLine) firstLine = line;
+              line.classList.add('highlight');
+            }
+          }
+        });
+        if (firstLine) firstLine.scrollIntoView({ block: 'nearest' });
+      }
+
+      // Handle clicking in the binary pane: find nearest mapping and highlight all panes via highlightMapping
+      function handleBinaryClick(offset) {
+        if (!currentSourceMap || currentSourceMap.length === 0) {
+          highlightBinaryOffset(offset);
+          return;
+        }
+        let bestIdx = 0;
+        let bestDiff = Number.POSITIVE_INFINITY;
+        for (let i = 0; i < currentSourceMap.length; i++) {
+          const m = currentSourceMap[i];
+          const diff = Math.abs(((m && typeof m.bodyOffset === 'number') ? m.bodyOffset : 0) - offset);
+          if (diff < bestDiff) {
+            bestDiff = diff;
+            bestIdx = i;
+          }
+        }
+        highlightMapping(bestIdx);
+      }
+
+      function updateStats() {
+        if (currentBinary) {
+          document.getElementById('binarySize').textContent = currentBinary.byteLength;
+        }
+        
+        if (currentSourceMap) {
+          document.getElementById('mappingCount').textContent = currentSourceMap.length;
+          
+          // Count unique function indices
+          const uniqueFunctions = new Set(currentSourceMap.map(m => m.funcIndex));
+          document.getElementById('functionCount').textContent = uniqueFunctions.size;
+        }
+      }
+
+      function showStatus(message, type = 'success') {
+        status.textContent = message;
+        status.className = `status ${type}`;
+      }
+    </script>
+  </body>
+</html>
