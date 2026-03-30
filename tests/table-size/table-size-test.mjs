@@ -79,8 +79,7 @@ async function testTableSize(debug = false) {
 			"Multi-table test: Table 2 min size should be 11",
 		);
 
-		const { instance: instance2 } =
-			await WebAssembly.instantiate(wasmBuffer2);
+		const { instance: instance2 } = await WebAssembly.instantiate(wasmBuffer2);
 		const sizes = instance2.exports.sizes;
 		const [size0, size1, size2] = sizes();
 

@@ -1,8 +1,16 @@
-function createError(message, line, column) {
-	const error = new Error(message);
-	error.context = {};
-	error.context.position = { line, column };
-	return error;
+import { createDiagnostic } from "./diagnostics.mjs";
+
+function createError(message, line, column, options = {}) {
+	return createDiagnostic({
+		stage: "tokenize",
+		code: options.code || "WAT_TOKENIZE",
+		message,
+		position: { line, column },
+		found: options.found,
+		expected: options.expected,
+		note: options.note,
+		hint: options.hint,
+	});
 }
 
 export function tokenize(fullInput) {
@@ -72,7 +80,7 @@ export function tokenize(fullInput) {
 
 	// Check for unclosed multi-line comment
 	if (inMultiLineComment) {
-		throw new createError(
+		throw createError(
 			`Unclosed multi-line comment starting at line ${commentStartLine + 1}, column ${commentStartCol + 1}`,
 			commentStartLine + 1,
 			commentStartCol + 1,
@@ -208,10 +216,18 @@ export function tokenize(fullInput) {
 								offsetMatch &&
 								Number.isNaN(Number.parseInt(offsetMatch[1], 10))
 							) {
-								throw new createError(
-									`Invalid offset value "${offsetMatch[1]}" at line ${tokenStartLine + 1}, column ${tokenStartCol + 1 + currentToken.length + attrToken.indexOf("offset=")}`,
+								throw createError(
+									`Invalid offset value "${offsetMatch[1]}"`,
 									tokenStartLine + 1,
-									tokenStartCol + 1,
+									tokenStartCol +
+										1 +
+										currentToken.length +
+										attrToken.indexOf("offset="),
+									{
+										code: "WAT_INVALID_OFFSET",
+										found: offsetMatch[1],
+										expected: "non-negative integer",
+									},
 								);
 							}
 
@@ -219,10 +235,18 @@ export function tokenize(fullInput) {
 								alignMatch &&
 								Number.isNaN(Number.parseInt(alignMatch[1], 10))
 							) {
-								throw new createError(
-									`Invalid align value "${alignMatch[1]}" at line ${tokenStartLine + 1}, column ${tokenStartCol + 1 + currentToken.length + attrToken.indexOf("align=")}`,
+								throw createError(
+									`Invalid align value "${alignMatch[1]}"`,
 									tokenStartLine + 1,
-									tokenStartCol + 1,
+									tokenStartCol +
+										1 +
+										currentToken.length +
+										attrToken.indexOf("align="),
+									{
+										code: "WAT_INVALID_ALIGN",
+										found: alignMatch[1],
+										expected: "non-negative integer",
+									},
 								);
 							}
 
@@ -277,7 +301,7 @@ export function tokenize(fullInput) {
 
 	// Check for unclosed string literal
 	if (inString) {
-		throw new createError(
+		throw createError(
 			`Unclosed string literal starting at line ${stringStartLine + 1}, column ${stringStartCol + 1}`,
 			stringStartLine + 1,
 			stringStartCol + 1,

@@ -1,5 +1,6 @@
 import { encodeSLEB128 } from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
+import { createError } from "./error.mjs";
 
 const { TYPE } = wasmConstants;
 
@@ -25,7 +26,12 @@ export function compileReferenceOpcodes(instr, func, module, body) {
 			// Look up function index by name
 			funcIndex = module.functions.findIndex((f) => f.name === instr.func);
 			if (funcIndex === -1) {
-				throw new Error(`Unknown function reference: ${instr.func}`);
+				throw createError(
+					instr,
+					func,
+					module,
+					`Unknown function reference: ${instr.func}`,
+				);
 			}
 		} else {
 			// Direct numeric index

@@ -1,4 +1,5 @@
 import { compileToWASM } from "./compile/compile.mjs";
+import { enhanceError } from "./diagnostics.mjs";
 import { parseWAT } from "./parser/parser.mjs";
 
 /*
@@ -9,18 +10,29 @@ import { parseWAT } from "./parser/parser.mjs";
 const compile = async (wat, options = {}) => {
 	// Backwards compatible: if profiling requested, use profile helper
 	if (options?.profile) return compileWithProfile(wat);
-	const parsed = parseWAT(wat, options);
-	const result = compileToWASM(parsed, options);
-
-	// If source map is requested, return object with binary and sourceMap
-	if (options?.sourceMap) {
-		return {
-			binary: result.binary || result,
-			sourceMap: result.sourceMap,
+	try {
+		const compileOptions = {
+			...options,
+			source: typeof wat === "string" ? wat : options.source,
 		};
-	}
+		const parsed = parseWAT(wat, compileOptions);
+		const result = compileToWASM(parsed, compileOptions);
 
-	return result.binary || result;
+		// If source map is requested, return object with binary and sourceMap
+		if (options?.sourceMap) {
+			return {
+				binary: result.binary || result,
+				sourceMap: result.sourceMap,
+			};
+		}
+
+		return result.binary || result;
+	} catch (error) {
+		throw enhanceError(error, {
+			source: typeof wat === "string" ? wat : options.source,
+			filename: options.filename || "input.wat",
+		});
+	}
 };
 
 const compileWithProfile = async (wat) => {
@@ -29,8 +41,14 @@ const compileWithProfile = async (wat) => {
 		typeof process !== "undefined" && process.hrtime?.bigint
 			? process.hrtime.bigint()
 			: BigInt(Math.floor(performance.now() * 1e6));
-	const parsed = parseWAT(wat, { profile });
-	const compiled = compileToWASM(parsed, { profile });
+	const parsed = parseWAT(wat, {
+		profile,
+		source: typeof wat === "string" ? wat : undefined,
+	});
+	const compiled = compileToWASM(parsed, {
+		profile,
+		source: typeof wat === "string" ? wat : undefined,
+	});
 	const tAllEnd =
 		typeof process !== "undefined" && process.hrtime?.bigint
 			? process.hrtime.bigint()

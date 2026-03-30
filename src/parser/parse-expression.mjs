@@ -88,13 +88,21 @@ export function parseExpression() {
 			return { type: "import", ...importExpr, position: tokenPos };
 		}
 
-		// Skip unrecognized expressions
-		while (!atEnd() && peekToken() !== ")") {
-			console.error("⚠️⚠️⚠️ Skip unrecognized expressions ", peekToken());
-			skipToken();
-		}
-		closeParenthesis();
-		return null;
+		throw createError(`Unknown expression type: ${expressionType}`, {
+			code: "WAT_UNKNOWN_EXPRESSION",
+			position: tokenPos,
+			found: expressionType,
+			expected: [
+				"module",
+				"func",
+				"export",
+				"local",
+				"memory",
+				"data",
+				"global",
+				"import",
+			],
+		});
 	}
 	// Handle simple tokens
 	skipToken();

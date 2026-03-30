@@ -1,3 +1,4 @@
+import { createDiagnostic } from "../../diagnostics.mjs";
 import { encodeULEB128 } from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
 
@@ -15,7 +16,12 @@ export function startSection(module, functions, binary) {
 			// Look up function index by name
 			startFuncIndex = functions.findIndex((f) => f.name === module.start);
 			if (startFuncIndex === -1) {
-				throw new Error(`Unknown start function: ${module.start}`);
+				throw createDiagnostic({
+					stage: "compile",
+					code: "WAT_UNKNOWN_START",
+					message: `Unknown start function: ${module.start}`,
+					position: module.position,
+				});
 			}
 		} else {
 			// Direct numeric index

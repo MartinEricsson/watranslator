@@ -19,10 +19,10 @@ async function testMultiMemoryExplicitIndices(debug = false) {
 
 		// Test 2: Check for WASM magic number
 		const magicBytes = wasmBuffer.slice(0, 4);
-		const magicNumber = 
-			magicBytes[0] | 
-			(magicBytes[1] << 8) | 
-			(magicBytes[2] << 16) | 
+		const magicNumber =
+			magicBytes[0] |
+			(magicBytes[1] << 8) |
+			(magicBytes[2] << 16) |
 			(magicBytes[3] << 24);
 		assert.strictEqual(
 			magicNumber,
@@ -32,10 +32,10 @@ async function testMultiMemoryExplicitIndices(debug = false) {
 
 		// Test 3: Check for WASM version
 		const versionBytes = wasmBuffer.slice(4, 8);
-		const version = 
-			versionBytes[0] | 
-			(versionBytes[1] << 8) | 
-			(versionBytes[2] << 16) | 
+		const version =
+			versionBytes[0] |
+			(versionBytes[1] << 8) |
+			(versionBytes[2] << 16) |
 			(versionBytes[3] << 24);
 		assert.strictEqual(version, 1, "Should have correct WASM version");
 
@@ -162,7 +162,9 @@ async function testMultiMemoryExplicitIndices(debug = false) {
 			"Should find memory operations with explicit indices encoded in binary",
 		);
 
-		console.log("✅ All multi-memory explicit indices binary encoding tests passed!");
+		console.log(
+			"✅ All multi-memory explicit indices binary encoding tests passed!",
+		);
 		console.log(
 			"   Note: Runtime execution tests skipped (multi-memory not yet widely supported)",
 		);

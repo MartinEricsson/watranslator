@@ -322,7 +322,9 @@ async function testReinterpretOps(debug = false) {
 		// Test NaN separately - any NaN pattern is valid (sign bit can vary, mantissa must be non-zero)
 		// We test this by verifying the reinterpret of a NaN float produces a valid NaN bit pattern
 		const nanTestResult = instance.exports.i32_reinterpret_f32(Number.NaN);
-		const nanPassed = (nanTestResult & 0x7f800000) === 0x7f800000 && (nanTestResult & 0x007fffff) !== 0;
+		const nanPassed =
+			(nanTestResult & 0x7f800000) === 0x7f800000 &&
+			(nanTestResult & 0x007fffff) !== 0;
 		console.log(
 			`i32.reinterpret_f32(NaN): result=0x${(nanTestResult >>> 0).toString(16).toUpperCase()}, NaN pattern check - ${nanPassed ? "✅" : "❌"}`,
 		);

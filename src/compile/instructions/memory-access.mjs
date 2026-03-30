@@ -69,11 +69,14 @@ export function compileMemoryAccess(instr, func, body, module) {
 
 		// Encode memory index only for multi-memory support
 		// Single-memory modules (MVP) don't include the memory index
-		const hasMultipleMemories = 
+		const hasMultipleMemories =
 			(module.memories && module.memories.length > 1) ||
-			(module.imports?.filter(imp => imp.kind === "memory").length > 1);
-		
-		if (hasMultipleMemories || (instr.memoryRef !== null && instr.memoryRef !== undefined)) {
+			module.imports?.filter((imp) => imp.kind === "memory").length > 1;
+
+		if (
+			hasMultipleMemories ||
+			(instr.memoryRef !== null && instr.memoryRef !== undefined)
+		) {
 			let memoryIndex = 0; // Default to memory 0
 
 			if (instr.memoryRef !== null && instr.memoryRef !== undefined) {
@@ -83,7 +86,7 @@ export function compileMemoryAccess(instr, func, body, module) {
 				) {
 					// For named memory reference, find the memory index
 					const memoryName = instr.memoryRef.substring(1);
-					
+
 					// Check imported memories first
 					const importedMemIndex = module.imports
 						?.filter((imp) => imp.kind === "memory")
@@ -100,9 +103,9 @@ export function compileMemoryAccess(instr, func, body, module) {
 						);
 						if (localMemIndex !== -1) {
 							// Add offset for imported memories
-							const importedMemCount = module.imports?.filter(
-								(imp) => imp.kind === "memory",
-							).length || 0;
+							const importedMemCount =
+								module.imports?.filter((imp) => imp.kind === "memory").length ||
+								0;
 							memoryIndex = importedMemCount + localMemIndex;
 						} else {
 							throw createError(

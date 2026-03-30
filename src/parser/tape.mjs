@@ -1,3 +1,5 @@
+import { createDiagnostic } from "../diagnostics.mjs";
+
 let position = 0;
 let tokens = [];
 let sourceMap = new Map();
@@ -14,7 +16,13 @@ export function atEnd() {
 
 export function getToken() {
 	if (position >= tokens.length) {
-		return null; // TODO: Should this throw an error instead?
+		throw createDiagnostic({
+			stage: "parse",
+			code: "WAT_UNEXPECTED_EOF",
+			message: "Unexpected end of input",
+			position: getCurrentCursor(),
+			found: "end of input",
+		});
 	}
 	const token = tokens[position];
 	position++;
@@ -40,15 +48,19 @@ export function skipToken() {
 	if (position < tokens.length) {
 		position++;
 	} else {
-		const err = new Error("No more tokens to skip");
-		err.context = {
-			position: sourceMap.get(tokens.length - 1),
-			token: tokens[tokens.length - 1],
-		};
-		throw err;
+		throw createDiagnostic({
+			stage: "parse",
+			code: "WAT_UNEXPECTED_EOF",
+			message: "Unexpected end of input",
+			position: getCurrentCursor(),
+			found: "end of input",
+		});
 	}
 }
 
 export function getCurrentCursor() {
-	return sourceMap.get(position);
+	return (
+		sourceMap.get(position) ||
+		sourceMap.get(tokens.length - 1) || { line: 1, column: 1 }
+	);
 }

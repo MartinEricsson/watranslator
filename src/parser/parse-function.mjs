@@ -62,11 +62,7 @@ export function parseFunction() {
 			blockLabels.set(label, blockStack.length);
 		}
 
-		if (
-			!atEnd() &&
-			peekToken() === "(" &&
-			peekTokenN(1) === "result"
-		) {
+		if (!atEnd() && peekToken() === "(" && peekTokenN(1) === "result") {
 			skipToken(); // "("
 			skipToken(); // "result"
 
@@ -121,10 +117,7 @@ export function parseFunction() {
 				currentBlock.endPosition = getCurrentCursor();
 				blockStack.pop();
 				skipToken();
-				if (
-					currentBlock.type === "if" &&
-					currentBlock.inElseBranch
-				) {
+				if (currentBlock.type === "if" && currentBlock.inElseBranch) {
 					currentBlock.inElseBranch = false;
 				}
 
@@ -150,14 +143,12 @@ export function parseFunction() {
 			}
 
 			if (keyword === "if") {
-				// S-expression style if/then/else is not supported yet
-				while (!atEnd() && peekToken() !== ")") {
-					skipToken();
-				}
-				if (!atEnd() && peekToken() === ")") {
-					skipToken();
-				}
-				continue;
+				throw createError("S-expression style `if` is not supported", {
+					code: "WAT_UNSUPPORTED_IF",
+					position: tokenPos,
+					found: keyword,
+					hint: "Use stack-style `if ... else ... end` form instead.",
+				});
 			}
 
 			if (keyword === "type") {
@@ -290,14 +281,15 @@ export function parseFunction() {
 				continue;
 			}
 
-			while (!atEnd() && peekToken() !== ")") {
-				skipToken();
-			}
+			throw createError(`Unknown function field: ${keyword}`, {
+				code: "WAT_UNKNOWN_FUNC_FIELD",
+				position: tokenPos,
+				found: keyword,
+				expected: ["param", "result", "local", "export", "import", "type"],
+			});
+		}
 
-			if (!atEnd() && peekToken() === ")") {
-				skipToken();
-			}
-		} else if (peekToken() === "block") {
+		if (peekToken() === "block") {
 			skipToken(); // Skip 'block' keyword
 
 			let label = null;

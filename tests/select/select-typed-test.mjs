@@ -96,9 +96,10 @@ async function testTypedSelect(debug = false) {
 		for (const { name, expected, func, params } of allTests) {
 			const result = instance.exports[func](...params);
 			// Handle BigInt comparisons for i64 tests
-			const resultRes = typeof expected === 'bigint' 
-				? result === expected 
-				: Math.abs(result - expected) < 0.0001; // Allow small float differences
+			const resultRes =
+				typeof expected === "bigint"
+					? result === expected
+					: Math.abs(result - expected) < 0.0001; // Allow small float differences
 			console.assert(
 				resultRes,
 				`❌ ${name} should return ${expected}, got ${result}`,

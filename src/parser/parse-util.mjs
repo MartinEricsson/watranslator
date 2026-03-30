@@ -1,3 +1,4 @@
+import { createDiagnostic } from "../diagnostics.mjs";
 import { atEnd, getCurrentCursor, peekToken, skipToken } from "./tape.mjs";
 
 export function isLabel(candidate) {
@@ -26,12 +27,27 @@ export function isNumber(candidate) {
 	);
 }
 
-export function createError(message) {
-	const pos = getCurrentCursor();
-	const token = !atEnd() ? `"${peekToken()}"` : "end of input";
-	return new Error(
-		`PARSE ERROR: ${message} at line ${pos.line}, column ${pos.column} near ${token}`,
-	);
+export function createError(message, options = {}) {
+	const pos = options.position || getCurrentCursor();
+	const token =
+		options.found !== undefined
+			? options.found
+			: !atEnd()
+				? peekToken()
+				: "end of input";
+
+	return createDiagnostic({
+		stage: "parse",
+		code: options.code || "WAT_PARSE",
+		message,
+		position: pos,
+		endPosition: options.endPosition,
+		found: token,
+		expected: options.expected,
+		note: options.note,
+		hint: options.hint,
+		context: options.context,
+	});
 }
 
 export function openParenthesis() {
@@ -39,8 +55,12 @@ export function openParenthesis() {
 
 	return (_) => {
 		if (peekToken() !== ")") {
-			const msg = `Missing closing parenthesis to opening at ${start.line} : ${start.column}`;
-			throw createError(msg);
+			throw createError("Missing closing parenthesis", {
+				code: "WAT_EXPECT_CLOSE_PAREN",
+				position: getCurrentCursor(),
+				expected: ")",
+				note: `Opening parenthesis is at line ${start.line}, column ${start.column}.`,
+			});
 		}
 		skipToken();
 	};

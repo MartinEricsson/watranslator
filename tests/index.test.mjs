@@ -15,6 +15,7 @@ import {
 import testComparisonOps from "./comparison-ops/comparison-ops-test.mjs";
 import testControlFlow from "./control-flow/control-flow-test.mjs";
 import testDataSection from "./data-section/data-section-test.mjs";
+import testDiagnostics from "./diagnostics/diagnostics-test.mjs";
 import testDivision from "./division/division-test.mjs";
 import testDropInstruction from "./drop/drop-test.mjs";
 import testEarlyReturn from "./early-return/early-return-test.mjs";
@@ -34,7 +35,6 @@ import testFunctionCalls from "./function-calls/function-calls-test.mjs";
 import testGlobalVariables from "./global-variables/global-variables-test.mjs";
 import testi64MathAndOps from "./i64-math-and-ops/i64-math-and-ops-test.mjs";
 import testI64ReinterpretF64 from "./i64-reinterpret-f64/i64-reinterpret-f64-test.mjs";
-import testReinterpretOps from "./reinterpret-ops/reinterpret-ops-test.mjs";
 import testImportedFunctionOrdered from "./imported-functions/imported-functions-ordered-test.mjs";
 import testImportedFunctions from "./imported-functions/imported-functions-test.mjs";
 import testImportedGlobals from "./imported-globals/imported-globals-test.mjs";
@@ -55,11 +55,13 @@ import testMemoryStorei64 from "./memory-store/i64-store-test.mjs";
 import testMemoryStore from "./memory-store/memory-store-test.mjs";
 import testMultiValue from "./multi-value/multi-value-test.mjs";
 import { testMultipleFunctionArguments } from "./multiple-function-arguments/multiple-function-arguments.mjs";
+import testNonTrappingConversions from "./non-trapping-conversions/non-trapping-conversions-test.mjs";
 import testNop from "./nop/nop-test.mjs";
 import testParameters from "./parameters/parameters-test.mjs";
 import testProfile from "./performance/profile-test.mjs";
 import testRefIsNull from "./reference-opcodes/ref-is-null-test.mjs";
 import testReferenceOpcodes from "./reference-opcodes/reference-opcodes-test.mjs";
+import testReinterpretOps from "./reinterpret-ops/reinterpret-ops-test.mjs";
 import testRemainder from "./remainder/remainder-test.mjs";
 import testSelect from "./select/select-test.mjs";
 import testSelectReference from "./select/select-typed-reference-test.mjs";
@@ -102,12 +104,11 @@ import testCompilation from "./test-compiler/test-compiler.mjs";
 import { testTypeConversionF64 } from "./type-conversion-f64/type-conversion-f64-test.mjs";
 import { testTypeConversionI64ToF64 } from "./type-conversion-i64-f64/type-conversion-i64-f64-test.mjs";
 import testTypeConversion from "./type-conversion/type-conversion.mjs";
-import testNonTrappingConversions from "./non-trapping-conversions/non-trapping-conversions-test.mjs";
 import testUnreachable from "./unreachable/unreachable-test.mjs";
 
+import testMultiMemoryExplicitIndices from "./multi-memory/multi-memory-explicit-indices-test.mjs";
 import testMultiMemoryIndexes from "./multi-memory/multi-memory-indexes-test.mjs";
 import testMultiMemory from "./multi-memory/multi-memory-test.mjs";
-import testMultiMemoryExplicitIndices from "./multi-memory/multi-memory-explicit-indices-test.mjs";
 
 const args = process.argv.slice(2);
 const debug = args.includes("--debug");
@@ -151,6 +152,7 @@ async function runTests() {
 		{ name: "Comparison Operations", test: testComparisonOps },
 		{ name: "Control Flow", test: testControlFlow },
 		{ name: "Data Section", test: testDataSection },
+		{ name: "Diagnostics", test: testDiagnostics },
 		{ name: "Division", test: testDivision },
 		{ name: "Drop Instruction", test: testDropInstruction },
 		{ name: "Early return", test: testEarlyReturn },

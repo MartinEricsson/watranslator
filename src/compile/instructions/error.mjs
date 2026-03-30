@@ -1,3 +1,5 @@
+import { createDiagnostic } from "../../diagnostics.mjs";
+
 export function createError(instr, func, module, message) {
 	// Get source position by cascading through available sources
 	const pos = instr?.position || // First try instruction position
@@ -6,33 +8,31 @@ export function createError(instr, func, module, message) {
 		func?.position || // Then function position
 		module?.position || { line: 0, column: 0 }; // Then module position // Fallback default
 
-	// Format a detailed error message with line number information
-	const errorMessage = `${message} at line ${pos.line}, column ${pos.column}`;
-	const error = new Error(errorMessage);
-
-	// Store detailed context for better error reporting
-	error.context = {
+	return createDiagnostic({
+		stage: "compile",
+		code: "WAT_COMPILE",
+		message,
 		position: pos,
-		instruction: instr
-			? {
-					type: instr.type,
-					operand: instr.operand,
-					value: instr.value,
-					position: instr.position,
-				}
-			: undefined,
-		function: func
-			? {
-					name: func.name,
-					position: func.position,
-				}
-			: undefined,
-		module: module
-			? {
-					position: module.position,
-				}
-			: undefined,
-	};
-
-	return error;
+		context: {
+			instruction: instr
+				? {
+						type: instr.type,
+						operand: instr.operand,
+						value: instr.value,
+						position: instr.position,
+					}
+				: undefined,
+			function: func
+				? {
+						name: func.name,
+						position: func.position,
+					}
+				: undefined,
+			module: module
+				? {
+						position: module.position,
+					}
+				: undefined,
+		},
+	});
 }

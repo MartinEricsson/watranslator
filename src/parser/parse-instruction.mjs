@@ -6,7 +6,7 @@ import { parseSIMDLaneBased } from "./instruction/parse-simd-lane-based.mjs";
 import { parseSIMDMemory } from "./instruction/parse-simd-memory.mjs";
 import { parseSIMDPlainOpcode } from "./instruction/parse-simd-plain-opcode.mjs";
 import { parseTableInstruction } from "./instruction/parse-table-instruction.mjs";
-import { isLabel } from "./parse-util.mjs";
+import { createError, isLabel } from "./parse-util.mjs";
 import {
 	atEnd,
 	getCurrentCursor,
@@ -442,7 +442,7 @@ export function parseInstruction(blockLabels) {
 		}
 		return { type: "data.drop", segmentIdx, position };
 	}
-	
+
 	// Handle memory.size instruction with optional memory reference
 	if (instrType === "memory.size") {
 		let memoryRef = null;
@@ -455,7 +455,7 @@ export function parseInstruction(blockLabels) {
 		}
 		return { type: "memory.size", memoryRef, position };
 	}
-	
+
 	// Handle memory.grow instruction with optional memory reference
 	if (instrType === "memory.grow") {
 		let memoryRef = null;
@@ -468,7 +468,7 @@ export function parseInstruction(blockLabels) {
 		}
 		return { type: "memory.grow", memoryRef, position };
 	}
-	
+
 	// Handle memory.fill instruction with optional memory reference
 	if (instrType === "memory.fill") {
 		let memoryRef = null;
@@ -481,7 +481,7 @@ export function parseInstruction(blockLabels) {
 		}
 		return { type: "memory.fill", memoryRef, position };
 	}
-	
+
 	// Handle memory.copy instruction with optional destination and source memory references
 	if (instrType === "memory.copy") {
 		let destMemoryRef = null;
@@ -504,13 +504,13 @@ export function parseInstruction(blockLabels) {
 		}
 		return { type: "memory.copy", destMemoryRef, srcMemoryRef, position };
 	}
-	
+
 	// Handle memory.init instruction with optional memory reference and segment index
 	if (instrType === "memory.init") {
 		let memoryRef = null;
 		// Default to segment 1 for backward compatibility with existing tests that use passive data segments
 		let segmentIdx = 1;
-		
+
 		// Check for memory reference first (can be $name or number)
 		if (!atEnd()) {
 			if (peekToken().startsWith("$")) {
@@ -522,10 +522,10 @@ export function parseInstruction(blockLabels) {
 				segmentIdx = Number.parseInt(token, 10);
 			}
 		}
-		
+
 		return { type: "memory.init", memoryRef, segmentIdx, position };
 	}
-	
+
 	// Handle elem.drop instruction
 	if (instrType === "elem.drop") {
 		// Check if next token is a number (element index)
@@ -595,16 +595,13 @@ export function parseInstruction(blockLabels) {
 			position,
 		};
 	}
-	// For unrecognized instructions, return a generic instruction
-	const error = new Error(
-		`Unrecognized instruction: ${instrType} at line: ${position.line} and column: ${position.column}`,
-	);
-	error.context = {};
-	error.context.position = {
-		line: position.line,
-		column: position.column,
-	};
-	error.context.instruction = instrType;
-
-	throw error;
+	throw createError(`Unrecognized instruction: ${instrType}`, {
+		code: "WAT_UNKNOWN_INSTRUCTION",
+		position,
+		found: instrType,
+		hint: "Check the opcode spelling against the WebAssembly text format specification.",
+		context: {
+			instruction: instrType,
+		},
+	});
 }

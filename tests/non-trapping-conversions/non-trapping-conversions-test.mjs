@@ -27,7 +27,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i32_trunc_sat_f32_s NaN to 0",
 				expected: 0,
 				func: "i32_trunc_sat_f32_s",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i32_trunc_sat_f32_s +Infinity to max",
@@ -65,7 +65,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i32_trunc_sat_f32_u NaN to 0",
 				expected: 0,
 				func: "i32_trunc_sat_f32_u",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i32_trunc_sat_f32_u +Infinity to max",
@@ -109,7 +109,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i32_trunc_sat_f64_s NaN to 0",
 				expected: 0,
 				func: "i32_trunc_sat_f64_s",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i32_trunc_sat_f64_s +Infinity to max",
@@ -147,7 +147,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i32_trunc_sat_f64_u NaN to 0",
 				expected: 0,
 				func: "i32_trunc_sat_f64_u",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i32_trunc_sat_f64_u +Infinity to max",
@@ -191,7 +191,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i64_trunc_sat_f32_s NaN to 0",
 				expected: 0n,
 				func: "i64_trunc_sat_f32_s",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i64_trunc_sat_f32_s +Infinity to max",
@@ -229,7 +229,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i64_trunc_sat_f32_u NaN to 0",
 				expected: 0n,
 				func: "i64_trunc_sat_f32_u",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i64_trunc_sat_f32_u +Infinity to max",
@@ -273,7 +273,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i64_trunc_sat_f64_s NaN to 0",
 				expected: 0n,
 				func: "i64_trunc_sat_f64_s",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i64_trunc_sat_f64_s +Infinity to max",
@@ -311,7 +311,7 @@ async function testNonTrappingConversions(debug = false) {
 				name: "i64_trunc_sat_f64_u NaN to 0",
 				expected: 0n,
 				func: "i64_trunc_sat_f64_u",
-				params: [NaN],
+				params: [Number.NaN],
 			},
 			{
 				name: "i64_trunc_sat_f64_u +Infinity to max",
@@ -345,7 +345,7 @@ async function testNonTrappingConversions(debug = false) {
 			const result = instance.exports[func](...params);
 
 			let passed = result === expected;
-			
+
 			// Handle unsigned i32 comparison properly
 			if (typeof expected === "number" && expected > 2147483647) {
 				const unsignedResult = result >>> 0;
@@ -374,7 +374,9 @@ async function testNonTrappingConversions(debug = false) {
 			return false;
 		}
 
-		console.log(`✅ All ${results.length} non-trapping conversion tests passed!`);
+		console.log(
+			`✅ All ${results.length} non-trapping conversion tests passed!`,
+		);
 		return true;
 	} catch (error) {
 		console.error("❌ Error in non-trapping conversions test:", error);

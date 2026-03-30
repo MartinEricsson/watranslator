@@ -1,3 +1,4 @@
+import { createDiagnostic } from "../diagnostics.mjs";
 import wasmConstants from "./constants.mjs";
 
 const { TYPE } = wasmConstants;
@@ -105,8 +106,6 @@ export function encodeF32(value) {
 
 // Helper function to encode bytes from WAT data section strings
 export function encodeBytes(str) {
-	console.log("Raw string to encode:", str);
-
 	// Special handler for WAT data section format
 	// In WAT, data section strings look like "\01\02\03" with single backslashes
 	// but in JS strings these are represented as "\\01\\02\\03"
@@ -153,7 +152,6 @@ export function encodeBytes(str) {
 			}
 		}
 
-		console.log("Encoded bytes:", bytes);
 		return bytes;
 	}
 
@@ -193,7 +191,6 @@ export function encodeBytes(str) {
 		}
 	}
 
-	console.log("Encoded bytes:", bytes);
 	return bytes;
 }
 
@@ -384,7 +381,11 @@ export function getLabelIndex(label, func, branchInstr = null) {
 // Fix and clean up the AST if needed
 export function sanitizeAST(ast) {
 	if (!ast || !Array.isArray(ast) || ast.length === 0) {
-		throw new Error("Invalid AST structure");
+		throw createDiagnostic({
+			stage: "validate",
+			code: "WAT_INVALID_AST",
+			message: "Invalid AST structure",
+		});
 	}
 
 	// Find the module object in the AST
@@ -393,7 +394,13 @@ export function sanitizeAST(ast) {
 	);
 
 	if (!moduleObj) {
-		throw new Error("No module found in AST");
+		throw createDiagnostic({
+			stage: "validate",
+			code: "WAT_NO_MODULE",
+			message: "No module found in AST",
+			position: ast[0]?.position,
+			note: "Compilation requires a top-level `(module ...)` expression.",
+		});
 	}
 
 	// Initialize module properties

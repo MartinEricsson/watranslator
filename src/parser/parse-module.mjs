@@ -38,6 +38,7 @@ export function parseModule() {
 				if (sectionType === "func") {
 					const func = parseFunction();
 					if (func) {
+						func.position = func.position || sectionPos;
 						// Add function to the module's functions array
 						module.functions.push(func);
 
@@ -55,6 +56,7 @@ export function parseModule() {
 					// Parse import declaration
 					const importDecl = parseImport();
 					if (importDecl) {
+						importDecl.position = importDecl.position || sectionPos;
 						module.imports.push(importDecl);
 
 						// If it's a function import, add it to the functions list as well
@@ -84,6 +86,7 @@ export function parseModule() {
 					// Parse memory declaration
 					const memory = parseMemory();
 					if (memory) {
+						memory.position = memory.position || sectionPos;
 						module.memories.push(memory);
 					}
 					skipToken(); // Skip closing paren
@@ -91,6 +94,7 @@ export function parseModule() {
 					// Parse data section
 					const data = parseData();
 					if (data) {
+						data.position = data.position || sectionPos;
 						module.datas.push(data);
 					}
 					skipToken(); // Skip closing paren
@@ -173,6 +177,7 @@ export function parseModule() {
 					// Handle global variable declaration
 					const global = parseGlobal();
 					if (global) {
+						global.position = global.position || sectionPos;
 						module.globals.push(global);
 					}
 					skipToken(); // Skip closing paren
@@ -180,6 +185,7 @@ export function parseModule() {
 					// Add support for table declarations
 					const table = parseTable();
 					if (table) {
+						table.position = table.position || sectionPos;
 						module.tables.push(table);
 					}
 					skipToken(); // Skip closing paren
@@ -187,6 +193,7 @@ export function parseModule() {
 					// Parse element section
 					const elem = parseElement();
 					if (elem) {
+						elem.position = elem.position || sectionPos;
 						module.elements.push(elem);
 					}
 					skipToken(); // Skip closing paren
@@ -204,21 +211,37 @@ export function parseModule() {
 					// Parse type section: (type $name (func (param i32 i32) (result i32)))
 					const typeDecl = parseType();
 					if (typeDecl) {
+						typeDecl.position = typeDecl.position || sectionPos;
 						module.types.push(typeDecl);
 					}
 					skipToken(); // Skip closing paren
 				} else {
-					// Skip unrecognized sections
-					console.log("⚠️ Skipping unrecognized section:", sectionType);
-					while (!atEnd() && peekToken() !== ")") {
-						skipToken();
-					}
-					skipToken(); // Skip closing paren
+					throw createError(`Unknown module section: ${sectionType}`, {
+						code: "WAT_UNKNOWN_SECTION",
+						position: sectionPos,
+						found: sectionType,
+						expected: [
+							"func",
+							"import",
+							"memory",
+							"data",
+							"export",
+							"global",
+							"table",
+							"elem",
+							"start",
+							"type",
+						],
+					});
 				}
 			}
 		} else {
-			console.log("⚠️ Skipping unrecognized token:", peekToken());
-			skipToken(); // Skip any unexpected tokens
+			throw createError("Unexpected token in module body", {
+				code: "WAT_UNEXPECTED_TOKEN",
+				position: getCurrentCursor(),
+				found: peekToken(),
+				expected: "(",
+			});
 		}
 	}
 

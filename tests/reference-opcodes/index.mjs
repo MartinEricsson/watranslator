@@ -4,16 +4,16 @@ import testRefIsNull from "./ref-is-null-test.mjs";
 import testReferenceOpcodes from "./reference-opcodes-test.mjs";
 
 try {
-  const result = await Promise.all([
-    testReferenceOpcodes(debug),
-    testRefIsNull(debug),
-  ]);
-  if (result.includes(false)) {
-    throw new Error("One or more tests failed");
-  }
-  console.log("✅ All reference opcodes tests passed!");
+	const result = await Promise.all([
+		testReferenceOpcodes(debug),
+		testRefIsNull(debug),
+	]);
+	if (result.includes(false)) {
+		throw new Error("One or more tests failed");
+	}
+	console.log("✅ All reference opcodes tests passed!");
 } catch (error) {
-  console.log("❌ Some reference opcodes tests failed!");
-  console.error("Error running tests:", error);
-  process.exit(1);
+	console.log("❌ Some reference opcodes tests failed!");
+	console.error("Error running tests:", error);
+	process.exit(1);
 }

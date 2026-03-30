@@ -1,3 +1,4 @@
+import { createDiagnostic } from "../../diagnostics.mjs";
 import { encodeSLEB128, encodeULEB128 } from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
 
@@ -33,9 +34,12 @@ export function elementSection(elements, functions, binary) {
 					// Look up function index by name
 					funcIndex = functions.findIndex((f) => f.name === funcRef);
 					if (funcIndex === -1) {
-						throw new Error(
-							`Unknown function reference in element section: ${funcRef}`,
-						);
+						throw createDiagnostic({
+							stage: "compile",
+							code: "WAT_UNKNOWN_FUNCTION",
+							message: `Unknown function reference in element section: ${funcRef}`,
+							position: element.position,
+						});
 					}
 				} else {
 					// Direct numeric index

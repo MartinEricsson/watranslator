@@ -11,7 +11,7 @@ async function testSignExtension(debug = false) {
 		const tests = [
 			{
 				name: "i32_extend8_s_positive",
-				expected: 0x0000007F,
+				expected: 0x0000007f,
 				func: "i32_extend8_s_positive",
 				params: [],
 			},
@@ -41,7 +41,7 @@ async function testSignExtension(debug = false) {
 			},
 			{
 				name: "i32_extend16_s_positive",
-				expected: 0x00007FFF,
+				expected: 0x00007fff,
 				func: "i32_extend16_s_positive",
 				params: [],
 			},
@@ -71,7 +71,7 @@ async function testSignExtension(debug = false) {
 			},
 			{
 				name: "i64_extend8_s_positive",
-				expected: BigInt(0x000000000000007F),
+				expected: BigInt(0x000000000000007f),
 				func: "i64_extend8_s_positive",
 				params: [],
 			},
@@ -101,7 +101,7 @@ async function testSignExtension(debug = false) {
 			},
 			{
 				name: "i64_extend16_s_positive",
-				expected: BigInt(0x0000000000007FFF),
+				expected: BigInt(0x0000000000007fff),
 				func: "i64_extend16_s_positive",
 				params: [],
 			},
@@ -131,7 +131,7 @@ async function testSignExtension(debug = false) {
 			},
 			{
 				name: "i64_extend32_s_positive",
-				expected: BigInt(0x000000007FFFFFFF),
+				expected: BigInt(0x000000007fffffff),
 				func: "i64_extend32_s_positive",
 				params: [],
 			},

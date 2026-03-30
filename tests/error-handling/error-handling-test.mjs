@@ -32,7 +32,12 @@ async function testErrorHandling(debug = false) {
 			expectedErrorMessage: "Unclosed multi-line comment",
 			line: 2,
 		},
-		//⚠️{ name: 'Unclosed parenthesis', file: 'unclosed-parenthesis', expectedErrorMessage: 'No more tokens to skip', line: 3 },
+		{
+			name: "Unclosed parenthesis",
+			file: "unclosed-parenthesis",
+			expectedErrorMessage: "Unexpected end of input",
+			line: 5,
+		},
 		{
 			name: "Invalid instruction",
 			file: "invalid-instruction",
@@ -64,8 +69,18 @@ async function testErrorHandling(debug = false) {
 			line: 4,
 		},
 		//⚠️{ name: 'Type mismatch', file: 'type-mismatch', expectedErrorMessage: 'Type mismatch', line: 9 },
-		//⚠️{ name: 'Invalid branch target', file: 'invalid-branch-target', expectedErrorMessage: 'Invalid branch target', line: 4 },
-		//⚠️{ name: 'Invalid result type', file: 'invalid-result-type', expectedErrorMessage: 'Unknown type', line: 2 },
+		{
+			name: "Invalid branch target",
+			file: "invalid-branch-target",
+			expectedErrorMessage: "Unknown branch target",
+			line: 4,
+		},
+		{
+			name: "Invalid result type",
+			file: "invalid-result-type",
+			expectedErrorMessage: "Unknown result type",
+			line: 2,
+		},
 		{
 			name: "Negative alignment i32",
 			file: "negative-alignment-i32",
