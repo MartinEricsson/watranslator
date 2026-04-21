@@ -34,6 +34,7 @@ import testF64PromoteF32 from "./f64-promote-f32/f64-promote-f32-test.mjs";
 import testFunctionCalls from "./function-calls/function-calls-test.mjs";
 import testGlobalVariables from "./global-variables/global-variables-test.mjs";
 import testi64MathAndOps from "./i64-math-and-ops/i64-math-and-ops-test.mjs";
+import testI64NegHex from "./i64-math-and-ops/i64-neg-hex-test.mjs";
 import testI64ReinterpretF64 from "./i64-reinterpret-f64/i64-reinterpret-f64-test.mjs";
 import testImportedFunctionOrdered from "./imported-functions/imported-functions-ordered-test.mjs";
 import testImportedFunctions from "./imported-functions/imported-functions-test.mjs";
@@ -171,6 +172,7 @@ async function runTests() {
 		{ name: "Function Calls", test: testFunctionCalls },
 		{ name: "Global Variables", test: testGlobalVariables },
 		{ name: "i64 Math and Ops", test: testi64MathAndOps },
+		{ name: "i64 const negative hex", test: testI64NegHex },
 		{ name: "i64 Reinterpret F64", test: testI64ReinterpretF64 },
 		{ name: "Reinterpret Operations", test: testReinterpretOps },
 		{ name: "Integration loop sum", test: testLoopSum },

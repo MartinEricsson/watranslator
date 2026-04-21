@@ -351,7 +351,16 @@ export function parseInstruction(blockLabels) {
 	if (instrType === "i64.const") {
 		// Handle 64-bit integers using BigInt
 		const valueStr = getToken();
-		let value = BigInt(valueStr);
+		let value;
+
+		// Handle negative hex: strip sign, parse magnitude, then negate
+		if (valueStr.toLowerCase().startsWith("-0x")) {
+			value = -BigInt("0x" + valueStr.slice(3));
+		} else if (valueStr.toLowerCase().startsWith("0x")) {
+			value = BigInt(valueStr);
+		} else {
+			value = BigInt(valueStr);
+		}
 
 		// Ensure the value is correctly interpreted as a 64-bit signed integer
 		// This handles the wrap-around behavior of i64.const in WebAssembly
@@ -404,14 +413,8 @@ export function parseInstruction(blockLabels) {
 			labels.push({ label, position });
 		}
 
-		if (labels.length > 1) {
-			// Remove the last label from the list as it's the default
-			defaultLabel = labels.pop();
-		}
-
-		if (labels.length === 1) {
-			defaultLabel = { ...labels[0] };
-		}
+		// The last label is always the default; the rest are case targets
+		defaultLabel = labels.pop();
 
 		// For named labels, return just the labels - the depths will be calculated during compilation
 		return {
@@ -424,21 +427,14 @@ export function parseInstruction(blockLabels) {
 	// Handle data.drop instruction
 	if (instrType === "data.drop") {
 		// Handle named data segment reference
-		if (!atEnd()) {
-			if (peekToken().startsWith("$")) {
-				const dataLabel = getToken();
-				return { type: "data.drop", dataLabel, position };
-			}
+		if (!atEnd() && peekToken().startsWith("$")) {
+			const dataLabel = getToken();
+			return { type: "data.drop", dataLabel, position };
 		}
-		return { type: "data.drop", position };
-	}
-	// Handle data.drop instruction with explicit segment index
-	if (instrType === "data.drop") {
-		// Check if next token is a number (segment index)
-		let segmentIdx = 1; // Default to 1 if not specified
+		// Handle explicit numeric segment index
+		let segmentIdx = null;
 		if (!atEnd() && /^\d+$/.test(peekToken())) {
-			segmentIdx = Number.parseInt(peekToken(), 10);
-			skipToken(); // Skip segment index
+			segmentIdx = Number.parseInt(getToken(), 10);
 		}
 		return { type: "data.drop", segmentIdx, position };
 	}
