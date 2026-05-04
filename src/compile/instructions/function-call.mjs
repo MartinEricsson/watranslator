@@ -1,4 +1,4 @@
-import { encodeULEB128 } from "../compile-utils.mjs";
+import { encodeULEB128, resolveFunctionIndex } from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
 import { createError } from "./error.mjs";
 
@@ -14,21 +14,7 @@ export function compileFunctionCall(
 	if (instr.type === "call") {
 		body.push(INSTR.CALL);
 
-		// Determine the function index
-		let funcIndex = -1;
-
-		if (
-			typeof instr.functionName === "string" &&
-			instr.functionName.startsWith("$")
-		) {
-			// Look up function index by name
-			funcIndex = moduleFunctions.findIndex(
-				(f) => f.name === instr.functionName,
-			);
-		} else {
-			// Direct numeric index
-			funcIndex = Number.parseInt(instr.functionName, 10) || 0;
-		}
+		const funcIndex = resolveFunctionIndex(instr.functionName, module);
 
 		if (funcIndex === -1) {
 			throw createError(

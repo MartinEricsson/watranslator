@@ -46,7 +46,7 @@ export function parseModule() {
 						if (func.export) {
 							module.exports[func.export] = {
 								kind: "func",
-								index: module.functions.length - 1,
+								index: func.name || module.functions.length - 1,
 							};
 						}
 					}
@@ -103,23 +103,9 @@ export function parseModule() {
 					const exportItem = parseExport();
 					if (exportItem?.name) {
 						if (exportItem.kind === "func") {
-							// Find function index by name
-							let funcIndex = -1;
-							if (exportItem.index.startsWith("$")) {
-								funcIndex = module.functions.findIndex(
-									(f) => f.name === exportItem.index,
-								);
-								if (funcIndex === -1) {
-									throw createError(
-										`Unknown exported function: ${exportItem.index}`,
-									);
-								}
-							} else {
-								funcIndex = Number.parseInt(exportItem.index, 10) || 0;
-							}
 							module.exports[exportItem.name] = {
 								kind: "func",
-								index: funcIndex,
+								index: exportItem.index,
 							};
 						} else if (exportItem.kind === "memory") {
 							// Update memory export handling for multi-memory support

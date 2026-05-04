@@ -119,18 +119,6 @@ export function parseWAT(src, options = {}) {
 				if (moduleObj.exports) {
 					for (const [, exportData] of Object.entries(moduleObj.exports)) {
 						if (
-							exportData.kind === "func" &&
-							typeof exportData.index === "string" &&
-							exportData.index.startsWith("$")
-						) {
-							// Find the function by name
-							const funcIndex = moduleObj.functions.findIndex(
-								(func) => func.name === exportData.index,
-							);
-							if (funcIndex !== -1) {
-								exportData.index = funcIndex;
-							}
-						} else if (
 							exportData.kind === "global" &&
 							typeof exportData.index === "string" &&
 							exportData.index.startsWith("$")
