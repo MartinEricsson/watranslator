@@ -1,7 +1,6 @@
 import {
 	encodeSLEB128,
 	encodeULEB128,
-	getLabelIndex,
 	getWasmType,
 } from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
@@ -9,6 +8,13 @@ import { createError } from "./error.mjs";
 import { compileInstruction } from "./instructions.mjs";
 
 const { INSTR, TYPE } = wasmConstants;
+
+const getBranchDepth = (label, depth) => {
+	if (typeof depth === "number" && depth >= 0) {
+		return depth;
+	}
+	throw new Error(`Unresolved branch target: ${label}`);
+};
 
 /**
  * Record source map entry before emitting opcode bytes
@@ -289,8 +295,7 @@ export function compileControlFlow(
 		body.push(INSTR.BR);
 
 		try {
-			// Branch target (label depth)
-			const labelIndex = getLabelIndex(instr.label, func, instr);
+			const labelIndex = getBranchDepth(instr.label, instr.labelDepth);
 			body.push(...encodeULEB128(labelIndex));
 		} catch (err) {
 			throw createError(
@@ -308,8 +313,7 @@ export function compileControlFlow(
 		body.push(INSTR.BR_IF);
 
 		try {
-			// Branch target (label depth)
-			const labelIndex = getLabelIndex(instr.label, func, instr);
+			const labelIndex = getBranchDepth(instr.label, instr.labelDepth);
 			body.push(...encodeULEB128(labelIndex));
 		} catch (err) {
 			throw createError(
@@ -332,13 +336,17 @@ export function compileControlFlow(
 			body.push(...encodeULEB128(instr.labels.length));
 
 			// Add each label's depth
-			for (const label of instr.labels) {
-				const labelIndex = getLabelIndex(label, func, instr);
+			for (let i = 0; i < instr.labels.length; i++) {
+				const label = instr.labels[i];
+				const labelIndex = getBranchDepth(label, instr.labelDepths?.[i]);
 				body.push(...encodeULEB128(labelIndex));
 			}
 
 			// Add the default label's depth
-			const defaultLabelIndex = getLabelIndex(instr.defaultLabel, func, instr);
+			const defaultLabelIndex = getBranchDepth(
+				instr.defaultLabel,
+				instr.defaultLabelDepth,
+			);
 			body.push(...encodeULEB128(defaultLabelIndex));
 		} catch (err) {
 			throw createError(

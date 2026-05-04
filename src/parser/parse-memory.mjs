@@ -1,3 +1,4 @@
+import { decodeWatString } from "../wat-string.mjs";
 import { createError } from "./parse-util.mjs";
 import {
 	atEnd,
@@ -43,7 +44,7 @@ export function parseMemory() {
 				peekToken().endsWith('"')
 			) {
 				const token = getToken();
-				exportName = token.substring(1, token.length - 1); // Remove quotes
+				exportName = decodeWatString(token);
 			}
 
 			// Skip closing paren

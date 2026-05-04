@@ -1,5 +1,8 @@
 import {
+	encodeF32,
+	encodeF32Bits,
 	encodeF64,
+	encodeF64Bits,
 	encodeSLEB128,
 	encodeSLEB128BigInt,
 } from "../compile-utils.mjs";
@@ -22,18 +25,21 @@ export function compileVariableConstants(instr, body) {
 
 	if (instr.type === "f32.const") {
 		body.push(INSTR.F32_CONST);
-
-		// Convert the float to its IEEE 754 representation and add to the binary
-		const buffer = new ArrayBuffer(4);
-		new Float32Array(buffer)[0] = instr.value;
-		const bytes = new Uint8Array(buffer);
-		body.push(...bytes);
+		body.push(
+			...(instr.bits !== undefined
+				? encodeF32Bits(instr.bits)
+				: encodeF32(instr.value)),
+		);
 		return true;
 	}
 
 	if (instr.type === "f64.const") {
 		body.push(INSTR.F64_CONST);
-		body.push(...encodeF64(instr.value));
+		body.push(
+			...(instr.bits !== undefined
+				? encodeF64Bits(instr.bits)
+				: encodeF64(instr.value)),
+		);
 		return true;
 	}
 
