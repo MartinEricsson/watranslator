@@ -21,6 +21,7 @@ export function parseGlobal() {
 	let init = null;
 	let importModule = null;
 	let importName = null;
+	let invalidInitExpression = null;
 
 	const position = getCurrentCursor();
 
@@ -171,6 +172,8 @@ export function parseGlobal() {
 						immediates,
 					};
 				}
+			} else {
+				invalidInitExpression = instrType;
 			}
 		}
 
@@ -188,6 +191,7 @@ export function parseGlobal() {
 		type,
 		mutable,
 		init,
+		invalidInitExpression,
 		position,
 		import:
 			importModule && importName

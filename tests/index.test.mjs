@@ -20,6 +20,7 @@ import testDeepNestingControlFlow from "./control-flow/deep-nesting-test.mjs";
 import testDataSection from "./data-section/data-section-test.mjs";
 import testDataSectionEscapes from "./data-section/escapes-test.mjs";
 import testDiagnostics from "./diagnostics/diagnostics-test.mjs";
+import testValidatorPass from "./diagnostics/validator-pass-test.mjs";
 import testDivision from "./division/division-test.mjs";
 import testDropInstruction from "./drop/drop-test.mjs";
 import testEarlyReturn from "./early-return/early-return-test.mjs";
@@ -167,6 +168,7 @@ async function runTests() {
 		{ name: "Data Section", test: testDataSection },
 		{ name: "Data Section Escapes", test: testDataSectionEscapes },
 		{ name: "Diagnostics", test: testDiagnostics },
+		{ name: "Validator Pass", test: testValidatorPass },
 		{ name: "Division", test: testDivision },
 		{ name: "Drop Instruction", test: testDropInstruction },
 		{ name: "Early return", test: testEarlyReturn },

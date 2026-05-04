@@ -1,4 +1,13 @@
 import { createDiagnostic } from "../diagnostics.mjs";
+import { validateElementTableTypes } from "./elements.mjs";
+import { validateExportTargets } from "./exports.mjs";
+import { validateGlobalInitExpressions } from "./globals.mjs";
+import {
+	validateMemargAlignments,
+	validateSharedMemoryLimits,
+} from "./memory.mjs";
+import { validateStackTypes } from "./stack.mjs";
+import { validateStartFunction } from "./start.mjs";
 
 const VALUE_TYPES = new Set([
 	"i32",
@@ -142,6 +151,17 @@ function validateInstruction(instr, scope, module) {
 		case "br":
 		case "br_if":
 			if (
+				isNumericReference(instr.label) &&
+				Number.parseInt(instr.label, 10) > Math.max(0, scope.blockDepth - 1)
+			) {
+				throw createDiagnostic({
+					stage: "validate",
+					code: "WAT_BRANCH_DEPTH_OUT_OF_BOUNDS",
+					message: `Branch depth ${instr.label} exceeds current control depth ${scope.blockDepth}`,
+					position: instr.position || scope.position,
+				});
+			}
+			if (
 				typeof instr.label === "string" &&
 				instr.label.startsWith("$") &&
 				!scope.blockLabels.has(instr.label)
@@ -152,6 +172,21 @@ function validateInstruction(instr, scope, module) {
 					message: `Unknown branch target: ${instr.label}`,
 					position: instr.position || scope.position,
 				});
+			}
+			break;
+		case "br_table":
+			for (const label of [...(instr.labels || []), instr.defaultLabel]) {
+				if (
+					isNumericReference(label) &&
+					Number.parseInt(label, 10) > Math.max(0, scope.blockDepth - 1)
+				) {
+					throw createDiagnostic({
+						stage: "validate",
+						code: "WAT_BRANCH_DEPTH_OUT_OF_BOUNDS",
+						message: `Branch depth ${label} exceeds current control depth ${scope.blockDepth}`,
+						position: instr.position || scope.position,
+					});
+				}
 			}
 			break;
 		default:
@@ -167,7 +202,7 @@ function validateInstruction(instr, scope, module) {
 		for (const nested of instr.instructions || []) {
 			validateInstruction(
 				nested,
-				{ ...scope, blockLabels: nextLabels },
+				{ ...scope, blockLabels: nextLabels, blockDepth: scope.blockDepth + 1 },
 				module,
 			);
 		}
@@ -175,11 +210,12 @@ function validateInstruction(instr, scope, module) {
 	}
 
 	if (instr.type === "if") {
+		const nextScope = { ...scope, blockDepth: scope.blockDepth + 1 };
 		for (const nested of instr.thenInstructions || []) {
-			validateInstruction(nested, scope, module);
+			validateInstruction(nested, nextScope, module);
 		}
 		for (const nested of instr.elseInstructions || []) {
-			validateInstruction(nested, scope, module);
+			validateInstruction(nested, nextScope, module);
 		}
 	}
 }
@@ -202,23 +238,6 @@ function validateExports(module) {
 			kindCollections[item.kind]?.[item.index]?.position || module.position,
 		(name) => `Duplicate export name: ${name}`,
 	);
-
-	for (const [name, exportData] of Object.entries(module.exports || {})) {
-		const items = kindCollections[exportData.kind] || [];
-		if (
-			!Number.isInteger(exportData.index) ||
-			exportData.index < 0 ||
-			exportData.index >= items.length
-		) {
-			throw createDiagnostic({
-				stage: "validate",
-				code: "WAT_INVALID_EXPORT",
-				message: `Invalid export target for "${name}"`,
-				position: module.position,
-				note: `Export kind \`${exportData.kind}\` has no item at index ${exportData.index}.`,
-			});
-		}
-	}
 }
 
 function validateStart(module) {
@@ -304,8 +323,15 @@ export function validateModule(module) {
 	);
 
 	validateExports(module);
+	validateExportTargets(module);
 	validateStart(module);
+	validateStartFunction(module);
 	validateElements(module);
+	validateElementTableTypes(module);
+	validateSharedMemoryLimits(module);
+	validateMemargAlignments(module);
+	validateGlobalInitExpressions(module);
+	validateStackTypes(module);
 	for (const global of module.globals || []) {
 		validateTypeValue(
 			global.type,
@@ -373,6 +399,7 @@ export function validateModule(module) {
 					position: func.position || module.position,
 					localNames,
 					blockLabels: new Set(),
+					blockDepth: 0,
 				},
 				module,
 			);
