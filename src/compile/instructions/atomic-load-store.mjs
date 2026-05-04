@@ -1,4 +1,8 @@
-import { encodeULEB128 } from "../compile-utils.mjs";
+import {
+	encodeMemarg,
+	getAtomicInstructionNaturalAlignment,
+} from "../compile-utils.mjs";
+import { createError } from "./error.mjs";
 
 const ATOMIC_PREFIX = 0xfe;
 const ATOMIC_I32_LOAD = 0x10; // i32.atomic.load
@@ -50,27 +54,26 @@ export function compileAtomicLoadStore(instr, func, body, module) {
 	const opcode = ATOMIC_INSTR.get(instrType);
 	body.push(opcode);
 
-	// Calculate the natural alignment based on the operation type
-	let defaultAlign = 2; // Default for 32-bit (2^2 = 4 bytes)
-
-	if (instrType.includes("8_") || instrType.includes("store8")) {
-		defaultAlign = 0; // 8-bit operations (2^0 = 1 byte)
-	} else if (instrType.includes("16_") || instrType.includes("store16")) {
-		defaultAlign = 1; // 16-bit operations (2^1 = 2 bytes)
-	} else if (instrType.includes("32_") || instrType.includes("store32")) {
-		defaultAlign = 2; // 32-bit operations (2^2 = 4 bytes)
-	} else if (instrType.startsWith("i64.") && !instrType.includes("_")) {
-		defaultAlign = 3; // Full 64-bit operations (2^3 = 8 bytes)
-	}
+	const naturalAlign = getAtomicInstructionNaturalAlignment(instrType);
 
 	// Encode memory alignment
 	const alignment =
-		typeof instr.align === "number" ? instr.align : defaultAlign;
-	body.push(...encodeULEB128(alignment));
+		typeof instr.align === "number" ? instr.align : naturalAlign;
+	if (alignment !== naturalAlign) {
+		throw createError(
+			instr,
+			func,
+			module,
+			`Invalid atomic alignment value: ${alignment}. Atomic operations require natural alignment of ${naturalAlign}`,
+		);
+	}
 
-	// Encode memory offset
-	const offset = typeof instr.offset === "number" ? instr.offset : 0;
-	body.push(...encodeULEB128(offset));
+	body.push(
+		...encodeMemarg({
+			align: alignment,
+			offset: typeof instr.offset === "number" ? instr.offset : 0,
+		}),
+	);
 
 	return true;
 }

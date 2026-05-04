@@ -237,6 +237,47 @@ export function getInstructionNaturalAlignment(instrType) {
 	}
 }
 
+export function getAtomicInstructionNaturalAlignment(instrType) {
+	if (
+		instrType.includes("load8_") ||
+		instrType.includes("store8") ||
+		instrType.includes("rmw8")
+	) {
+		return 0;
+	}
+
+	if (
+		instrType.includes("load16_") ||
+		instrType.includes("store16") ||
+		instrType.includes("rmw16")
+	) {
+		return 1;
+	}
+
+	if (
+		instrType.includes("load32_") ||
+		instrType.includes("store32") ||
+		instrType.includes("rmw32")
+	) {
+		return 2;
+	}
+
+	return instrType.startsWith("i64.") ? 3 : 2;
+}
+
+export function encodeMemarg({ align, offset = 0, memoryIndex = null }) {
+	const hasMemoryIndex = memoryIndex !== null && memoryIndex !== undefined;
+	const flags = hasMemoryIndex ? align | 0x40 : align;
+	const bytes = [...encodeULEB128(flags)];
+
+	if (hasMemoryIndex) {
+		bytes.push(...encodeULEB128(memoryIndex));
+	}
+
+	bytes.push(...encodeULEB128(offset || 0));
+	return bytes;
+}
+
 // Convert WAT type string to binary type
 export function getWasmType(type) {
 	switch (type) {

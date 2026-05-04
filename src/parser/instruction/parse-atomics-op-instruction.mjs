@@ -1,4 +1,31 @@
-import { atEnd } from "../tape.mjs";
+import { atEnd, getToken, peekToken } from "../tape.mjs";
+
+function readMemargAttributes(instrToken, defaultAlign) {
+	let align = defaultAlign;
+	let offset = 0;
+	const attrText = [instrToken];
+
+	while (
+		!atEnd() &&
+		typeof peekToken() === "string" &&
+		(peekToken().startsWith("offset=") || peekToken().startsWith("align="))
+	) {
+		attrText.push(getToken());
+	}
+
+	const joined = attrText.join(" ");
+	const offsetMatch = joined.match(/offset=(\d+)/);
+	if (offsetMatch?.[1]) {
+		offset = Number.parseInt(offsetMatch[1], 10);
+	}
+
+	const alignMatch = joined.match(/align=(-?\d+)/);
+	if (alignMatch?.[1]) {
+		align = Number.parseInt(alignMatch[1], 10);
+	}
+
+	return { align, offset };
+}
 
 export function parseAtomicsOpInstruction(instrToken, position) {
 	if (atEnd()) return null;
@@ -30,23 +57,18 @@ export function parseAtomicsOpInstruction(instrToken, position) {
 			align = is64Bit ? 3 : 2; // 3 for i64 (8 bytes = 2^3), 2 for i32 (4 bytes = 2^2)
 		}
 
-		// Extract offset if present
-		let offset = 0;
-		const offsetMatch = instrToken.match(/offset=(\d+)/);
-		if (offsetMatch?.[1]) {
-			offset = Number.parseInt(offsetMatch[1], 10);
-		}
-
-		// Extract align if present
-		const alignMatch = instrToken.match(/align=(-?\d+)/);
-		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
-		}
+		const memarg = readMemargAttributes(instrToken, align);
 
 		// Get the instruction type without attributes (the part before any space)
 		const op = instrToken.split(/\s+/)[0];
 
-		return { type: op, op, offset, align, position };
+		return {
+			type: op,
+			op,
+			offset: memarg.offset,
+			align: memarg.align,
+			position,
+		};
 	}
 
 	return null;
