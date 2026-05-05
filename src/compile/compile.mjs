@@ -1,6 +1,7 @@
 import { enhanceError } from "../diagnostics.mjs";
 import { SourceMapManager } from "../sourcemap.mjs";
 import { validateModule } from "../validate/validate.mjs";
+import { createBytesWriter } from "./bytes-writer.mjs";
 import { sanitizeAST } from "./compile-utils.mjs";
 import wasmConstants from "./constants.mjs";
 import { codeSection } from "./sections/code.mjs";
@@ -37,7 +38,9 @@ const compileToWASM = (ast, options = {}) => {
 		validateModule(module);
 
 		// Start with the magic and version
-		const binary = [...BINARY.MAGIC, ...BINARY.VERSION];
+		const binary = createBytesWriter();
+		binary.writeBytes(BINARY.MAGIC);
+		binary.writeBytes(BINARY.VERSION);
 
 		// For completely empty module (no functions, memories, etc), just return the header
 		if (
@@ -50,7 +53,7 @@ const compileToWASM = (ast, options = {}) => {
 			(!module.elements || module.elements.length === 0) &&
 			(!module.exports || Object.keys(module.exports).length === 0)
 		) {
-			return new Uint8Array(binary);
+			return binary.toUint8Array();
 		}
 
 		const functions = module.functions || [];
@@ -102,7 +105,7 @@ const compileToWASM = (ast, options = {}) => {
 			dataSection(module, binary);
 		}
 
-		const result = new Uint8Array(binary);
+		const result = binary.toUint8Array();
 		if (profile) {
 			const tEnd =
 				typeof process !== "undefined" && process.hrtime?.bigint

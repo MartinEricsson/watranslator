@@ -68,6 +68,7 @@ import testNonTrappingConversions from "./non-trapping-conversions/non-trapping-
 import testNop from "./nop/nop-test.mjs";
 import testNumericLiterals from "./numeric-literals/numeric-literals-test.mjs";
 import testParameters from "./parameters/parameters-test.mjs";
+import testLargeModuleEmit from "./performance/large-module-emit-test.mjs";
 import testProfile from "./performance/profile-test.mjs";
 import testRefIsNull from "./reference-opcodes/ref-is-null-test.mjs";
 import testReferenceOpcodes from "./reference-opcodes/reference-opcodes-test.mjs";
@@ -210,6 +211,7 @@ async function runTests() {
 		{ name: "Instruction Shape", test: testInstructionShape },
 		{ name: "Local Variables", test: testLocalVariables },
 		{ name: "Large Module", test: testLargeModule },
+		{ name: "Large Module Emit", test: testLargeModuleEmit },
 		{ name: "Profile Instrumentation", test: testProfile },
 		{ name: "Memory fill", test: testMemoryFill },
 		{ name: "Memory Init", test: testMemoryInit },

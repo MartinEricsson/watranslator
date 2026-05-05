@@ -9,6 +9,7 @@ export {
 import wasmConstants from "./constants.mjs";
 
 const { TYPE } = wasmConstants;
+const utf8Encoder = new TextEncoder();
 
 // Helper function to encode unsigned LEB128 integer
 export function encodeULEB128(inputvalue) {
@@ -90,7 +91,6 @@ export function encodeSLEB128BigInt(inputvalue) {
 
 // Helper function to encode string
 export function encodeString(str) {
-	const utf8Encoder = new TextEncoder();
 	const bytes = utf8Encoder.encode(str);
 	return [...encodeULEB128(bytes.length), ...Array.from(bytes)];
 }
