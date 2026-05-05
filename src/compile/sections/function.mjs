@@ -1,4 +1,4 @@
-import { buildFunctionIndex, encodeULEB128 } from "../compile-utils.mjs";
+import { encodeULEB128 } from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
 
 const { SECTION } = wasmConstants;
@@ -18,10 +18,9 @@ export function functionSection(functions, binary) {
 
 		// Function signatures
 		const funcSignatures = [...encodeULEB128(nonImportedFunctions.length)];
-		const functionIndex = buildFunctionIndex(functions);
 		for (let i = 0; i < nonImportedFunctions.length; i++) {
 			const func = nonImportedFunctions[i];
-			const typeIndex = functionIndex.byFunction.get(func);
+			const typeIndex = func.typeIndex ?? 0;
 			funcSignatures.push(...encodeULEB128(typeIndex)); // Type index
 		}
 

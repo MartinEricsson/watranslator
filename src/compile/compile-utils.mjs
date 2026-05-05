@@ -180,7 +180,7 @@ export function encodeMemarg({ align, offset = 0, memoryIndex = null }) {
 		bytes.push(...encodeULEB128(memoryIndex));
 	}
 
-	bytes.push(...encodeULEB128(offset || 0));
+	bytes.push(...encodeULEB128(offset ?? 0));
 	return bytes;
 }
 

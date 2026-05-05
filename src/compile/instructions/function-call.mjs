@@ -42,8 +42,7 @@ export function compileFunctionCall(
 		body.push(INSTR.CALL_INDIRECT);
 
 		try {
-			// For call_indirect, we need to encode the type index
-			let typeIndex = 0; // Default to type index 0
+			let typeIndex = instr.typeIndex ?? 0;
 
 			if (instr.typeRef && module && module.types) {
 				// If a type reference was specified (e.g., type $i32_i32_to_i32)
@@ -54,9 +53,7 @@ export function compileFunctionCall(
 				);
 
 				if (typeEntry) {
-					// In a real compiler, we'd assign a unique index to each type
-					// For simplicity, we'll use 0 since we know there's just one type in our test
-					typeIndex = 0;
+					typeIndex = typeEntry.typeIndex ?? typeIndex;
 				} else {
 					throw createError(
 						instr,
@@ -65,11 +62,6 @@ export function compileFunctionCall(
 						`Unknown type reference: ${typeRefName}`,
 					);
 				}
-			} else if (instr.params && instr.params.length > 0) {
-				// If inline parameters were specified
-				// In a real compiler, we'd need to look up the right type index
-				// or create a new type entry if needed
-				typeIndex = 0;
 			}
 
 			// Push the type index as LEB128 encoded value

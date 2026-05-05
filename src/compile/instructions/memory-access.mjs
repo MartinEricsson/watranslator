@@ -80,7 +80,7 @@ export function compileMemoryAccess(instr, func, body, module) {
 		body.push(MEMORY_ACCESS_INSTR.get(instr.type));
 
 		// Validate alignment
-		const align = instr.align || 0;
+		const align = instr.align ?? 0;
 		if (align < 0) {
 			throw createError(
 				instr,
@@ -120,7 +120,7 @@ export function compileMemoryAccess(instr, func, body, module) {
 		body.push(
 			...encodeMemarg({
 				align,
-				offset: instr.offset || 0,
+				offset: instr.offset ?? 0,
 				memoryIndex,
 			}),
 		);

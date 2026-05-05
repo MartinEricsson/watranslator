@@ -25,7 +25,8 @@ export function startSection(module, functions, binary) {
 			}
 		} else {
 			// Direct numeric index
-			startFuncIndex = Number.parseInt(module.start, 10) || 0;
+			const parsed = Number.parseInt(module.start, 10);
+			startFuncIndex = Number.isNaN(parsed) ? 0 : parsed;
 		}
 
 		// The start section just contains the function index

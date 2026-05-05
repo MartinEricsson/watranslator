@@ -55,7 +55,7 @@ export function memorySection(module, binary) {
 			memoryEntries.push(flags);
 
 			// Minimum size
-			memoryEntries.push(...encodeULEB128(memory.min || 1)); // Default to 1 page if not specified
+			memoryEntries.push(...encodeULEB128(memory.min ?? 0));
 
 			// Maximum size (always include for shared memory)
 			if (effectiveMax !== null) {

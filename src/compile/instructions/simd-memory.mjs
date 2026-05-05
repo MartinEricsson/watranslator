@@ -161,7 +161,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_LOAD32_ZERO);
 		const align = instruction.align !== undefined ? instruction.align : 2;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 		return true;
 	}
 
@@ -169,7 +169,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_LOAD64_ZERO);
 		const align = instruction.align !== undefined ? instruction.align : 3;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 		return true;
 	}
 
@@ -178,7 +178,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_LOAD8_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 0;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-15)
 		const laneIndex = instruction.laneIndex;
@@ -198,7 +198,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_LOAD16_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 1;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-7)
 		const laneIndex = instruction.laneIndex;
@@ -218,7 +218,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_LOAD32_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 2;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-3)
 		const laneIndex = instruction.laneIndex;
@@ -238,7 +238,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_LOAD64_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 3;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-1)
 		const laneIndex = instruction.laneIndex;
@@ -259,7 +259,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_STORE8_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 0;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-15)
 		const laneIndex = instruction.laneIndex;
@@ -279,7 +279,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_STORE16_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 1;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-7)
 		const laneIndex = instruction.laneIndex;
@@ -299,7 +299,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_STORE32_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 2;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-3)
 		const laneIndex = instruction.laneIndex;
@@ -319,7 +319,7 @@ export function compileSIMDMemory(instruction, bytes) {
 		bytes.push(SIMD_PREFIX, V128_STORE64_LANE);
 		const align = instruction.align !== undefined ? instruction.align : 3;
 		bytes.push(...encodeULEB128(align));
-		bytes.push(...encodeULEB128(instruction.offset || 0));
+		bytes.push(...encodeULEB128(instruction.offset ?? 0));
 
 		// Add the lane index (0-1)
 		const laneIndex = instruction.laneIndex;

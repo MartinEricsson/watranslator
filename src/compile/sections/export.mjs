@@ -3,6 +3,12 @@ import wasmConstants from "../constants.mjs";
 
 const { EXPORT, SECTION } = wasmConstants;
 
+const parseIndex = (value) => {
+	if (typeof value === "number") return value;
+	const parsed = Number.parseInt(value, 10);
+	return Number.isNaN(parsed) ? 0 : parsed;
+};
+
 export function exportSection(module, binary) {
 	if (module.exports && Object.keys(module.exports).length > 0) {
 		const exportSection = [SECTION.EXPORT]; // Section ID
@@ -23,10 +29,7 @@ export function exportSection(module, binary) {
 				exportEntries.push(EXPORT.FUNC);
 
 				// Function index
-				const funcIndex =
-					typeof exportData.index === "number"
-						? exportData.index
-						: Number.parseInt(exportData.index, 10) || 0;
+				const funcIndex = parseIndex(exportData.index);
 
 				exportEntries.push(...encodeULEB128(funcIndex));
 			} else if (exportData.kind === "memory") {
@@ -34,10 +37,7 @@ export function exportSection(module, binary) {
 				exportEntries.push(EXPORT.MEM);
 
 				// Memory index
-				const memIndex =
-					typeof exportData.index === "number"
-						? exportData.index
-						: Number.parseInt(exportData.index, 10) || 0;
+				const memIndex = parseIndex(exportData.index);
 
 				exportEntries.push(...encodeULEB128(memIndex));
 			} else if (exportData.kind === "global") {
@@ -45,10 +45,7 @@ export function exportSection(module, binary) {
 				exportEntries.push(EXPORT.GLOBAL);
 
 				// Global index
-				const globalIndex =
-					typeof exportData.index === "number"
-						? exportData.index
-						: Number.parseInt(exportData.index, 10) || 0;
+				const globalIndex = parseIndex(exportData.index);
 
 				exportEntries.push(...encodeULEB128(globalIndex));
 			} else if (exportData.kind === "table") {
@@ -57,10 +54,7 @@ export function exportSection(module, binary) {
 				exportEntries.push(EXPORT.TABLE);
 
 				// Table index
-				const tableIndex =
-					typeof exportData.index === "number"
-						? exportData.index
-						: Number.parseInt(exportData.index, 10) || 0;
+				const tableIndex = parseIndex(exportData.index);
 
 				exportEntries.push(...encodeULEB128(tableIndex));
 			}

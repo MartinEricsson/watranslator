@@ -160,7 +160,7 @@ export function compileAtomicOps(instr, func, body, module) {
 	}
 
 	body.push(
-		...encodeMemarg({ align: memarg.align, offset: memarg.offset || 0 }),
+		...encodeMemarg({ align: memarg.align, offset: memarg.offset ?? 0 }),
 	);
 
 	return true;

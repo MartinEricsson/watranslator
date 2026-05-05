@@ -43,7 +43,8 @@ export function elementSection(elements, functions, binary) {
 					}
 				} else {
 					// Direct numeric index
-					funcIndex = Number.parseInt(funcRef, 10) || 0;
+					const parsed = Number.parseInt(funcRef, 10);
+					funcIndex = Number.isNaN(parsed) ? 0 : parsed;
 				}
 
 				// Add function index to element entries

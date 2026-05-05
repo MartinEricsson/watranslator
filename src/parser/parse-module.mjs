@@ -87,7 +87,20 @@ export function parseModule() {
 					const memory = parseMemory();
 					if (memory) {
 						memory.position = memory.position || sectionPos;
-						module.memories.push(memory);
+						if (memory.import) {
+							module.imports.push({
+								kind: "memory",
+								module: memory.import.module,
+								field: memory.import.field,
+								min: memory.min,
+								max: memory.max,
+								shared: memory.shared,
+								name: memory.id,
+								position: memory.position,
+							});
+						} else {
+							module.memories.push(memory);
+						}
 					}
 					skipToken(); // Skip closing paren
 				} else if (sectionType === "data") {

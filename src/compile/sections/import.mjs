@@ -19,7 +19,7 @@ export function importSection(module, binary) {
 					kind: "function",
 					module: func.import.module,
 					field: func.import.field,
-					typeIndex: i, // This will need to be adjusted to point to the correct type
+					typeIndex: func.typeIndex ?? 0,
 					isImported: true,
 				});
 
@@ -140,7 +140,7 @@ export function importSection(module, binary) {
 			if (imp.shared) flags |= 2;
 
 			importEntries.push(flags);
-			importEntries.push(...encodeULEB128(imp.min || 1));
+			importEntries.push(...encodeULEB128(imp.min ?? 0));
 
 			if (imp.max !== undefined && imp.max !== null) {
 				importEntries.push(...encodeULEB128(imp.max));
