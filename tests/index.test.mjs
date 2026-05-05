@@ -76,6 +76,7 @@ import testLargeModuleEmit from "./performance/large-module-emit-test.mjs";
 import testProfile from "./performance/profile-test.mjs";
 import testTokenize100KB from "./performance/tokenize-100kb-test.mjs";
 import testRefIsNull from "./reference-opcodes/ref-is-null-test.mjs";
+import testRefNullBoundaries from "./reference-opcodes/ref-null-boundary-test.mjs";
 import testReferenceOpcodes from "./reference-opcodes/reference-opcodes-test.mjs";
 import testReinterpretOps from "./reinterpret-ops/reinterpret-ops-test.mjs";
 import testRemainder from "./remainder/remainder-test.mjs";
@@ -102,6 +103,7 @@ import testSIMDI64x2Compare from "./simd-i64x2-compare/simd-i64x2-compare-test.m
 import testSIMDi64x2Ops from "./simd-i64x2-ops/simd-i64x2-ops-test.mjs";
 import testSIMDMemarg from "./simd-memory/simd-memarg-test.mjs";
 import testSIMDMemory from "./simd-memory/simd-memory-test.mjs";
+import testSIMDHighOpcodeEncoding from "./simd-opcodes/simd-high-opcode-encoding-test.mjs";
 import simdReplaceAllLaneTest from "./simd-replace-lane/simd-replace-lane-all-test.mjs";
 import simdReplaceLaneTest from "./simd-replace-lane/simd-replace-lane-test.mjs";
 import testSIMDShuffle from "./simd-shuffle/simd-shuffle-test.mjs";
@@ -251,6 +253,7 @@ async function runTests() {
 		{ name: "Numeric Literals", test: testNumericLiterals },
 		{ name: "Parameters", test: testParameters },
 		{ name: "Reference Is Null", test: testRefIsNull },
+		{ name: "Reference Null Boundaries", test: testRefNullBoundaries },
 		{ name: "Reentrant Compiler", test: testReentrantCompiler },
 		{ name: "Remainder", test: testRemainder },
 		{ name: "Simple Loop", test: testSimpleLoop },
@@ -280,6 +283,7 @@ async function runTests() {
 		{ name: "SIMD Extract Lane I16x8", test: simdExtractLaneI16x8Test },
 		{ name: "SIMD Memory", test: testSIMDMemory },
 		{ name: "SIMD Memory Memarg", test: testSIMDMemarg },
+		{ name: "SIMD High Opcode Encoding", test: testSIMDHighOpcodeEncoding },
 		{ name: "SIMD Shuffle", test: testSIMDShuffle },
 		{ name: "SIMD Swizzle and Splat", test: testSIMDSwizzleSplat },
 		{ name: "SIMD Replace Lane", test: simdReplaceLaneTest },
