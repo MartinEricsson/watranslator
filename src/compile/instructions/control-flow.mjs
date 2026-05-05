@@ -3,11 +3,9 @@ import {
 	encodeULEB128,
 	getWasmType,
 } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
+import { INSTR, TYPE } from "../constants.mjs";
 import { createError } from "./error.mjs";
 import { compileInstruction } from "./instructions.mjs";
-
-const { INSTR, TYPE } = wasmConstants;
 
 const getBranchDepth = (label, depth) => {
 	if (typeof depth === "number" && depth >= 0) {

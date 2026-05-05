@@ -1,7 +1,6 @@
 import { encodeULEB128, getWasmType } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
+import { SECTION } from "../constants.mjs";
 import { createError } from "../instructions/error.mjs";
-const { SECTION } = wasmConstants;
 
 const signatureKey = (sig) =>
 	JSON.stringify({

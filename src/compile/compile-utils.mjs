@@ -6,9 +6,8 @@ export {
 	encodeF64,
 	encodeF64Bits,
 } from "../number-literals.mjs";
-import wasmConstants from "./constants.mjs";
+import { TYPE } from "./constants.mjs";
 
-const { TYPE } = wasmConstants;
 const utf8Encoder = new TextEncoder();
 
 // Helper function to encode unsigned LEB128 integer

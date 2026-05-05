@@ -1,7 +1,5 @@
 import { encodeULEB128 } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
-
-const { SECTION } = wasmConstants;
+import { SECTION } from "../constants.mjs";
 
 export function functionSection(functions, binary) {
 	if (functions.length > 0) {

@@ -1,9 +1,7 @@
 import { createBytesWriter } from "../bytes-writer.mjs";
 import { encodeULEB128, getWasmType } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
+import { INSTR, SECTION } from "../constants.mjs";
 import { compileInstruction } from "../instructions/instructions.mjs";
-
-const { INSTR, SECTION } = wasmConstants;
 
 export function codeSection(
 	functions,

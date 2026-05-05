@@ -1,6 +1,4 @@
-import wasmConstants from "../constants.mjs";
-
-const { INSTR } = wasmConstants;
+import { INSTR } from "../constants.mjs";
 
 // stack instr
 const STACK_INSTR = [

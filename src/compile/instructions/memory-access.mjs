@@ -2,10 +2,8 @@ import {
 	encodeMemarg,
 	getInstructionNaturalAlignment,
 } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
+import { INSTR } from "../constants.mjs";
 import { createError } from "./error.mjs";
-
-const { INSTR } = wasmConstants;
 
 const MEMORY_ACCESS_INSTR = new Map([
 	["i32.load", INSTR.I32_LOAD],

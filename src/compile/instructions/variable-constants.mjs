@@ -6,9 +6,7 @@ import {
 	encodeSLEB128,
 	encodeSLEB128BigInt,
 } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
-
-const { INSTR } = wasmConstants;
+import { INSTR } from "../constants.mjs";
 
 export function compileVariableConstants(instr, body) {
 	if (instr.op === "i32.const") {

@@ -1,8 +1,6 @@
 import { encodeULEB128 } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
+import { INSTR } from "../constants.mjs";
 import { createError } from "./error.mjs";
-
-const { INSTR } = wasmConstants;
 
 function variableByIndexName(instr, func) {
 	let varIndex = -1;

@@ -1,7 +1,5 @@
-import wasmConstants from "../constants.mjs";
+import { INSTR } from "../constants.mjs";
 import { createError } from "./error.mjs";
-
-const { INSTR } = wasmConstants;
 
 export function compileTableInstruction(instr, func, module, body) {
 	if (instr.op === "table.init") {

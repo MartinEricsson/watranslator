@@ -2,9 +2,9 @@ import {
 	encodeMemarg,
 	getAtomicInstructionNaturalAlignment,
 } from "../compile-utils.mjs";
+import { ATOMIC_PREFIX } from "../constants.mjs";
 import { createError } from "./error.mjs";
 
-const ATOMIC_PREFIX = 0xfe;
 const ATOMIC_I32_LOAD = 0x10; // i32.atomic.load
 const ATOMIC_I64_LOAD = 0x11; // i64.atomic.load
 const ATOMIC_I32_LOAD8_U = 0x12; // i32.atomic.load8_u

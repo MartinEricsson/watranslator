@@ -1,7 +1,5 @@
 import { encodeString, encodeULEB128 } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
-
-const { EXPORT, SECTION } = wasmConstants;
+import { EXPORT, SECTION } from "../constants.mjs";
 
 const parseIndex = (value) => {
 	if (typeof value === "number") return value;

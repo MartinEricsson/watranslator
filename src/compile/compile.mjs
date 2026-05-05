@@ -3,7 +3,7 @@ import { SourceMapManager } from "../sourcemap.mjs";
 import { validateModule } from "../validate/validate.mjs";
 import { createBytesWriter } from "./bytes-writer.mjs";
 import { sanitizeAST } from "./compile-utils.mjs";
-import wasmConstants from "./constants.mjs";
+import { BINARY } from "./constants.mjs";
 import { codeSection } from "./sections/code.mjs";
 import { dataCountSection, dataSection } from "./sections/data.mjs";
 import { elementSection } from "./sections/element.mjs";
@@ -16,8 +16,6 @@ import { multivalueSection } from "./sections/multivalue.mjs";
 import { startSection } from "./sections/start.mjs";
 import { tableSection } from "./sections/table.mjs";
 import { typeSection } from "./sections/type.mjs";
-
-const { BINARY } = wasmConstants;
 
 const compileToWASM = (ast, options = {}) => {
 	try {

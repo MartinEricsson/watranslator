@@ -1,6 +1,6 @@
 import { encodeULEB128 } from "../compile-utils.mjs";
+import { ATOMIC_PREFIX } from "../constants.mjs";
 
-const ATOMIC_PREFIX = 0xfe;
 const ATOMIC_NOTIFY = 0x00;
 const ATOMIC_WAIT32 = 0x01;
 const ATOMIC_WAIT64 = 0x02;
