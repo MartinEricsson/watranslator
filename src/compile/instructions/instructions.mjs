@@ -127,6 +127,6 @@ export function compileInstruction(
 		instr,
 		func,
 		module,
-		`Unsupported instruction type: ${instr.type || instr.op}. Check for typos or refer to the WebAssembly specification.`,
+		`Unsupported instruction type: ${instr.op}. Check for typos or refer to the WebAssembly specification.`,
 	);
 }

@@ -9,8 +9,8 @@ const memoryInstructions = (instructions = []) => {
 	for (const instr of instructions) {
 		if (!instr || typeof instr !== "object") continue;
 		if (
-			typeof instr.type === "string" &&
-			(instr.type.includes(".load") || instr.type.includes(".store"))
+			typeof instr.op === "string" &&
+			(instr.op.includes(".load") || instr.op.includes(".store"))
 		) {
 			result.push(instr);
 		}
@@ -49,14 +49,14 @@ export function validateMemargAlignments(module) {
 	for (const func of module.functions || []) {
 		for (const instr of memoryInstructions(func.instructions || [])) {
 			if (instr.align === undefined || instr.align === null) continue;
-			const natural = instr.type.startsWith("v128.")
-				? getSIMDNaturalAlignment(instr.type)
-				: instr.type.includes(".atomic.")
-					? getAtomicInstructionNaturalAlignment(instr.type)
-					: getInstructionNaturalAlignment(instr.type);
+			const natural = instr.op.startsWith("v128.")
+				? getSIMDNaturalAlignment(instr.op)
+				: instr.op.includes(".atomic.")
+					? getAtomicInstructionNaturalAlignment(instr.op)
+					: getInstructionNaturalAlignment(instr.op);
 			if (natural === undefined) continue;
 			if (instr.align > natural) {
-				const isAtomic = instr.type.includes(".atomic.");
+				const isAtomic = instr.op.includes(".atomic.");
 				throw createDiagnostic({
 					stage: "validate",
 					code: "WAT_INVALID_MEMARG_ALIGN",

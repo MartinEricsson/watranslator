@@ -1,5 +1,6 @@
 import { enhanceError } from "../diagnostics.mjs";
 import { tokenize } from "../tokenize.mjs";
+import { normalizeModuleInstructionShapes } from "./instruction-shape.mjs";
 import { parseExpression } from "./parse-expression.mjs";
 import { createTape } from "./tape.mjs";
 
@@ -112,6 +113,10 @@ export function parseWAT(src, options = {}) {
 					moduleObj.functions = moduleObj.functions.map((func) =>
 						applyTypeRefToFunction(func, moduleObj),
 					);
+				}
+
+				if (moduleObj.functions) {
+					normalizeModuleInstructionShapes(moduleObj);
 				}
 
 				// Resolve exports

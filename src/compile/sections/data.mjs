@@ -1,4 +1,8 @@
-import { encodeSLEB128, encodeULEB128, encodeBytes } from "../compile-utils.mjs";
+import {
+	encodeBytes,
+	encodeSLEB128,
+	encodeULEB128,
+} from "../compile-utils.mjs";
 import wasmConstants from "../constants.mjs";
 
 const { INSTR, SECTION } = wasmConstants;

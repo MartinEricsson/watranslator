@@ -54,7 +54,7 @@ export default async function testDeepNestingControlFlow() {
 	const deepFunc = ast[0].functions.find((func) => func.export === "deep");
 	const branch = findInstruction(
 		deepFunc.instructions,
-		(instr) => instr.type === "br" && instr.label === "$exit",
+		(instr) => instr.op === "br" && instr.label === "$exit",
 	);
 
 	if (!branch || branch.labelDepth !== 320) {
@@ -66,7 +66,7 @@ export default async function testDeepNestingControlFlow() {
 	const tableFunc = ast[0].functions.find((func) => func.export === "table");
 	const branchTable = findInstruction(
 		tableFunc.instructions,
-		(instr) => instr.type === "br_table",
+		(instr) => instr.op === "br_table",
 	);
 
 	if (

@@ -307,6 +307,7 @@ export function parseFunction(tape) {
 		}
 
 		if (peekToken() === "block") {
+			const position = getCurrentCursor();
 			skipToken(); // Skip 'block' keyword
 
 			let label = null;
@@ -350,6 +351,7 @@ export function parseFunction(tape) {
 				label: label,
 				resultType: resultType,
 				instructions: [],
+				position,
 			};
 
 			// Add this block to its parent's instructions or the main function body
@@ -364,6 +366,7 @@ export function parseFunction(tape) {
 			// Push this block to the stack to collect its instructions
 			blockStack.push(blockInstr);
 		} else if (peekToken() === "loop") {
+			const position = getCurrentCursor();
 			skipToken(); // Skip 'loop' keyword
 
 			let label = null;
@@ -407,6 +410,7 @@ export function parseFunction(tape) {
 				label: label,
 				resultType: resultType,
 				instructions: [],
+				position,
 			};
 
 			// Add this loop to its parent's instructions or the main function body
@@ -421,6 +425,7 @@ export function parseFunction(tape) {
 			// Push this loop to the stack to collect its instructions
 			blockStack.push(loopInstr);
 		} else if (peekToken() === "if") {
+			const position = getCurrentCursor();
 			skipToken(); // Skip 'if' keyword
 
 			let resultType = null;
@@ -459,6 +464,7 @@ export function parseFunction(tape) {
 				thenInstructions: [],
 				elseInstructions: [],
 				inElseBranch: false,
+				position,
 			};
 
 			// Add this if to its parent's instructions or the main function body

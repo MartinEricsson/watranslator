@@ -30,7 +30,7 @@ const V128_STORE64_LANE = 91; // v128.store64_lane
 const SIMD_PREFIX = 0xfd;
 
 export function compileSIMDMemory(instruction, bytes) {
-	const type = instruction.type;
+	const type = instruction.op;
 
 	// Handle v128.load - basic 16-byte aligned vector load
 	if (type === "v128.load") {

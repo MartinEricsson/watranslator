@@ -11,19 +11,19 @@ import wasmConstants from "../constants.mjs";
 const { INSTR } = wasmConstants;
 
 export function compileVariableConstants(instr, body) {
-	if (instr.type === "i32.const") {
+	if (instr.op === "i32.const") {
 		body.push(INSTR.I32_CONST);
 		body.push(...encodeSLEB128(instr.value));
 		return true;
 	}
 
-	if (instr.type === "i64.const") {
+	if (instr.op === "i64.const") {
 		body.push(INSTR.I64_CONST);
 		body.push(...encodeSLEB128BigInt(instr.value));
 		return true;
 	}
 
-	if (instr.type === "f32.const") {
+	if (instr.op === "f32.const") {
 		body.push(INSTR.F32_CONST);
 		body.push(
 			...(instr.bits !== undefined
@@ -33,7 +33,7 @@ export function compileVariableConstants(instr, body) {
 		return true;
 	}
 
-	if (instr.type === "f64.const") {
+	if (instr.op === "f64.const") {
 		body.push(INSTR.F64_CONST);
 		body.push(
 			...(instr.bits !== undefined

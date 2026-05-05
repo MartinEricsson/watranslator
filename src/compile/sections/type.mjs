@@ -95,7 +95,7 @@ export function typeSection(module, functions, multiValueBlockTypes, binary) {
 
 	for (const func of functions) {
 		walkInstructions(func.instructions, (instr) => {
-			if (instr.type !== "call_indirect") return;
+			if (instr.op !== "call_indirect") return;
 
 			if (instr.typeRef) {
 				const typeEntry = (module.types || []).find(

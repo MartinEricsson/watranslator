@@ -243,7 +243,7 @@ const SIMD_OPCODES = new Map([
  * @returns {boolean} - True if the instruction was handled, false otherwise.
  */
 export function compileSIMDPlainOpcode(instruction, bytes) {
-	const opcode = instruction.type;
+	const opcode = instruction.op;
 
 	if (!SIMD_OPCODES.has(opcode)) {
 		return false;

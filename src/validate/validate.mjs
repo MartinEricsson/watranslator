@@ -72,7 +72,7 @@ function validateInstruction(instr, scope, module) {
 		return;
 	}
 
-	switch (instr.type) {
+	switch (instr.op) {
 		case "call":
 			if (
 				typeof instr.functionName === "string" &&
@@ -193,7 +193,7 @@ function validateInstruction(instr, scope, module) {
 			break;
 	}
 
-	if (instr.type === "block" || instr.type === "loop") {
+	if (instr.op === "block" || instr.op === "loop") {
 		const nextLabels = new Set(scope.blockLabels);
 		if (instr.label) {
 			nextLabels.add(instr.label);
@@ -209,7 +209,7 @@ function validateInstruction(instr, scope, module) {
 		return;
 	}
 
-	if (instr.type === "if") {
+	if (instr.op === "if") {
 		const nextScope = { ...scope, blockDepth: scope.blockDepth + 1 };
 		for (const nested of instr.thenInstructions || []) {
 			validateInstruction(nested, nextScope, module);

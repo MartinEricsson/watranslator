@@ -53,7 +53,7 @@ const popType = (stack, expected, instr, module, func) => {
 		throw createDiagnostic({
 			stage: "validate",
 			code: "WAT_STACK_TYPE_MISMATCH",
-			message: `Stack type mismatch for ${instr.type}: expected ${expected}, got ${actual}`,
+			message: `Stack type mismatch for ${instr.op}: expected ${expected}, got ${actual}`,
 			position: instr.position || func.position || module.position,
 		});
 	}
@@ -93,64 +93,64 @@ const functionTypesFor = (module) => {
 
 function validateInstructionStack(instr, context) {
 	const { stack, module, func, locals, globals, functions } = context;
-	const constType = constResultType(instr.type);
+	const constType = constResultType(instr.op);
 	if (constType) {
 		stack.push(constType);
 		return;
 	}
 
-	if (instr.type === "get_local" || instr.type === "local.get") {
+	if (instr.op === "get_local" || instr.op === "local.get") {
 		const type = locals.get(String(instr.operand));
 		if (type) stack.push(type);
 		return;
 	}
 
-	if (instr.type === "set_local" || instr.type === "local.set") {
+	if (instr.op === "set_local" || instr.op === "local.set") {
 		const type = locals.get(String(instr.operand));
 		if (type) popType(stack, type, instr, module, func);
 		return;
 	}
 
-	if (instr.type === "local.tee") {
+	if (instr.op === "local.tee") {
 		const type = locals.get(String(instr.operand));
 		if (type) popType(stack, type, instr, module, func);
 		if (type) stack.push(type);
 		return;
 	}
 
-	if (instr.type === "global.get") {
+	if (instr.op === "global.get") {
 		const type = globals.get(String(instr.operand));
 		if (type) stack.push(type);
 		return;
 	}
 
-	if (instr.type === "global.set") {
+	if (instr.op === "global.set") {
 		const type = globals.get(String(instr.operand));
 		if (type) popType(stack, type, instr, module, func);
 		return;
 	}
 
-	if (binaryOps.has(instr.type)) {
-		const [operandType, resultType] = binaryOps.get(instr.type);
+	if (binaryOps.has(instr.op)) {
+		const [operandType, resultType] = binaryOps.get(instr.op);
 		popType(stack, operandType, instr, module, func);
 		popType(stack, operandType, instr, module, func);
 		stack.push(resultType);
 		return;
 	}
 
-	if (instr.type?.endsWith(".eqz")) {
-		const operandType = instr.type.startsWith("i64.") ? "i64" : "i32";
+	if (instr.op?.endsWith(".eqz")) {
+		const operandType = instr.op.startsWith("i64.") ? "i64" : "i32";
 		popType(stack, operandType, instr, module, func);
 		stack.push("i32");
 		return;
 	}
 
-	if (instr.type === "drop") {
+	if (instr.op === "drop") {
 		popType(stack, "any", instr, module, func);
 		return;
 	}
 
-	if (instr.type === "call") {
+	if (instr.op === "call") {
 		const target = functions.get(String(instr.functionName));
 		if (!target) return;
 		for (const param of [...(target.parameters || [])].reverse()) {
@@ -160,24 +160,24 @@ function validateInstructionStack(instr, context) {
 		return;
 	}
 
-	if (instr.type?.endsWith(".load") || instr.type?.includes(".load")) {
+	if (instr.op?.endsWith(".load") || instr.op?.includes(".load")) {
 		popType(stack, "i32", instr, module, func);
-		if (instr.type.startsWith("i64.")) stack.push("i64");
-		else if (instr.type.startsWith("f32.")) stack.push("f32");
-		else if (instr.type.startsWith("f64.")) stack.push("f64");
-		else if (instr.type.startsWith("v128.")) stack.push("v128");
+		if (instr.op.startsWith("i64.")) stack.push("i64");
+		else if (instr.op.startsWith("f32.")) stack.push("f32");
+		else if (instr.op.startsWith("f64.")) stack.push("f64");
+		else if (instr.op.startsWith("v128.")) stack.push("v128");
 		else stack.push("i32");
 		return;
 	}
 
-	if (instr.type?.endsWith(".store") || instr.type?.includes(".store")) {
-		const valueType = instr.type.startsWith("i64.")
+	if (instr.op?.endsWith(".store") || instr.op?.includes(".store")) {
+		const valueType = instr.op.startsWith("i64.")
 			? "i64"
-			: instr.type.startsWith("f32.")
+			: instr.op.startsWith("f32.")
 				? "f32"
-				: instr.type.startsWith("f64.")
+				: instr.op.startsWith("f64.")
 					? "f64"
-					: instr.type.startsWith("v128.")
+					: instr.op.startsWith("v128.")
 						? "v128"
 						: "i32";
 		popType(stack, valueType, instr, module, func);
@@ -185,14 +185,14 @@ function validateInstructionStack(instr, context) {
 		return;
 	}
 
-	if (instr.type === "block" || instr.type === "loop") {
+	if (instr.op === "block" || instr.op === "loop") {
 		for (const nested of instr.instructions || []) {
 			validateInstructionStack(nested, context);
 		}
 		return;
 	}
 
-	if (instr.type === "if") {
+	if (instr.op === "if") {
 		popType(stack, "i32", instr, module, func);
 		const base = [...stack];
 		const thenStack = [...base];

@@ -125,7 +125,7 @@ const ATOMIC_INSTR = new Map([
 
 export function compileAtomicOps(instr, func, body, module) {
 	// Special case for atomic.fence
-	if (instr.type === "atomic.fence" || instr.op === "atomic.fence") {
+	if (instr.op === "atomic.fence" || instr.op === "atomic.fence") {
 		// Write the atomic prefix first (0xFE)
 		body.push(ATOMIC_PREFIX);
 

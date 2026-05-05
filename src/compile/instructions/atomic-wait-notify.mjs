@@ -7,7 +7,7 @@ const ATOMIC_WAIT64 = 0x02;
 
 export function compileAtomicWaitNotify(instr, func, body, module) {
 	// Handle memory.atomic.notify, memory.atomic.wait32, memory.atomic.wait64
-	if (instr.type === "memory.atomic.notify") {
+	if (instr.op === "memory.atomic.notify") {
 		// Add atomic prefix (0xFE) for all atomic operations
 		body.push(ATOMIC_PREFIX);
 		body.push(ATOMIC_NOTIFY);
@@ -22,7 +22,7 @@ export function compileAtomicWaitNotify(instr, func, body, module) {
 		return true;
 	}
 
-	if (instr.type === "memory.atomic.wait32") {
+	if (instr.op === "memory.atomic.wait32") {
 		// Add atomic prefix (0xFE) for all atomic operations
 		body.push(ATOMIC_PREFIX);
 		body.push(ATOMIC_WAIT32);
@@ -37,7 +37,7 @@ export function compileAtomicWaitNotify(instr, func, body, module) {
 		return true;
 	}
 
-	if (instr.type === "memory.atomic.wait64") {
+	if (instr.op === "memory.atomic.wait64") {
 		// Add atomic prefix (0xFE) for all atomic operations
 		body.push(ATOMIC_PREFIX);
 		body.push(ATOMIC_WAIT64);

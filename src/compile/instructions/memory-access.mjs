@@ -75,9 +75,9 @@ function resolveMemoryIndex(instr, module, func) {
 
 // Modified to properly handle imported memories
 export function compileMemoryAccess(instr, func, body, module) {
-	if (MEMORY_ACCESS_INSTR.has(instr.type)) {
+	if (MEMORY_ACCESS_INSTR.has(instr.op)) {
 		// Use standard memory access instruction
-		body.push(MEMORY_ACCESS_INSTR.get(instr.type));
+		body.push(MEMORY_ACCESS_INSTR.get(instr.op));
 
 		// Validate alignment
 		const align = instr.align ?? 0;
@@ -91,7 +91,7 @@ export function compileMemoryAccess(instr, func, body, module) {
 		}
 
 		// Get natural alignment for this instruction type
-		const naturalAlign = getInstructionNaturalAlignment(instr.type);
+		const naturalAlign = getInstructionNaturalAlignment(instr.op);
 
 		// Validate that alignment doesn't exceed natural alignment
 		if (align > naturalAlign) {

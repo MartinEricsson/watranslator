@@ -140,8 +140,8 @@ const STACK_INSTR = [
 ];
 
 export function compileStackInstruction(instr, body) {
-	if (STACK_INSTR.some((i) => i.type === instr.type)) {
-		const stackInstr = STACK_INSTR.find((i) => i.type === instr.type);
+	if (STACK_INSTR.some((i) => i.type === instr.op)) {
+		const stackInstr = STACK_INSTR.find((i) => i.type === instr.op);
 		body.push(stackInstr.instr);
 		return true;
 	}

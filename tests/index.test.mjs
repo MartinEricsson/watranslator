@@ -111,6 +111,7 @@ import testTableFuncref from "./table-funcref/table-funcref-test.mjs";
 import testTableGrow from "./table-grow/table-grow-test.mjs";
 import testTableInit from "./table-init/table-init-test.mjs";
 import testTableSize from "./table-size/table-size-test.mjs";
+import testInstructionShape from "./test-compiler/instruction-shape.test.mjs";
 import testReentrantCompiler from "./test-compiler/reentrant.test.mjs";
 import testCompilation from "./test-compiler/test-compiler.mjs";
 import { testTypeConversionF64 } from "./type-conversion-f64/type-conversion-f64-test.mjs";
@@ -206,6 +207,7 @@ async function runTests() {
 			name: "Imported Function Calls Ordered",
 			test: testImportedFunctionOrdered,
 		},
+		{ name: "Instruction Shape", test: testInstructionShape },
 		{ name: "Local Variables", test: testLocalVariables },
 		{ name: "Large Module", test: testLargeModule },
 		{ name: "Profile Instrumentation", test: testProfile },
