@@ -26,6 +26,10 @@ const commonOptions = {
   format: 'esm',      // ES modules
   minify: isProd,
   sourcemap: !isProd,
+  define: {
+    NODE_ONLY: 'false',
+  },
+  dropLabels: ['NODE_ONLY'],
 };
 
 async function build() {
