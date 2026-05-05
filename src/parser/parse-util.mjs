@@ -75,6 +75,34 @@ export function parseDecimalOrHex(token) {
 	return Number.parseInt(token, 10);
 }
 
+export function readMemargAttributes(tape, instrToken, defaultAlign) {
+	const { atEnd, getToken, peekToken } = tape;
+	let align = defaultAlign;
+	let offset = 0;
+	const attrText = [instrToken];
+
+	while (
+		!atEnd() &&
+		typeof peekToken() === "string" &&
+		(peekToken().startsWith("offset=") || peekToken().startsWith("align="))
+	) {
+		attrText.push(getToken());
+	}
+
+	const joined = attrText.join(" ");
+	const offsetMatch = joined.match(/offset=(\d+)/);
+	if (offsetMatch?.[1]) {
+		offset = Number.parseInt(offsetMatch[1], 10);
+	}
+
+	const alignMatch = joined.match(/align=(-?\d+)/);
+	if (alignMatch?.[1]) {
+		align = Number.parseInt(alignMatch[1], 10);
+	}
+
+	return { align, offset };
+}
+
 export function parseSigned64BitHex(hexString) {
 	// Convert the hex string to a BigInt
 	let value = BigInt(hexString);

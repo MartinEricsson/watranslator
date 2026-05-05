@@ -171,7 +171,7 @@ export function getAtomicInstructionNaturalAlignment(instrType) {
 }
 
 export function encodeMemarg({ align, offset = 0, memoryIndex = null }) {
-	const hasMemoryIndex = memoryIndex !== null && memoryIndex !== undefined;
+	const hasMemoryIndex = memoryIndex !== null;
 	const flags = hasMemoryIndex ? align | 0x40 : align;
 	const bytes = [...encodeULEB128(flags)];
 

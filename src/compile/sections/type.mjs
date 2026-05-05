@@ -1,4 +1,5 @@
-import { encodeULEB128, getWasmType } from "../compile-utils.mjs";
+import { createBytesWriter } from "../bytes-writer.mjs";
+import { getWasmType } from "../compile-utils.mjs";
 import { SECTION } from "../constants.mjs";
 import { createError } from "../instructions/error.mjs";
 
@@ -30,29 +31,25 @@ function signatureFromFunction(func) {
 	};
 }
 
-function compileFunctionType(sig) {
-	// Function type tag
-	const typeSectionContent = [0x60]; // Function type
+function compileFunctionType(writer, sig) {
+	writer.writeByte(0x60); // Function type tag
 
-	// Param types
 	const paramTypes = sig.params.map((param) => getWasmType(param));
-	typeSectionContent.push(...encodeULEB128(paramTypes.length));
-	typeSectionContent.push(...paramTypes);
+	writer.writeULEB128(paramTypes.length);
+	for (const t of paramTypes) writer.writeByte(t);
 
-	// Result types - properly handle multi-value returns
 	let resultTypes = [];
 	try {
 		if (sig.results && Array.isArray(sig.results)) {
 			resultTypes = sig.results.map(getWasmType);
 		}
 	} catch (e) {
-		throw createError(null, null, null, e.message);
+		const sigDesc = `(${(sig.params || []).join(", ")}) -> (${(sig.results || []).join(", ")})`;
+		throw createError(null, null, null, `${e.message} in type ${sigDesc}`);
 	}
 
-	typeSectionContent.push(...encodeULEB128(resultTypes.length));
-	typeSectionContent.push(...resultTypes);
-
-	return typeSectionContent;
+	writer.writeULEB128(resultTypes.length);
+	for (const t of resultTypes) writer.writeByte(t);
 }
 
 function walkInstructions(instructions, visitor) {
@@ -69,7 +66,6 @@ export function typeSection(module, functions, multiValueBlockTypes, binary) {
 		entries: [],
 		indexBySignature: new Map(),
 	};
-	module.typeContext = typeContext;
 
 	for (const type of module.types || []) {
 		type.typeIndex = getOrAddType(typeContext, {
@@ -114,21 +110,19 @@ export function typeSection(module, functions, multiValueBlockTypes, binary) {
 
 	// =================== TYPE SECTION ===================
 	if (typeContext.entries.length > 0) {
-		// Encode types for all functions
-		const typeSection = [SECTION.TYPE]; // Section ID
-
-		const typesVector = [...encodeULEB128(typeContext.entries.length)];
-
+		const typesVector = createBytesWriter();
+		typesVector.writeULEB128(typeContext.entries.length);
 		for (const typeEntry of typeContext.entries) {
-			typesVector.push(...compileFunctionType(typeEntry));
+			compileFunctionType(typesVector, typeEntry);
 		}
 
-		// Section size
-		typeSection.push(...encodeULEB128(typesVector.length));
+		const section = createBytesWriter();
+		section.writeByte(SECTION.TYPE);
+		section.writeULEB128(typesVector.length);
+		section.writeBytes(typesVector.toUint8Array());
 
-		// Section content
-		typeSection.push(...typesVector);
-
-		binary.push(...typeSection);
+		binary.writeBytes(section.toUint8Array());
 	}
+
+	return typeContext;
 }
