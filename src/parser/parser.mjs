@@ -1,7 +1,8 @@
 import { enhanceError } from "../diagnostics.mjs";
 import { tokenize } from "../tokenize.mjs";
+import { normalizeModuleInstructionShapes } from "./instruction-shape.mjs";
 import { parseExpression } from "./parse-expression.mjs";
-import { atEnd, initTape } from "./tape.mjs";
+import { createTape } from "./tape.mjs";
 
 export function parseWAT(src, options = {}) {
 	try {
@@ -20,13 +21,12 @@ export function parseWAT(src, options = {}) {
 			profile.tokenize_ns = Number(tTokEnd - tTokStart);
 		}
 		const sourceMap = tokens.sourceMap || new Map();
-
-		initTape(tokens, sourceMap);
+		const tape = createTape(tokens, sourceMap);
 
 		// Start parsing from the beginning of the tokens
 		const ast = [];
-		while (!atEnd()) {
-			const expr = parseExpression();
+		while (!tape.atEnd()) {
+			const expr = parseExpression(tape);
 			if (expr !== null) {
 				ast.push(expr);
 			}
@@ -115,22 +115,14 @@ export function parseWAT(src, options = {}) {
 					);
 				}
 
+				if (moduleObj.functions) {
+					normalizeModuleInstructionShapes(moduleObj);
+				}
+
 				// Resolve exports
 				if (moduleObj.exports) {
 					for (const [, exportData] of Object.entries(moduleObj.exports)) {
 						if (
-							exportData.kind === "func" &&
-							typeof exportData.index === "string" &&
-							exportData.index.startsWith("$")
-						) {
-							// Find the function by name
-							const funcIndex = moduleObj.functions.findIndex(
-								(func) => func.name === exportData.index,
-							);
-							if (funcIndex !== -1) {
-								exportData.index = funcIndex;
-							}
-						} else if (
 							exportData.kind === "global" &&
 							typeof exportData.index === "string" &&
 							exportData.index.startsWith("$")

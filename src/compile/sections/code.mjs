@@ -1,8 +1,7 @@
+import { createBytesWriter } from "../bytes-writer.mjs";
 import { encodeULEB128, getWasmType } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
+import { INSTR, SECTION } from "../constants.mjs";
 import { compileInstruction } from "../instructions/instructions.mjs";
-
-const { INSTR, SECTION } = wasmConstants;
 
 export function codeSection(
 	functions,
@@ -22,10 +21,12 @@ export function codeSection(
 			return;
 		}
 
-		const codeSection = [SECTION.CODE]; // Section ID
+		const codeSection = createBytesWriter(); // Section ID
+		codeSection.writeByte(SECTION.CODE);
 
 		// Function bodies count
-		const codeBodies = [...encodeULEB128(nonImportedFunctions.length)];
+		const codeBodies = createBytesWriter();
+		codeBodies.writeULEB128(nonImportedFunctions.length);
 
 		// For each function
 		for (
@@ -34,7 +35,7 @@ export function codeSection(
 			funcIndex++
 		) {
 			const func = nonImportedFunctions[funcIndex];
-			const body = [];
+			const body = createBytesWriter();
 
 			// Local declarations - group locals by type
 			const localsByType = {};
@@ -90,18 +91,18 @@ export function codeSection(
 			}
 
 			// End opcode
-			body.push(INSTR.END);
+			body.writeByte(INSTR.END);
 			// Function body size and content
-			codeBodies.push(...encodeULEB128(body.length));
-			codeBodies.push(...body);
+			codeBodies.writeULEB128(body.length);
+			codeBodies.writeBytes(body.toUint8Array());
 		}
 
 		// Section size
-		codeSection.push(...encodeULEB128(codeBodies.length));
+		codeSection.writeULEB128(codeBodies.length);
 
 		// Section content
-		codeSection.push(...codeBodies);
+		codeSection.writeBytes(codeBodies.toUint8Array());
 
-		binary.push(...codeSection);
+		binary.writeBytes(codeSection.toUint8Array());
 	}
 }

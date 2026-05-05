@@ -38,6 +38,39 @@ async function testImportedFunctionOrdered(debug = false) {
 		log(
 			`clearValue function executed successfully with result: ${clearResult}`,
 		);
+
+		const { wasmBuffer: outOfOrderWasmBuffer } = await readTestData(
+			"imported-functions/imported-function-after-local.wat",
+			debug,
+		);
+		if (!WebAssembly.validate(outOfOrderWasmBuffer)) {
+			throw new Error("Out-of-order import fixture emitted invalid WASM");
+		}
+
+		let importedCallCount = 0;
+		const outOfOrderModule = await WebAssembly.instantiate(
+			outOfOrderWasmBuffer,
+			{
+				env: {
+					imported: (value) => {
+						importedCallCount++;
+						return value + 1;
+					},
+				},
+			},
+		);
+		const outOfOrderResult = outOfOrderModule.instance.exports.run(41);
+		if (outOfOrderResult !== 52) {
+			throw new Error(
+				`Expected out-of-order import result 52, got ${outOfOrderResult}`,
+			);
+		}
+		if (importedCallCount !== 1) {
+			throw new Error(
+				`Expected imported function to be called once, got ${importedCallCount}`,
+			);
+		}
+
 		return true;
 	} catch (e) {
 		log(`Error reading test data: ${e.message}`, debug, "ERROR");

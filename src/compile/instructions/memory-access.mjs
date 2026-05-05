@@ -1,11 +1,9 @@
 import {
-	encodeULEB128,
+	encodeMemarg,
 	getInstructionNaturalAlignment,
 } from "../compile-utils.mjs";
-import wasmConstants from "../constants.mjs";
+import { INSTR } from "../constants.mjs";
 import { createError } from "./error.mjs";
-
-const { INSTR } = wasmConstants;
 
 const MEMORY_ACCESS_INSTR = new Map([
 	["i32.load", INSTR.I32_LOAD],
@@ -33,14 +31,54 @@ const MEMORY_ACCESS_INSTR = new Map([
 	["f64.store", INSTR.F64_STORE],
 ]);
 
+function resolveMemoryIndex(instr, module, func) {
+	if (instr.memoryRef === null || instr.memoryRef === undefined) {
+		return 0;
+	}
+
+	if (typeof instr.memoryRef === "string" && instr.memoryRef.startsWith("$")) {
+		const importedMemories =
+			module.imports?.filter((imp) => imp.kind === "memory") || [];
+		const memoryName = instr.memoryRef.substring(1);
+		const importedMemIndex = importedMemories.findIndex(
+			(imp) => imp.field === memoryName || imp.name === instr.memoryRef,
+		);
+
+		if (importedMemIndex !== -1) {
+			return importedMemIndex;
+		}
+
+		const localMemIndex = (module.memories || []).findIndex(
+			(mem) => mem.id === instr.memoryRef || mem.name === memoryName,
+		);
+
+		if (localMemIndex !== -1) {
+			return importedMemories.length + localMemIndex;
+		}
+
+		throw createError(
+			instr,
+			func,
+			module,
+			`Unknown memory reference: ${instr.memoryRef}`,
+		);
+	}
+
+	if (typeof instr.memoryRef === "number") {
+		return instr.memoryRef;
+	}
+
+	return 0;
+}
+
 // Modified to properly handle imported memories
 export function compileMemoryAccess(instr, func, body, module) {
-	if (MEMORY_ACCESS_INSTR.has(instr.type)) {
+	if (MEMORY_ACCESS_INSTR.has(instr.op)) {
 		// Use standard memory access instruction
-		body.push(MEMORY_ACCESS_INSTR.get(instr.type));
+		body.push(MEMORY_ACCESS_INSTR.get(instr.op));
 
 		// Validate alignment
-		const align = instr.align || 0;
+		const align = instr.align ?? 0;
 		if (align < 0) {
 			throw createError(
 				instr,
@@ -51,7 +89,7 @@ export function compileMemoryAccess(instr, func, body, module) {
 		}
 
 		// Get natural alignment for this instruction type
-		const naturalAlign = getInstructionNaturalAlignment(instr.type);
+		const naturalAlign = getInstructionNaturalAlignment(instr.op);
 
 		// Validate that alignment doesn't exceed natural alignment
 		if (align > naturalAlign) {
@@ -63,67 +101,27 @@ export function compileMemoryAccess(instr, func, body, module) {
 			);
 		}
 
-		// Memory arguments: alignment and offset
-		body.push(...encodeULEB128(align));
-		body.push(...encodeULEB128(instr.offset || 0));
-
 		// Encode memory index only for multi-memory support
 		// Single-memory modules (MVP) don't include the memory index
 		const hasMultipleMemories =
 			(module.memories && module.memories.length > 1) ||
 			module.imports?.filter((imp) => imp.kind === "memory").length > 1;
 
+		let memoryIndex = null;
 		if (
 			hasMultipleMemories ||
 			(instr.memoryRef !== null && instr.memoryRef !== undefined)
 		) {
-			let memoryIndex = 0; // Default to memory 0
-
-			if (instr.memoryRef !== null && instr.memoryRef !== undefined) {
-				if (
-					typeof instr.memoryRef === "string" &&
-					instr.memoryRef.startsWith("$")
-				) {
-					// For named memory reference, find the memory index
-					const memoryName = instr.memoryRef.substring(1);
-
-					// Check imported memories first
-					const importedMemIndex = module.imports
-						?.filter((imp) => imp.kind === "memory")
-						.findIndex(
-							(imp) => imp.field === memoryName || imp.name === instr.memoryRef,
-						);
-
-					if (importedMemIndex !== -1) {
-						memoryIndex = importedMemIndex;
-					} else if (module.memories) {
-						// Check module-defined memories
-						const localMemIndex = module.memories.findIndex(
-							(mem) => mem.id === instr.memoryRef || mem.name === memoryName,
-						);
-						if (localMemIndex !== -1) {
-							// Add offset for imported memories
-							const importedMemCount =
-								module.imports?.filter((imp) => imp.kind === "memory").length ||
-								0;
-							memoryIndex = importedMemCount + localMemIndex;
-						} else {
-							throw createError(
-								instr,
-								func,
-								module,
-								`Unknown memory reference: ${instr.memoryRef}`,
-							);
-						}
-					}
-				} else if (typeof instr.memoryRef === "number") {
-					memoryIndex = instr.memoryRef;
-				}
-			}
-
-			// Encode memory index as LEB128 for multi-memory support
-			body.push(...encodeULEB128(memoryIndex));
+			memoryIndex = resolveMemoryIndex(instr, module, func);
 		}
+
+		body.push(
+			...encodeMemarg({
+				align,
+				offset: instr.offset ?? 0,
+				memoryIndex,
+			}),
+		);
 
 		return true;
 	}

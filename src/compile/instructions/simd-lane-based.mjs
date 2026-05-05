@@ -1,8 +1,8 @@
 import { encodeF32, encodeF64 } from "../compile-utils.mjs";
+import { SIMD_PREFIX } from "../constants.mjs";
 import { createError } from "./error.mjs";
 
 // SIMD Instructions (v128)
-const SIMD_PREFIX = 0xfd;
 const V128_CONST = 12; // v128.const
 const I8X16_SHUFFLE = 13; // i8x16.shuffle
 

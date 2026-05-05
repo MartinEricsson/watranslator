@@ -16,7 +16,7 @@ export function createError(instr, func, module, message) {
 		context: {
 			instruction: instr
 				? {
-						type: instr.type,
+						type: instr.op,
 						operand: instr.operand,
 						value: instr.value,
 						position: instr.position,

@@ -1,10 +1,14 @@
 import { testRunner } from "../test-utils.mjs";
+import testSIMDMemarg from "./simd-memarg-test.mjs";
 import testSIMDMemory from "./simd-memory-test.mjs";
 
 try {
-	const result = await testRunner(testSIMDMemory, "simd-memory", true);
-	if (!result) {
-		throw new Error("SIMD memory test failed");
+	const results = await Promise.all([
+		testRunner(testSIMDMemory, "simd-memory", true),
+		testRunner(testSIMDMemarg, "simd-memarg", true),
+	]);
+	if (results.includes(false)) {
+		throw new Error("One or more tests failed");
 	}
 } catch (error) {
 	console.error("Error during SIMD memory test:", error);

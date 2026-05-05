@@ -1,6 +1,7 @@
-import { atEnd, getToken, peekToken, skipToken } from "./tape.mjs";
+import { decodeWatString } from "../wat-string.mjs";
 
-export function parseExport() {
+export function parseExport(tape) {
+	const { atEnd, getToken, peekToken, skipToken } = tape;
 	let name = null;
 	let kind = null;
 	let index = null;
@@ -8,7 +9,7 @@ export function parseExport() {
 	// Parse export name (string)
 	if (!atEnd() && peekToken().startsWith('"') && peekToken().endsWith('"')) {
 		const token = getToken();
-		name = token.substring(1, token.length - 1); // Remove quotes
+		name = decodeWatString(token);
 	}
 
 	// Parse export definition: (func $name) or (func index)

@@ -1,5 +1,4 @@
 import { createDiagnostic } from "../diagnostics.mjs";
-import { atEnd, getCurrentCursor, peekToken, skipToken } from "./tape.mjs";
 
 export function isLabel(candidate) {
 	// if the candidate is a string and starts with a $ or if it is an integer
@@ -28,12 +27,14 @@ export function isNumber(candidate) {
 }
 
 export function createError(message, options = {}) {
-	const pos = options.position || getCurrentCursor();
+	const tape = options.tape || null;
+	const pos = options.position ||
+		tape?.getCurrentCursor() || { line: 1, column: 1 };
 	const token =
 		options.found !== undefined
 			? options.found
-			: !atEnd()
-				? peekToken()
+			: tape && !tape.atEnd()
+				? tape.peekToken()
 				: "end of input";
 
 	return createDiagnostic({
@@ -50,19 +51,20 @@ export function createError(message, options = {}) {
 	});
 }
 
-export function openParenthesis() {
-	const start = getCurrentCursor();
+export function openParenthesis(tape) {
+	const start = tape.getCurrentCursor();
 
 	return (_) => {
-		if (peekToken() !== ")") {
+		if (tape.peekToken() !== ")") {
 			throw createError("Missing closing parenthesis", {
 				code: "WAT_EXPECT_CLOSE_PAREN",
-				position: getCurrentCursor(),
+				position: tape.getCurrentCursor(),
 				expected: ")",
 				note: `Opening parenthesis is at line ${start.line}, column ${start.column}.`,
+				tape,
 			});
 		}
-		skipToken();
+		tape.skipToken();
 	};
 }
 
@@ -71,6 +73,34 @@ export function parseDecimalOrHex(token) {
 		return Number.parseInt(token, 16);
 	}
 	return Number.parseInt(token, 10);
+}
+
+export function readMemargAttributes(tape, instrToken, defaultAlign) {
+	const { atEnd, getToken, peekToken } = tape;
+	let align = defaultAlign;
+	let offset = 0;
+	const attrText = [instrToken];
+
+	while (
+		!atEnd() &&
+		typeof peekToken() === "string" &&
+		(peekToken().startsWith("offset=") || peekToken().startsWith("align="))
+	) {
+		attrText.push(getToken());
+	}
+
+	const joined = attrText.join(" ");
+	const offsetMatch = joined.match(/offset=(\d+)/);
+	if (offsetMatch?.[1]) {
+		offset = Number.parseInt(offsetMatch[1], 10);
+	}
+
+	const alignMatch = joined.match(/align=(-?\d+)/);
+	if (alignMatch?.[1]) {
+		align = Number.parseInt(alignMatch[1], 10);
+	}
+
+	return { align, offset };
 }
 
 export function parseSigned64BitHex(hexString) {

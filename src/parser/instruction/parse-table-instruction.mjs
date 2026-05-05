@@ -1,6 +1,5 @@
-import { atEnd, getToken } from "../tape.mjs";
-
-export function parseTableInstruction(instrToken, position) {
+export function parseTableInstruction(tape, instrToken, position) {
+	const { atEnd, getToken } = tape;
 	if (atEnd()) return null;
 
 	if (instrToken === "table.size") {

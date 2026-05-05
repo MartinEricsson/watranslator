@@ -1,6 +1,32 @@
-import { atEnd, getToken, peekToken } from "../tape.mjs";
+function readMemoryRef(tape) {
+	const { atEnd, getToken, peekToken, peekTokenN, skipToken } = tape;
+	if (atEnd()) {
+		return null;
+	}
 
-export function parseMemoryOpsInstruction(instrToken, position) {
+	if (peekToken() === "(" && peekTokenN(1) === "memory") {
+		skipToken();
+		skipToken();
+		const memoryRef = !atEnd() ? getToken() : null;
+		if (!atEnd() && peekToken() === ")") {
+			skipToken();
+		}
+		return memoryRef;
+	}
+
+	if (typeof peekToken() === "string" && peekToken().startsWith("$")) {
+		return getToken();
+	}
+
+	if (/^\d+$/.test(String(peekToken()))) {
+		return Number.parseInt(getToken(), 10);
+	}
+
+	return null;
+}
+
+export function parseMemoryOpsInstruction(tape, instrToken, position) {
+	const { atEnd, getToken, peekToken, skipToken } = tape;
 	if (atEnd()) return null;
 
 	// Handle memory instructions with inline offset/align attributes
@@ -36,18 +62,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		else if (isLoad16S) type = "i32.load16_s";
 		else if (isLoad16U) type = "i32.load16_u";
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type, offset, align, memoryRef, position };
@@ -78,8 +93,9 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 
 		// Determine instruction type
 		const type = instrToken.includes("load8_s") ? "i64.load8_s" : "i64.load8_u";
+		const memoryRef = readMemoryRef(tape);
 
-		return { type, offset, align, position };
+		return { type, offset, align, memoryRef, position };
 	}
 
 	if (
@@ -87,8 +103,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		(instrToken.startsWith("i64.load16_s") ||
 			instrToken.startsWith("i64.load16_u"))
 	) {
-		// Default align for byte loads should be 0
-		let align = 0;
+		let align = 1;
 		let offset = 0;
 
 		// Extract offset if present
@@ -107,8 +122,9 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		const type = instrToken.includes("load16_s")
 			? "i64.load16_s"
 			: "i64.load16_u";
+		const memoryRef = readMemoryRef(tape);
 
-		return { type, offset, align, position };
+		return { type, offset, align, memoryRef, position };
 	}
 
 	if (
@@ -116,8 +132,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		(instrToken.startsWith("i64.load32_s") ||
 			instrToken.startsWith("i64.load32_u"))
 	) {
-		// Default align for byte loads should be 0
-		let align = 0;
+		let align = 2;
 		let offset = 0;
 
 		// Extract offset if present
@@ -136,8 +151,9 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		const type = instrToken.includes("load32_s")
 			? "i64.load32_s"
 			: "i64.load32_u";
+		const memoryRef = readMemoryRef(tape);
 
-		return { type, offset, align, position };
+		return { type, offset, align, memoryRef, position };
 	}
 
 	// Handle i64.load* instructions with memory references
@@ -178,18 +194,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		else if (isLoad32S) type = "i64.load32_s";
 		else if (isLoad32U) type = "i64.load32_u";
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type, offset, align, memoryRef, position };
@@ -224,18 +229,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		if (isStore8) type = "i32.store8";
 		else if (isStore16) type = "i32.store16";
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type, offset, align, memoryRef, position };
@@ -273,18 +267,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		else if (isStore16) type = "i64.store16";
 		else if (isStore32) type = "i64.store32";
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		return { type, offset, align, memoryRef, position };
 	}
@@ -308,18 +291,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f32.load", offset, align, memoryRef, position };
@@ -344,18 +316,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f64.load", offset, align, memoryRef, position };
@@ -380,18 +341,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f32.store", offset, align, memoryRef, position };
@@ -416,18 +366,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		// Check for memory reference - either a name ($mem1) or an index (0, 1, etc.)
-		let memoryRef = null;
-		if (!atEnd()) {
-			// Handle named memory reference
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			}
-			// Handle numeric memory index
-			else if (/^\d+$/.test(peekToken())) {
-				memoryRef = Number.parseInt(getToken(), 10);
-			}
-		}
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f64.store", offset, align, memoryRef, position };

@@ -3,9 +3,9 @@ import {
 	parseDecimalOrHex,
 	parseSigned64BitHex,
 } from "../parse-util.mjs";
-import { atEnd, getToken, peekToken, skipToken } from "../tape.mjs";
 
-export function parseSIMDLaneBased(instrToken, position) {
+export function parseSIMDLaneBased(tape, instrToken, position) {
+	const { atEnd, getToken, peekToken, skipToken } = tape;
 	if (typeof instrToken !== "string") {
 		return false;
 	}
