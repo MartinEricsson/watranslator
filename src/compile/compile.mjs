@@ -49,6 +49,7 @@ const compileToWASM = (ast, options = {}) => {
 			(!module.imports || module.imports.length === 0) &&
 			(!module.tables || module.tables.length === 0) &&
 			(!module.elements || module.elements.length === 0) &&
+			(!module.types || module.types.length === 0) &&
 			(!module.exports || Object.keys(module.exports).length === 0)
 		) {
 			return binary.toUint8Array();
