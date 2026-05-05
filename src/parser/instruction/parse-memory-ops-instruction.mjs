@@ -1,6 +1,5 @@
-import { atEnd, getToken, peekToken, peekTokenN, skipToken } from "../tape.mjs";
-
-function readMemoryRef() {
+function readMemoryRef(tape) {
+	const { atEnd, getToken, peekToken, peekTokenN, skipToken } = tape;
 	if (atEnd()) {
 		return null;
 	}
@@ -26,7 +25,8 @@ function readMemoryRef() {
 	return null;
 }
 
-export function parseMemoryOpsInstruction(instrToken, position) {
+export function parseMemoryOpsInstruction(tape, instrToken, position) {
+	const { atEnd, getToken, peekToken, skipToken } = tape;
 	if (atEnd()) return null;
 
 	// Handle memory instructions with inline offset/align attributes
@@ -62,7 +62,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		else if (isLoad16S) type = "i32.load16_s";
 		else if (isLoad16U) type = "i32.load16_u";
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type, offset, align, memoryRef, position };
@@ -93,7 +93,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 
 		// Determine instruction type
 		const type = instrToken.includes("load8_s") ? "i64.load8_s" : "i64.load8_u";
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		return { type, offset, align, memoryRef, position };
 	}
@@ -122,7 +122,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		const type = instrToken.includes("load16_s")
 			? "i64.load16_s"
 			: "i64.load16_u";
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		return { type, offset, align, memoryRef, position };
 	}
@@ -151,7 +151,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		const type = instrToken.includes("load32_s")
 			? "i64.load32_s"
 			: "i64.load32_u";
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		return { type, offset, align, memoryRef, position };
 	}
@@ -194,7 +194,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		else if (isLoad32S) type = "i64.load32_s";
 		else if (isLoad32U) type = "i64.load32_u";
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type, offset, align, memoryRef, position };
@@ -229,7 +229,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		if (isStore8) type = "i32.store8";
 		else if (isStore16) type = "i32.store16";
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type, offset, align, memoryRef, position };
@@ -267,7 +267,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 		else if (isStore16) type = "i64.store16";
 		else if (isStore32) type = "i64.store32";
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		return { type, offset, align, memoryRef, position };
 	}
@@ -291,7 +291,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f32.load", offset, align, memoryRef, position };
@@ -316,7 +316,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f64.load", offset, align, memoryRef, position };
@@ -341,7 +341,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f32.store", offset, align, memoryRef, position };
@@ -366,7 +366,7 @@ export function parseMemoryOpsInstruction(instrToken, position) {
 			align = Number.parseInt(alignMatch[1], 10);
 		}
 
-		const memoryRef = readMemoryRef();
+		const memoryRef = readMemoryRef(tape);
 
 		// Create instruction object
 		return { type: "f64.store", offset, align, memoryRef, position };

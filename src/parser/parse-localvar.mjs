@@ -1,6 +1,5 @@
-import { atEnd, getCurrentCursor, getToken, peekToken } from "./tape.mjs";
-
-export function parseLocalVar() {
+export function parseLocalVar(tape) {
+	const { atEnd, getCurrentCursor, getToken, peekToken } = tape;
 	let name = null;
 	let type = null;
 

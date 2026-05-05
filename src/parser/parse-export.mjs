@@ -1,7 +1,7 @@
 import { decodeWatString } from "../wat-string.mjs";
-import { atEnd, getToken, peekToken, skipToken } from "./tape.mjs";
 
-export function parseExport() {
+export function parseExport(tape) {
+	const { atEnd, getToken, peekToken, skipToken } = tape;
 	let name = null;
 	let kind = null;
 	let index = null;

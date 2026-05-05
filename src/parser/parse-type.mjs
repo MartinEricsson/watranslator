@@ -1,12 +1,5 @@
-import {
-	atEnd,
-	getCurrentCursor,
-	getToken,
-	peekToken,
-	skipToken,
-} from "./tape.mjs";
-
-export function parseType() {
+export function parseType(tape) {
+	const { atEnd, getCurrentCursor, getToken, peekToken, skipToken } = tape;
 	const typePos = getCurrentCursor();
 	// Parse type declaration: (type $name (func (param i32 i32) (result i32)))
 	let name = null;

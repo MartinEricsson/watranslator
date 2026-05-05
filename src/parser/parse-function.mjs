@@ -1,14 +1,6 @@
 import { decodeWatString } from "../wat-string.mjs";
 import { parseInstruction } from "./parse-instruction.mjs";
 import { createError } from "./parse-util.mjs";
-import {
-	atEnd,
-	getCurrentCursor,
-	getToken,
-	peekToken,
-	peekTokenN,
-	skipToken,
-} from "./tape.mjs";
 
 function isParamType(candidate) {
 	return (
@@ -23,7 +15,15 @@ function isParamType(candidate) {
 	);
 }
 
-export function parseFunction() {
+export function parseFunction(tape) {
+	const {
+		atEnd,
+		getCurrentCursor,
+		getToken,
+		peekToken,
+		peekTokenN,
+		skipToken,
+	} = tape;
 	let name = null;
 	const params = [];
 	const results = [];
@@ -163,6 +163,7 @@ export function parseFunction() {
 					position: tokenPos,
 					found: keyword,
 					hint: "Use stack-style `if ... else ... end` form instead.",
+					tape,
 				});
 			}
 
@@ -301,6 +302,7 @@ export function parseFunction() {
 				position: tokenPos,
 				found: keyword,
 				expected: ["param", "result", "local", "export", "import", "type"],
+				tape,
 			});
 		}
 
@@ -487,7 +489,7 @@ export function parseFunction() {
 			skipToken();
 		} else {
 			// Parse other instructions (local.get, i32.add, etc.)
-			const instr = parseInstruction(resolveLabelDepth);
+			const instr = parseInstruction(tape, resolveLabelDepth);
 
 			// Add the instruction to the current block or function body
 			if (blockStack.length > 0) {

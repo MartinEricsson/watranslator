@@ -1,7 +1,7 @@
 import { enhanceError } from "../diagnostics.mjs";
 import { tokenize } from "../tokenize.mjs";
 import { parseExpression } from "./parse-expression.mjs";
-import { atEnd, initTape } from "./tape.mjs";
+import { createTape } from "./tape.mjs";
 
 export function parseWAT(src, options = {}) {
 	try {
@@ -20,13 +20,12 @@ export function parseWAT(src, options = {}) {
 			profile.tokenize_ns = Number(tTokEnd - tTokStart);
 		}
 		const sourceMap = tokens.sourceMap || new Map();
-
-		initTape(tokens, sourceMap);
+		const tape = createTape(tokens, sourceMap);
 
 		// Start parsing from the beginning of the tokens
 		const ast = [];
-		while (!atEnd()) {
-			const expr = parseExpression();
+		while (!tape.atEnd()) {
+			const expr = parseExpression(tape);
 			if (expr !== null) {
 				ast.push(expr);
 			}

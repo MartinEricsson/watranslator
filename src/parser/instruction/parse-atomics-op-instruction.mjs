@@ -1,6 +1,5 @@
-import { atEnd, getToken, peekToken } from "../tape.mjs";
-
-function readMemargAttributes(instrToken, defaultAlign) {
+function readMemargAttributes(tape, instrToken, defaultAlign) {
+	const { atEnd, getToken, peekToken } = tape;
 	let align = defaultAlign;
 	let offset = 0;
 	const attrText = [instrToken];
@@ -27,7 +26,8 @@ function readMemargAttributes(instrToken, defaultAlign) {
 	return { align, offset };
 }
 
-export function parseAtomicsOpInstruction(instrToken, position) {
+export function parseAtomicsOpInstruction(tape, instrToken, position) {
+	const { atEnd } = tape;
 	if (atEnd()) return null;
 
 	// Handle atomic load/store instructions
@@ -57,7 +57,7 @@ export function parseAtomicsOpInstruction(instrToken, position) {
 			align = is64Bit ? 3 : 2; // 3 for i64 (8 bytes = 2^3), 2 for i32 (4 bytes = 2^2)
 		}
 
-		const memarg = readMemargAttributes(instrToken, align);
+		const memarg = readMemargAttributes(tape, instrToken, align);
 
 		// Get the instruction type without attributes (the part before any space)
 		const op = instrToken.split(/\s+/)[0];

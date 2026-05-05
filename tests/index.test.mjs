@@ -111,6 +111,7 @@ import testTableFuncref from "./table-funcref/table-funcref-test.mjs";
 import testTableGrow from "./table-grow/table-grow-test.mjs";
 import testTableInit from "./table-init/table-init-test.mjs";
 import testTableSize from "./table-size/table-size-test.mjs";
+import testReentrantCompiler from "./test-compiler/reentrant.test.mjs";
 import testCompilation from "./test-compiler/test-compiler.mjs";
 import { testTypeConversionF64 } from "./type-conversion-f64/type-conversion-f64-test.mjs";
 import { testTypeConversionI64ToF64 } from "./type-conversion-i64-f64/type-conversion-i64-f64-test.mjs";
@@ -236,6 +237,7 @@ async function runTests() {
 		{ name: "Numeric Literals", test: testNumericLiterals },
 		{ name: "Parameters", test: testParameters },
 		{ name: "Reference Is Null", test: testRefIsNull },
+		{ name: "Reentrant Compiler", test: testReentrantCompiler },
 		{ name: "Remainder", test: testRemainder },
 		{ name: "Simple Loop", test: testSimpleLoop },
 		{ name: "Source Map", test: testSourceMap },

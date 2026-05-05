@@ -1,6 +1,5 @@
-import { atEnd, getToken, peekToken, skipToken } from "./tape.mjs";
-
-export function parseElement() {
+export function parseElement(tape) {
+	const { atEnd, getToken, peekToken, skipToken } = tape;
 	// Parse element section: (elem (i32.const <offset>) <funcref> <funcref>...) or (elem passive funcref <funcref>...)
 	let offset = 0;
 	const functionIndices = [];

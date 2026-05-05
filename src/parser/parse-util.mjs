@@ -1,5 +1,4 @@
 import { createDiagnostic } from "../diagnostics.mjs";
-import { atEnd, getCurrentCursor, peekToken, skipToken } from "./tape.mjs";
 
 export function isLabel(candidate) {
 	// if the candidate is a string and starts with a $ or if it is an integer
@@ -28,12 +27,14 @@ export function isNumber(candidate) {
 }
 
 export function createError(message, options = {}) {
-	const pos = options.position || getCurrentCursor();
+	const tape = options.tape || null;
+	const pos = options.position ||
+		tape?.getCurrentCursor() || { line: 1, column: 1 };
 	const token =
 		options.found !== undefined
 			? options.found
-			: !atEnd()
-				? peekToken()
+			: tape && !tape.atEnd()
+				? tape.peekToken()
 				: "end of input";
 
 	return createDiagnostic({
@@ -50,19 +51,20 @@ export function createError(message, options = {}) {
 	});
 }
 
-export function openParenthesis() {
-	const start = getCurrentCursor();
+export function openParenthesis(tape) {
+	const start = tape.getCurrentCursor();
 
 	return (_) => {
-		if (peekToken() !== ")") {
+		if (tape.peekToken() !== ")") {
 			throw createError("Missing closing parenthesis", {
 				code: "WAT_EXPECT_CLOSE_PAREN",
-				position: getCurrentCursor(),
+				position: tape.getCurrentCursor(),
 				expected: ")",
 				note: `Opening parenthesis is at line ${start.line}, column ${start.column}.`,
+				tape,
 			});
 		}
-		skipToken();
+		tape.skipToken();
 	};
 }
 

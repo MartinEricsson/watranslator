@@ -5,15 +5,9 @@ import {
 	parseI64Literal,
 } from "../number-literals.mjs";
 import { decodeWatString } from "../wat-string.mjs";
-import {
-	atEnd,
-	getCurrentCursor,
-	getToken,
-	peekToken,
-	skipToken,
-} from "./tape.mjs";
 
-export function parseGlobal() {
+export function parseGlobal(tape) {
+	const { atEnd, getCurrentCursor, getToken, peekToken, skipToken } = tape;
 	// Parse global declaration: (global $name [(mut)] type [init]) or (global $name (import "module" "name") type)
 	let name = null;
 	let type = null;

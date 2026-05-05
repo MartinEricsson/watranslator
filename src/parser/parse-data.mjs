@@ -2,9 +2,9 @@ import {
 	decodeWatStringToBytes,
 	stripWatStringQuotes,
 } from "../wat-string.mjs";
-import { atEnd, getToken, peekToken, skipToken } from "./tape.mjs";
 
-export function parseData() {
+export function parseData(tape) {
+	const { atEnd, getToken, peekToken, skipToken } = tape;
 	// Parse data section: (data (i32.const <offset>) "<bytes>") or passive (data $name "<bytes>")
 	let offset = 0;
 	let bytes = "";
