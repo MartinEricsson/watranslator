@@ -483,6 +483,7 @@ export function parseFunction(tape) {
 			if (blockStack.length > 0) {
 				const currentBlock = blockStack[blockStack.length - 1];
 				if (currentBlock.type === "if") {
+					currentBlock.elsePosition = getCurrentCursor();
 					currentBlock.inElseBranch = true;
 				}
 			}
@@ -490,7 +491,11 @@ export function parseFunction(tape) {
 		} else if (peekToken() === "end") {
 			// Handle end of a block - pop the current block from the stack
 			if (blockStack.length > 0) {
-				blockStack.pop();
+				const currentBlock = blockStack.pop();
+				currentBlock.endPosition = getCurrentCursor();
+				if (currentBlock.type === "if" && currentBlock.inElseBranch) {
+					currentBlock.inElseBranch = false;
+				}
 			}
 			skipToken();
 		} else {
