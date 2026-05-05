@@ -81,6 +81,7 @@ import testRefNullBoundaries from "./reference-opcodes/ref-null-boundary-test.mj
 import testReferenceOpcodes from "./reference-opcodes/reference-opcodes-test.mjs";
 import testReinterpretOps from "./reinterpret-ops/reinterpret-ops-test.mjs";
 import testRemainder from "./remainder/remainder-test.mjs";
+import testLargeSectionSizes from "./sections/large-section-size-test.mjs";
 import testSectionPresenceMatrix from "./sections/section-presence-matrix-test.mjs";
 import testSelect from "./select/select-test.mjs";
 import testSelectReference from "./select/select-typed-reference-test.mjs";
@@ -295,6 +296,7 @@ async function runTests() {
 		{ name: "SIMD Replace All Lane", test: simdReplaceAllLaneTest },
 		{ name: "SIMD Vector Ops", test: testSIMDVectorOps },
 		{ name: "Select", test: testSelect },
+		{ name: "Large Section Sizes", test: testLargeSectionSizes },
 		{ name: "Section Presence Matrix", test: testSectionPresenceMatrix },
 		{ name: "Sign Extension", test: testSignExtension },
 		{ name: "Subtraction", test: testSubtraction },
