@@ -40,8 +40,7 @@
     local.get $dest   ;; Destination address
     local.get $offset ;; Offset within the data segment
     local.get $size   ;; Size (number of bytes to copy)
-    i32.const 1       ;; Data segment index (1 = the passive data segment)
-    memory.init       ;; Initialize memory from data segment
+    memory.init $special_data
   )
 
   ;; Initialize memory with a pattern we can check later

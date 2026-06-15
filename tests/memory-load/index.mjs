@@ -1,7 +1,7 @@
 import { testRunner } from "../test-utils.mjs";
 import testF32F64Memarg from "./f32-f64-memarg-test.mjs";
-import testI64Load from "./i64-load-test.mjs";
 import testI64LoadDefaultAlign from "./i64-load-default-align-test.mjs";
+import testI64Load from "./i64-load-test.mjs";
 import testMemoryLoad from "./memory-load-test.mjs";
 
 try {

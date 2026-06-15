@@ -75,11 +75,11 @@ const compileToWASM = (ast, options = {}) => {
 		// =================== TABLE SECTION ===================
 		tableSection(tables, binary);
 
-		// =================== GLOBAL SECTION ===================
-		globalSection(globals, binary);
-
 		// =================== MEMORY SECTION ===================
 		memorySection(module, binary);
+
+		// =================== GLOBAL SECTION ===================
+		globalSection(globals, binary);
 
 		// =================== EXPORT SECTION ===================
 		exportSection(module, binary);

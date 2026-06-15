@@ -57,10 +57,12 @@ export function parseElement(tape) {
 	}
 
 	// Parse offset expression for active element segments
+	let hasOffset = false;
 	if (mode === "active" && !atEnd() && peekToken() === "(") {
 		skipToken(); // Skip opening paren
 
 		if (!atEnd() && peekToken() === "i32.const") {
+			hasOffset = true;
 			skipToken(); // Skip i32.const
 
 			if (!atEnd() && /^-?\d+$/.test(peekToken())) {
@@ -80,6 +82,10 @@ export function parseElement(tape) {
 				skipToken();
 			}
 		}
+	}
+
+	if (mode !== "passive") {
+		mode = hasOffset ? "active" : "passive";
 	}
 
 	// Handle 'func' marker before function references

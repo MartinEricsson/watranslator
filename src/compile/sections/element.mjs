@@ -12,16 +12,17 @@ export function elementSection(elements, functions, binary) {
 
 		// Process each element segment
 		for (const element of elements) {
-			// Active element segment (mode 0x00: active with expression)
-			elementEntries.push(0x00); // Mode: active, table index 0
-
-			// Offset expression for this segment
-			elementEntries.push(INSTR.I32_CONST); // i32.const
-			elementEntries.push(...encodeSLEB128(element.offset)); // offset value
-			elementEntries.push(INSTR.END); // end of offset expression
-
-			// Count of function indices in this segment
-			elementEntries.push(...encodeULEB128(element.functionIndices.length));
+			if (element.mode === "passive") {
+				elementEntries.push(0x01);
+				elementEntries.push(0x00);
+				elementEntries.push(...encodeULEB128(element.functionIndices.length));
+			} else {
+				elementEntries.push(0x00);
+				elementEntries.push(INSTR.I32_CONST);
+				elementEntries.push(...encodeSLEB128(element.offset));
+				elementEntries.push(INSTR.END);
+				elementEntries.push(...encodeULEB128(element.functionIndices.length));
+			}
 
 			// Function indices
 			for (const funcRef of element.functionIndices) {

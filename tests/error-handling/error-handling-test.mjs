@@ -84,8 +84,8 @@ async function testErrorHandling(debug = false) {
 		{
 			name: "Negative alignment i32",
 			file: "negative-alignment-i32",
-			expectedErrorMessage: "Invalid alignment value",
-			line: 5,
+			expectedErrorMessage: "Invalid alignment",
+			line: 1,
 		},
 	];
 

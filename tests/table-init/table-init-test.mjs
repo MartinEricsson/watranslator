@@ -45,9 +45,9 @@ async function testTableInit(debug = false) {
 		const func2 = getFunc(2);
 		const func3 = getFunc(3);
 
-		assert.strictEqual(func1(), 42, "Function at index 1 should return 42");
-		assert.strictEqual(func2(), 43, "Function at index 2 should return 43");
-		assert.strictEqual(func3(), 44, "Function at index 3 should return 44");
+		assert.strictEqual(func1, 42, "Function at index 1 should return 42");
+		assert.strictEqual(func2, 43, "Function at index 2 should return 43");
+		assert.strictEqual(func3, 44, "Function at index 3 should return 44");
 
 		if (debug) console.log("✅ Table initialization test passed");
 		return true;

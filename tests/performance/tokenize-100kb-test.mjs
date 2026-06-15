@@ -6,7 +6,7 @@ const MIN_WAT_BYTES = 100_000;
 const EXPECTED_WAT_BYTES = 110_072;
 const EXPECTED_TOKEN_COUNT = 15_045;
 const EXPECTED_TOKEN_SHA256 =
-	"810ea9cfe31cbbc846663e957e23e208b688237fd71d1cd201b172bfa75c44ca";
+	"99dae2e31e592c86f37a2afdff81f73c4abf75317ac1f85b37cfcaa552e78d59";
 const MAX_TOKENIZE_MS = 1_500;
 
 function buildWat() {
@@ -16,7 +16,7 @@ function buildWat() {
 	while (lines.join("\n").length < 110_000) {
 		lines.push(`  (func $f${index} (param $p i32) (result i32)`);
 		lines.push(`    local.get $p ;; line comment ${index}`);
-		lines.push(`    i32.load offset=${index % 97} align=2`);
+		lines.push(`    i32.load offset=${index % 97} align=4`);
 		lines.push("    drop");
 		lines.push(`    i32.const ${index}`);
 		lines.push("  )");
@@ -48,7 +48,7 @@ export default async function testTokenize100KB(debug = false) {
 			.update(JSON.stringify(Array.from(tokens)))
 			.digest("hex");
 		const firstLoadIndex = tokens.findIndex((token) =>
-			token.startsWith("i32.load offset=0 align=2"),
+			token.startsWith("i32.load offset=0 align=4"),
 		);
 
 		if (elapsed > MAX_TOKENIZE_MS) {

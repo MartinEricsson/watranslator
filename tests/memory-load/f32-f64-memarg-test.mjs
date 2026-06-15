@@ -9,20 +9,20 @@ export default async function testF32F64Memarg() {
   (func (export "store_f32") (param $value f32)
     i32.const 0
     local.get $value
-    f32.store offset=8 align=2
+    f32.store offset=8 align=4
   )
   (func (export "load_f32") (result f32)
     i32.const 0
-    f32.load offset=8 align=2
+    f32.load offset=8 align=4
   )
   (func (export "store_f64") (param $value f64)
     i32.const 0
     local.get $value
-    f64.store offset=16 align=3
+    f64.store offset=16 align=8
   )
   (func (export "load_f64") (result f64)
     i32.const 0
-    f64.load offset=16 align=3
+    f64.load offset=16 align=8
   )
 )`),
 	);

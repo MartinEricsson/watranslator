@@ -9,9 +9,9 @@ export default async function testAtomicMemarg() {
   (func (export "store_load") (param $addr i32) (param $value i32) (result i32)
     local.get $addr
     local.get $value
-    i32.atomic.store offset=4 align=2
+    i32.atomic.store offset=4 align=4
     local.get $addr
-    i32.atomic.load offset=4 align=2
+    i32.atomic.load offset=4 align=4
   )
 )`),
 	);

@@ -97,10 +97,23 @@ export function readMemargAttributes(tape, instrToken, defaultAlign) {
 
 	const alignMatch = joined.match(/align=(-?\d+)/);
 	if (alignMatch?.[1]) {
-		align = Number.parseInt(alignMatch[1], 10);
+		align = alignBytesToLog2(alignMatch[1]);
 	}
 
 	return { align, offset };
+}
+
+// Converts a WAT `align=N` value (alignment in bytes, a power of two) to the
+// log2 form used internally and in the binary memarg flags. Throws on a value
+// that is not a positive power of two.
+export function alignBytesToLog2(rawBytes) {
+	const n = Number(rawBytes);
+	if (!Number.isInteger(n) || n <= 0 || (n & (n - 1)) !== 0) {
+		throw new Error(
+			`Invalid alignment: ${rawBytes} (must be a positive power of two)`,
+		);
+	}
+	return Math.log2(n);
 }
 
 export function parseSigned64BitHex(hexString) {

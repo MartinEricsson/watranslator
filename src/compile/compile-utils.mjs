@@ -183,6 +183,33 @@ export function encodeMemarg({ align, offset = 0, memoryIndex = null }) {
 	return bytes;
 }
 
+export function importedMemories(module) {
+	return (module.imports || []).filter((imp) => imp.kind === "memory");
+}
+
+export function hasMultipleMemories(module) {
+	return (module.memories?.length || 0) + importedMemories(module).length > 1;
+}
+
+export function resolveMemoryIndex(memoryRef, module) {
+	if (memoryRef === null || memoryRef === undefined) return 0;
+	if (typeof memoryRef === "number") return memoryRef;
+	if (typeof memoryRef === "string" && memoryRef.startsWith("$")) {
+		const imports = importedMemories(module);
+		const name = memoryRef.substring(1);
+		const importedIdx = imports.findIndex(
+			(imp) => imp.field === name || imp.name === memoryRef,
+		);
+		if (importedIdx !== -1) return importedIdx;
+		const localIdx = (module.memories || []).findIndex(
+			(mem) => mem.id === memoryRef || mem.name === name,
+		);
+		if (localIdx !== -1) return imports.length + localIdx;
+		return -1;
+	}
+	return 0;
+}
+
 // Convert WAT type string to binary type
 export function getWasmType(type) {
 	switch (type) {

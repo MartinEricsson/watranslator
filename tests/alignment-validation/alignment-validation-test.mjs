@@ -8,7 +8,7 @@ const ALIGNMENT_TESTS = [
   (memory 1)
   (func $test (param $addr i32) (result i32)
     local.get $addr
-    i32.load align=2
+    i32.load align=4
   )
 )`,
 		shouldPass: true,
@@ -19,7 +19,7 @@ const ALIGNMENT_TESTS = [
   (memory 1)
   (func $test (param $addr i32) (result i64)
     local.get $addr
-    i64.load align=3
+    i64.load align=8
   )
 )`,
 		shouldPass: true,
@@ -30,7 +30,7 @@ const ALIGNMENT_TESTS = [
   (memory 1)
   (func $test (param $addr i32) (result i32)
     local.get $addr
-    i32.load align=3
+    i32.load align=8
   )
 )`,
 		shouldPass: false,
@@ -43,7 +43,7 @@ const ALIGNMENT_TESTS = [
   (memory 1)
   (func $test (param $addr i32) (result i64)
     local.get $addr
-    i64.load align=4
+    i64.load align=16
   )
 )`,
 		shouldPass: false,
@@ -60,7 +60,7 @@ const ALIGNMENT_TESTS = [
   )
 )`,
 		shouldPass: false,
-		expectedError: "Invalid alignment value: -1",
+		expectedError: "Invalid alignment: -1",
 	},
 ];
 

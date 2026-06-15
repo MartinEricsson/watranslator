@@ -17,7 +17,7 @@ async function testI64NegHex(debug = false) {
 
 		assert.strictEqual(
 			instance.exports.neg_large_hex(),
-			-0xDEADBEEFn,
+			-0xdeadbeefn,
 			"i64.const -0xDEADBEEF should equal -0xDEADBEEFn",
 		);
 

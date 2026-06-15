@@ -1,4 +1,4 @@
-import { createError } from "../parse-util.mjs";
+import { alignBytesToLog2, createError } from "../parse-util.mjs";
 
 function parseOffsetAndAlign(tape, inlineAttributes = []) {
 	const { atEnd, peekToken, skipToken } = tape;
@@ -7,7 +7,7 @@ function parseOffsetAndAlign(tape, inlineAttributes = []) {
 
 	for (const attr of inlineAttributes) {
 		if (attr.startsWith("align=")) {
-			align = Number.parseInt(attr.split("=")[1], 10);
+			align = alignBytesToLog2(attr.split("=")[1]);
 		} else if (attr.startsWith("offset=")) {
 			offset = Number.parseInt(attr.split("=")[1], 10);
 		}
@@ -18,7 +18,7 @@ function parseOffsetAndAlign(tape, inlineAttributes = []) {
 		const nextToken = peekToken();
 
 		if (nextToken.startsWith("align=")) {
-			align = Number.parseInt(nextToken.split("=")[1], 10);
+			align = alignBytesToLog2(nextToken.split("=")[1]);
 			skipToken();
 		} else if (nextToken.startsWith("offset=")) {
 			offset = Number.parseInt(nextToken.split("=")[1], 10);
