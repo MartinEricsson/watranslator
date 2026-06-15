@@ -56,7 +56,9 @@ import testLargeModule from "./large-module/large-module-test.mjs"; // Generated
 import testLEB128Boundaries from "./leb128/leb128-boundary-test.mjs";
 import testLocalVariables from "./local-vars/local-vars-test.mjs";
 import testMemoryFill from "./memory-fill/memory-fill-test.mjs";
+import testMemoryInitMulti from "./memory-init/memory-init-multi-test.mjs";
 import testMemoryInit from "./memory-init/memory-init-test.mjs";
+import testAlignBytes from "./memory-load/align-bytes-test.mjs";
 import testF32F64Memarg from "./memory-load/f32-f64-memarg-test.mjs";
 import testMemoryi64Load from "./memory-load/i64-load-test.mjs";
 import testMemoryLoad from "./memory-load/memory-load-test.mjs";
@@ -81,7 +83,9 @@ import testRefNullBoundaries from "./reference-opcodes/ref-null-boundary-test.mj
 import testReferenceOpcodes from "./reference-opcodes/reference-opcodes-test.mjs";
 import testReinterpretOps from "./reinterpret-ops/reinterpret-ops-test.mjs";
 import testRemainder from "./remainder/remainder-test.mjs";
+import testByteExact from "./sections/byte-exact-test.mjs";
 import testLargeSectionSizes from "./sections/large-section-size-test.mjs";
+import testMemoryAndGlobalOrder from "./sections/memory-and-global-order-test.mjs";
 import testSectionPresenceMatrix from "./sections/section-presence-matrix-test.mjs";
 import testSelect from "./select/select-test.mjs";
 import testSelectReference from "./select/select-typed-reference-test.mjs";
@@ -120,6 +124,7 @@ import testSubtraction from "./subtraction/subtraction-test.mjs";
 import testTableCopy from "./table-copy/table-copy-test.mjs";
 import testTableFill from "./table-fill/table-fill-test.mjs";
 import testTableFuncref from "./table-funcref/table-funcref-test.mjs";
+import testTableGetNamed from "./table-get/table-get-named-test.mjs";
 import testTableGrow from "./table-grow/table-grow-test.mjs";
 import testTableInit from "./table-init/table-init-test.mjs";
 import testTableSize from "./table-size/table-size-test.mjs";
@@ -136,6 +141,7 @@ import testMultiMemoryMemargEncoding from "./multi-memory/memarg-encoding-test.m
 import testMultiMemoryExplicitIndices from "./multi-memory/multi-memory-explicit-indices-test.mjs";
 import testMultiMemoryIndexes from "./multi-memory/multi-memory-indexes-test.mjs";
 import testMultiMemory from "./multi-memory/multi-memory-test.mjs";
+import testNamedLocalMemory from "./multi-memory/named-local-memory-test.mjs";
 
 const args = process.argv.slice(2);
 const debug = args.includes("--debug");
@@ -232,8 +238,10 @@ async function runTests() {
 		{ name: "Profile Instrumentation", test: testProfile },
 		{ name: "Memory fill", test: testMemoryFill },
 		{ name: "Memory Init", test: testMemoryInit },
+		{ name: "Memory Init Multi Segment", test: testMemoryInitMulti },
 		{ name: "Memory Load", test: testMemoryLoad },
 		{ name: "F32/F64 Memory Memarg", test: testF32F64Memarg },
+		{ name: "Align Bytes Memarg", test: testAlignBytes },
 		{ name: "Memory i64 Load", test: testMemoryi64Load },
 		{ name: "Memory Store i32", test: testMemoryStorei32 },
 		{ name: "Memory Store i64", test: testMemoryStorei64 },
@@ -244,6 +252,7 @@ async function runTests() {
 			test: testMultipleFunctionArguments,
 		},
 		{ name: "Multi Memory", test: testMultiMemory },
+		{ name: "Named Local Memory", test: testNamedLocalMemory },
 		{
 			name: "Multi Memory Memarg Encoding",
 			test: testMultiMemoryMemargEncoding,
@@ -297,14 +306,17 @@ async function runTests() {
 		{ name: "SIMD Vector Ops", test: testSIMDVectorOps },
 		{ name: "Select", test: testSelect },
 		{ name: "Large Section Sizes", test: testLargeSectionSizes },
+		{ name: "Byte Exact Sections", test: testByteExact },
+		{ name: "Memory And Global Order", test: testMemoryAndGlobalOrder },
 		{ name: "Section Presence Matrix", test: testSectionPresenceMatrix },
 		{ name: "Sign Extension", test: testSignExtension },
 		{ name: "Subtraction", test: testSubtraction },
 		{ name: "Start instruction", test: testStartInstruction },
 		{ name: "Table Copy", test: testTableCopy },
 		{ name: "Table Fill", test: testTableFill },
-		//{ name: "Table Init", test: testTableInit },
+		{ name: "Table Init", test: testTableInit },
 		{ name: "Table Grow", test: testTableGrow },
+		{ name: "Table Get Named", test: testTableGetNamed },
 		{ name: "Table Size", test: testTableSize },
 		{ name: "Table Funcref", test: testTableFuncref },
 		{ name: "Type Section Dedup", test: testTypeSectionDedup },
@@ -319,7 +331,13 @@ async function runTests() {
 	];
 	const testResults = testCases.map(async ({ name, test }) => {
 		console.log(`Running ${name} test...`);
-		const result = await test(debug);
+		let result;
+		try {
+			result = await test(debug);
+		} catch (error) {
+			console.error(`❌ ${name} threw:`, error);
+			result = false;
+		}
 		resultVerification(name, result);
 		return result;
 	});

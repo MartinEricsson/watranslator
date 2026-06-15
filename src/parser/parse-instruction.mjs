@@ -489,32 +489,24 @@ export function parseInstruction(tape, resolveLabelDepth = () => null) {
 
 	// Handle memory.init instruction with optional memory reference and segment index
 	if (instrType === "memory.init") {
-		let memoryRef = null;
-		// Default to segment 1 for backward compatibility with existing tests that use passive data segments
-		let segmentIdx = 1;
-
-		// Check for memory reference first (can be $name or number)
-		if (!atEnd()) {
-			if (peekToken().startsWith("$")) {
-				memoryRef = getToken();
-			} else if (/^\d+$/.test(peekToken())) {
-				const token = getToken();
-				// This could be either memory ref or segment idx
-				// For now, treat first number as segment idx for backward compatibility
-				segmentIdx = Number.parseInt(token, 10);
-			}
+		let dataLabel = null;
+		let segmentIdx = null;
+		if (!atEnd() && peekToken().startsWith("$")) {
+			dataLabel = getToken();
+		} else if (!atEnd() && /^\d+$/.test(peekToken())) {
+			segmentIdx = Number.parseInt(getToken(), 10);
 		}
-
-		return { type: "memory.init", memoryRef, segmentIdx, position };
+		return { type: "memory.init", dataLabel, segmentIdx, position };
 	}
 
 	// Handle elem.drop instruction
 	if (instrType === "elem.drop") {
-		// Check if next token is a number (element index)
-		let elementIdx = 0; // Default to 0 if not specified
-		if (!atEnd() && /^\d+$/.test(peekToken())) {
-			elementIdx = Number.parseInt(peekToken(), 10);
-			skipToken(); // Skip element index
+		let elementIdx = null;
+		if (
+			!atEnd() &&
+			(peekToken().startsWith("$") || /^\d+$/.test(peekToken()))
+		) {
+			elementIdx = getToken();
 		}
 		return { type: "elem.drop", elementIdx, position };
 	}

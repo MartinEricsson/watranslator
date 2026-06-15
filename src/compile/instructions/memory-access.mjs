@@ -1,6 +1,8 @@
 import {
 	encodeMemarg,
 	getInstructionNaturalAlignment,
+	hasMultipleMemories,
+	resolveMemoryIndex,
 } from "../compile-utils.mjs";
 import { INSTR } from "../constants.mjs";
 import { createError } from "./error.mjs";
@@ -30,46 +32,6 @@ const MEMORY_ACCESS_INSTR = new Map([
 	["f32.store", INSTR.F32_STORE],
 	["f64.store", INSTR.F64_STORE],
 ]);
-
-function resolveMemoryIndex(instr, module, func) {
-	if (instr.memoryRef === null || instr.memoryRef === undefined) {
-		return 0;
-	}
-
-	if (typeof instr.memoryRef === "string" && instr.memoryRef.startsWith("$")) {
-		const importedMemories =
-			module.imports?.filter((imp) => imp.kind === "memory") || [];
-		const memoryName = instr.memoryRef.substring(1);
-		const importedMemIndex = importedMemories.findIndex(
-			(imp) => imp.field === memoryName || imp.name === instr.memoryRef,
-		);
-
-		if (importedMemIndex !== -1) {
-			return importedMemIndex;
-		}
-
-		const localMemIndex = (module.memories || []).findIndex(
-			(mem) => mem.id === instr.memoryRef || mem.name === memoryName,
-		);
-
-		if (localMemIndex !== -1) {
-			return importedMemories.length + localMemIndex;
-		}
-
-		throw createError(
-			instr,
-			func,
-			module,
-			`Unknown memory reference: ${instr.memoryRef}`,
-		);
-	}
-
-	if (typeof instr.memoryRef === "number") {
-		return instr.memoryRef;
-	}
-
-	return 0;
-}
 
 // Modified to properly handle imported memories
 export function compileMemoryAccess(instr, func, body, module) {
@@ -103,16 +65,22 @@ export function compileMemoryAccess(instr, func, body, module) {
 
 		// Encode memory index only for multi-memory support
 		// Single-memory modules (MVP) don't include the memory index
-		const hasMultipleMemories =
-			(module.memories && module.memories.length > 1) ||
-			module.imports?.filter((imp) => imp.kind === "memory").length > 1;
+		const hasMultiple = hasMultipleMemories(module);
 
 		let memoryIndex = null;
 		if (
-			hasMultipleMemories ||
+			hasMultiple ||
 			(instr.memoryRef !== null && instr.memoryRef !== undefined)
 		) {
-			memoryIndex = resolveMemoryIndex(instr, module, func);
+			memoryIndex = resolveMemoryIndex(instr.memoryRef, module);
+			if (memoryIndex === -1) {
+				throw createError(
+					instr,
+					func,
+					module,
+					`Unknown memory reference: ${instr.memoryRef}`,
+				);
+			}
 		}
 
 		body.push(

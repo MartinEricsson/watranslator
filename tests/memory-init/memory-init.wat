@@ -15,8 +15,7 @@
     local.get $dest
     local.get $offset  
     local.get $size
-    i32.const 1      ;; Push segment index onto stack for memory.init
-    memory.init      ;; Initialize memory from data segment
+    memory.init $special_data
   )
 
   ;; Function to read a byte from memory
@@ -27,8 +26,7 @@
 
   ;; Function to drop a data segment after it's no longer needed
   (func $dropSegment
-    i32.const 1      ;; Push segment index onto stack for data.drop
-    data.drop        ;; Drop the data segment
+    data.drop $special_data
   )
 
   ;; Active data segment (automatically copied to memory at index 0)

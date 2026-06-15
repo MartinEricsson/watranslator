@@ -59,11 +59,7 @@ const readTestData = async (filename, debug = false) => {
 		if (typeof WebAssembly !== "undefined" && WebAssembly.validate) {
 			const valid = WebAssembly.validate(wasmBuffer);
 			if (!valid) {
-				log({
-					message: `⚠️  WebAssembly.validate returned false for ${filename}`,
-					debug,
-					level: "WARN",
-				});
+				throw new Error(`WebAssembly.validate returned false for ${filename}`);
 			}
 		}
 
@@ -134,4 +130,11 @@ const dumpWASM = (wasmBuffer) => {
 	console.log(`WASM Binary: ${hexString}`);
 };
 
-export { readTestData, testRunner, logger, dumpWASM, assertBytesEqual, expectCompileError };
+export {
+	readTestData,
+	testRunner,
+	logger,
+	dumpWASM,
+	assertBytesEqual,
+	expectCompileError,
+};

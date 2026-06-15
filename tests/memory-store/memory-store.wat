@@ -14,7 +14,7 @@
   (func $store_with_align_offset (param $addr i32) (param $value i32)
     local.get $addr
     local.get $value
-    i32.store offset=8 align=2  ;; Store with offset=8, align=4 bytes
+    i32.store offset=8 align=4  ;; Store with offset=8, align=4 bytes
   )
   
   ;; Test i32.store8 - Store the low 8 bits

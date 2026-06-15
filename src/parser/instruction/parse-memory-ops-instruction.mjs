@@ -1,3 +1,5 @@
+import { alignBytesToLog2 } from "../parse-util.mjs";
+
 function readMemoryRef(tape) {
 	const { atEnd, getToken, peekToken, peekTokenN, skipToken } = tape;
 	if (atEnd()) {
@@ -52,7 +54,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present in the token
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		// Determine instruction type
@@ -88,7 +90,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		// Determine instruction type
@@ -115,7 +117,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		// Determine instruction type
@@ -144,7 +146,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		// Determine instruction type
@@ -182,7 +184,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present in the token
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		// Determine instruction type
@@ -221,7 +223,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present in the token
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		// Determine instruction type
@@ -258,7 +260,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		// Determine instruction type
@@ -288,7 +290,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present in the token
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		const memoryRef = readMemoryRef(tape);
@@ -313,7 +315,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present in the token
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		const memoryRef = readMemoryRef(tape);
@@ -338,7 +340,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present in the token
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		const memoryRef = readMemoryRef(tape);
@@ -363,7 +365,7 @@ export function parseMemoryOpsInstruction(tape, instrToken, position) {
 		// Extract align if present in the token
 		const alignMatch = instrToken.match(/align=(-?\d+)/);
 		if (alignMatch?.[1]) {
-			align = Number.parseInt(alignMatch[1], 10);
+			align = alignBytesToLog2(alignMatch[1]);
 		}
 
 		const memoryRef = readMemoryRef(tape);

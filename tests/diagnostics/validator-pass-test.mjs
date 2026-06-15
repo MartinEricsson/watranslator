@@ -41,7 +41,7 @@ export default async function testValidatorPass() {
 			(memory 1)
 			(func (export "bad") (param i32) (result i32)
 				local.get 0
-				i32.load align=3)
+				i32.load align=8)
 		)`,
 		/Cannot exceed natural alignment/,
 	);

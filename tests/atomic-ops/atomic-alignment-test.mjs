@@ -95,7 +95,7 @@ export default async function testAtomicAlignment() {
 
 	assert.ok(
 		WebAssembly.validate(
-			compileWat(watForRmw("i32.atomic.rmw.add", " align=2")),
+			compileWat(watForRmw("i32.atomic.rmw.add", " align=4")),
 		),
 		"explicit matching RMW alignment should validate",
 	);
@@ -105,7 +105,7 @@ export default async function testAtomicAlignment() {
   (memory 1 1 shared)
   (func (export "run") (param $addr i32) (result i64)
     local.get $addr
-    i64.atomic.load align=3
+    i64.atomic.load align=8
   )
 )`),
 		),
@@ -113,7 +113,7 @@ export default async function testAtomicAlignment() {
 	);
 
 	await expectCompileError(
-		watForRmw("i32.atomic.rmw.add", " align=1"),
+		watForRmw("i32.atomic.rmw.add", " align=2"),
 		/atomic alignment/i,
 	);
 	await expectCompileError(
@@ -121,7 +121,7 @@ export default async function testAtomicAlignment() {
   (memory 1 1 shared)
   (func (export "run") (param $addr i32) (result i64)
     local.get $addr
-    i64.atomic.load align=2
+    i64.atomic.load align=4
   )
 )`,
 		/atomic alignment/i,
@@ -132,7 +132,7 @@ export default async function testAtomicAlignment() {
   (func (export "run") (param $addr i32) (param $value i32)
     local.get $addr
     local.get $value
-    i32.atomic.store8 align=1
+    i32.atomic.store8 align=2
   )
 )`,
 		/atomic alignment/i,
